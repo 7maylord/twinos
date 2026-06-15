@@ -43,37 +43,47 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute top-1/2 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+    <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Premium background gradient */}
+      <div className="absolute inset-0 mesh-gradient pointer-events-none"></div>
+      <div className="absolute top-1/2 right-0 w-96 h-96 bg-gradient-to-l from-primary/10 to-transparent rounded-full blur-3xl pointer-events-none animate-float" style={{ animationDelay: '1s' }}></div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section Header */}
-        <div className="text-center mb-16 animate-fade-up">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4">
+        {/* Premium Section Header */}
+        <div className="text-center mb-20 animate-fade-up">
+          <div className="inline-flex items-center gap-2 px-4 py-2 glassmorphic-accent rounded-full mb-6">
+            <span className="text-xs font-bold uppercase tracking-widest text-accent">Features</span>
+          </div>
+          <h2 className="text-5xl sm:text-6xl font-black mb-6 leading-tight">
             Powerful Features,{' '}
-            <span className="gradient-text">Built for Scale</span>
+            <span className="gradient-text-bright">Built for Scale</span>
           </h2>
-          <p className="text-lg text-foreground/60 max-w-2xl mx-auto">
-            Everything you need to simulate, analyze, and optimize your business decisions.
+          <p className="text-lg text-foreground/70 max-w-3xl mx-auto leading-relaxed">
+            Everything you need to simulate, analyze, and optimize business decisions with enterprise-grade precision.
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        {/* Premium Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (
               <div
                 key={feature.title}
-                className="group glassmorphic p-8 rounded-2xl hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 animate-fade-up"
+                className="group glassmorphic-light p-10 rounded-3xl border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2 animate-fade-up relative overflow-hidden"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                  <Icon className="text-white" size={24} />
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
+                
+                {/* Content */}
+                <div className="relative z-10">
+                  <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-125 group-hover:shadow-lg transition-all duration-300`}>
+                    <Icon className="text-white" size={28} />
+                  </div>
+                  <h3 className="text-2xl font-black mb-3">{feature.title}</h3>
+                  <p className="text-foreground/70 leading-relaxed text-base">{feature.description}</p>
                 </div>
-                <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                <p className="text-foreground/70 leading-relaxed">{feature.description}</p>
               </div>
             )
           })}

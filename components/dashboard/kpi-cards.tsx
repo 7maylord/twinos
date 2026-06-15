@@ -39,20 +39,29 @@ const kpis = [
 
 export default function KPICards() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-up">
-      {kpis.map((kpi) => {
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {kpis.map((kpi, index) => {
         const Icon = kpi.icon
+        const isPositive = kpi.change.startsWith('+')
         return (
           <div
-            key={kpi.title}
-            className="bg-card border border-card-border rounded-xl p-6 backdrop-blur-md hover:border-primary transition-all duration-300 group"
+            key={index}
+            className={`glassmorphic p-8 rounded-2xl border border-white/5 hover:border-white/20 transition-all duration-300 animate-fade-up hover-lift group`}
+            style={{ animationDelay: `${index * 0.1}s` }}
           >
-            <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${kpi.bgColor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-              <Icon className={`w-6 h-6 bg-gradient-to-r ${kpi.color} bg-clip-text text-transparent`} />
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
+                <p className="text-foreground/60 text-xs font-bold uppercase tracking-wider">{kpi.title}</p>
+                <h3 className="text-4xl font-black mt-3">{kpi.value}</h3>
+              </div>
+              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${kpi.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                <Icon size={28} className={`text-transparent bg-gradient-to-br ${kpi.color} bg-clip-text`} />
+              </div>
             </div>
-            <p className="text-sm text-muted font-medium mb-1">{kpi.title}</p>
-            <p className="text-2xl font-bold text-foreground mb-2">{kpi.value}</p>
-            <p className="text-xs text-green-400 font-semibold">{kpi.change} from last month</p>
+            <div className="flex items-center gap-2 pt-6 border-t border-white/5">
+              <span className={`text-sm font-bold ${isPositive ? 'text-accent-bright' : 'text-red-500'}`}>{kpi.change}</span>
+              <span className="text-xs text-foreground/50">from last month</span>
+            </div>
           </div>
         )
       })}
