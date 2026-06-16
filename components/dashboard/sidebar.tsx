@@ -69,10 +69,17 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="px-4 pt-6 border-t border-gray-200 space-y-2">
-        <button className="w-full flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:text-black hover:bg-gray-200/50 rounded-full transition-all duration-200">
+        <Link
+          href="/dashboard/settings"
+          className={`flex items-center gap-3 px-4 py-2.5 transition-all duration-200 ${
+            isActive('/dashboard/settings')
+              ? 'bg-black text-white rounded-full font-medium'
+              : 'text-gray-600 hover:text-black hover:bg-gray-200/50 rounded-full'
+          }`}
+        >
           <Settings className="w-5 h-5" />
           <span className="font-medium text-base">Settings</span>
-        </button>
+        </Link>
         <button className="w-full flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:text-black hover:bg-gray-200/50 rounded-full transition-all duration-200">
           <LogOut className="w-5 h-5" />
           <span className="font-medium text-base">Logout</span>
