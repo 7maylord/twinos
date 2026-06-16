@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
-import { Plus, Trash2, Tag, Users, ShieldAlert } from 'lucide-react';
+import { Plus, Trash2, Tag, Users, ShieldAlert, Upload, Download, AlertCircle, FileSpreadsheet } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -48,6 +48,17 @@ export default function SettingsPage() {
   const [empSalary, setEmpSalary] = useState('');
   const [addingEmployee, setAddingEmployee] = useState(false);
 
+  // CSV Import States
+  const [prodCsvFile, setProdCsvFile] = useState<File | null>(null);
+  const [prodParsed, setProdParsed] = useState<any[] | null>(null);
+  const [prodParseError, setProdParseError] = useState<string | null>(null);
+  const [importingProd, setImportingProd] = useState(false);
+
+  const [empCsvFile, setEmpCsvFile] = useState<File | null>(null);
+  const [empParsed, setEmpParsed] = useState<any[] | null>(null);
+  const [empParseError, setEmpParseError] = useState<string | null>(null);
+  const [importingEmp, setImportingEmp] = useState(false);
+
   // Fetch business profile and relations
   const fetchBusiness = async () => {
     try {
@@ -66,6 +77,207 @@ export default function SettingsPage() {
   useEffect(() => {
     fetchBusiness();
   }, []);
+
+  // CSV Parsing and File download/import helpers
+  const downloadSampleCSV = (type: 'products' | 'employees') => {
+    const csvContent = type === 'products'
+      ? 'name,price,cost\nFilter Coffee,4.50,1.10\nAvocado Toast,12.00,3.50\nCroissant,3.75,0.90\nCold Brew,5.00,1.25'
+      : 'name,role,salary\nAlice Smith,Barista,3200\nBob Johnson,Chef,4200\nCharlie Brown,Shift Supervisor,4800\nDiana Prince,Manager,5500';
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${type}_sample.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const parseCSV = (text: string, type: 'products' | 'employees') => {
+    // Split into lines and filter empty ones
+    const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    if (lines.length < 2) {
+      throw new Error('CSV file is empty or only contains a header row.');
+    }
+
+    // Parse header row, strip quotes, lowercase and trim
+    const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+
+    // Validate headers
+    if (type === 'products') {
+      const hasName = headers.includes('name');
+      const hasPrice = headers.includes('price');
+      const hasCost = headers.includes('cost');
+      if (!hasName || !hasPrice || !hasCost) {
+        throw new Error('Invalid CSV headers. Required: name, price, cost');
+      }
+    } else {
+      const hasName = headers.includes('name');
+      const hasRole = headers.includes('role');
+      const hasSalary = headers.includes('salary');
+      if (!hasName || !hasRole || !hasSalary) {
+        throw new Error('Invalid CSV headers. Required: name, role, salary');
+      }
+    }
+
+    const records: any[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      const values: string[] = [];
+      let currentVal = '';
+      let insideQuotes = false;
+      
+      for (let charIdx = 0; charIdx < line.length; charIdx++) {
+        const char = line[charIdx];
+        if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === ',' && !insideQuotes) {
+          values.push(currentVal.trim());
+          currentVal = '';
+        } else {
+          currentVal += char;
+        }
+      }
+      values.push(currentVal.trim());
+
+      const record: Record<string, any> = {};
+      headers.forEach((header, idx) => {
+        let val = values[idx] || '';
+        val = val.replace(/^["']|["']$/g, '').trim();
+        record[header] = val;
+      });
+
+      if (!record.name) {
+        throw new Error(`Line ${i + 1}: Name is required.`);
+      }
+
+      if (type === 'products') {
+        const price = Number(record.price);
+        const cost = Number(record.cost);
+        if (isNaN(price) || record.price === '') {
+          throw new Error(`Line ${i + 1}: Price must be a valid number.`);
+        }
+        if (isNaN(cost) || record.cost === '') {
+          throw new Error(`Line ${i + 1}: Cost must be a valid number.`);
+        }
+        records.push({
+          name: record.name,
+          price: price,
+          cost: cost
+        });
+      } else {
+        const salary = Number(record.salary);
+        if (isNaN(salary) || record.salary === '') {
+          throw new Error(`Line ${i + 1}: Salary must be a valid number.`);
+        }
+        records.push({
+          name: record.name,
+          role: record.role || 'Barista',
+          salary: salary
+        });
+      }
+    }
+
+    return records;
+  };
+
+  const handleProductCsvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setProdCsvFile(file);
+    setProdParseError(null);
+    setProdParsed(null);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      try {
+        const parsed = parseCSV(text, 'products');
+        setProdParsed(parsed);
+      } catch (err: any) {
+        setProdParseError(err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleEmployeeCsvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setEmpCsvFile(file);
+    setEmpParseError(null);
+    setEmpParsed(null);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      try {
+        const parsed = parseCSV(text, 'employees');
+        setEmpParsed(parsed);
+      } catch (err: any) {
+        setEmpParseError(err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImportProducts = async () => {
+    if (!prodParsed || prodParsed.length === 0) return;
+    setImportingProd(true);
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(prodParsed),
+      });
+
+      if (res.ok) {
+        setProdCsvFile(null);
+        setProdParsed(null);
+        fetchBusiness();
+        alert('Products imported successfully.');
+      } else {
+        const err = await res.json();
+        alert(`Failed to import products: ${err.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error importing products.');
+    } finally {
+      setImportingProd(false);
+    }
+  };
+
+  const handleImportEmployees = async () => {
+    if (!empParsed || empParsed.length === 0) return;
+    setImportingEmp(true);
+    try {
+      const res = await fetch('/api/employees', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(empParsed),
+      });
+
+      if (res.ok) {
+        setEmpCsvFile(null);
+        setEmpParsed(null);
+        fetchBusiness();
+        alert('Employees imported successfully.');
+      } else {
+        const err = await res.json();
+        alert(`Failed to import employees: ${err.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error importing employees.');
+    } finally {
+      setImportingEmp(false);
+    }
+  };
 
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,60 +444,121 @@ export default function SettingsPage() {
           {/* Products Workspace */}
           {activeTab === 'products' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Product Form */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm h-fit">
-                <h3 className="text-lg font-medium text-black mb-4">Add Product</h3>
-                <form onSubmit={handleAddProduct} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                      Product Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={prodName}
-                      onChange={(e) => setProdName(e.target.value)}
-                      placeholder="e.g. Filter Coffee"
-                      className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
-                    />
+              <div className="space-y-6">
+                {/* Product Form */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm h-fit">
+                  <h3 className="text-lg font-medium text-black mb-4">Add Product</h3>
+                  <form onSubmit={handleAddProduct} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Product Name
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={prodName}
+                        onChange={(e) => setProdName(e.target.value)}
+                        placeholder="e.g. Filter Coffee"
+                        className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Sale Price ($)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        required
+                        value={prodPrice}
+                        onChange={(e) => setProdPrice(e.target.value)}
+                        placeholder="e.g. 4.50"
+                        className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Unit Cost ($)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        required
+                        value={prodCost}
+                        onChange={(e) => setProdCost(e.target.value)}
+                        placeholder="e.g. 1.10"
+                        className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={addingProduct}
+                      className="w-full py-2.5 px-4 bg-black text-white hover:bg-gray-800 rounded-full font-medium flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <Plus size={16} />
+                      Add Product
+                    </button>
+                  </form>
+                </div>
+
+                {/* CSV Import */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-medium text-black">Bulk Import Products</h3>
+                    <button 
+                      onClick={() => downloadSampleCSV('products')}
+                      className="text-xs text-gray-500 hover:text-black flex items-center gap-1.5 transition-colors font-medium animate-fadeIn"
+                      type="button"
+                    >
+                      <Download size={14} />
+                      Get Template
+                    </button>
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                      Sale Price ($)
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      required
-                      value={prodPrice}
-                      onChange={(e) => setProdPrice(e.target.value)}
-                      placeholder="e.g. 4.50"
-                      className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
-                    />
+                  
+                  <div className="space-y-4">
+                    <div className="border border-dashed border-gray-200 hover:border-gray-300 rounded-xl p-6 text-center cursor-pointer relative transition-colors bg-[#F5F5F5]/40 hover:bg-[#F5F5F5]/70">
+                      <input 
+                        type="file" 
+                        accept=".csv"
+                        onChange={handleProductCsvChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <div className="space-y-2 flex flex-col items-center justify-center">
+                        <FileSpreadsheet className="text-gray-400 w-8 h-8" />
+                        <p className="text-xs font-semibold text-gray-700">
+                          {prodCsvFile ? prodCsvFile.name : 'Choose CSV file or drag here'}
+                        </p>
+                        <p className="text-[10px] text-gray-400">
+                          Required headers: name, price, cost
+                        </p>
+                      </div>
+                    </div>
+
+                    {prodParseError && (
+                      <div className="flex gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600 font-medium">
+                        <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+                        <span>{prodParseError}</span>
+                      </div>
+                    )}
+
+                    {prodParsed && (
+                      <div className="p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-700 font-medium space-y-1">
+                        <p className="font-semibold text-green-800">File parsed successfully!</p>
+                        <p>Detected {prodParsed.length} product(s) ready for import.</p>
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleImportProducts}
+                      disabled={!prodParsed || importingProd}
+                      className="w-full py-2.5 px-4 bg-[#2B2644] hover:bg-[#1f1b33] text-white disabled:bg-gray-200 disabled:text-gray-400 rounded-full font-medium flex items-center justify-center gap-2 transition-colors duration-200 text-sm"
+                    >
+                      <Upload size={16} />
+                      {importingProd ? 'Importing...' : 'Import Products'}
+                    </button>
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                      Unit Cost ($)
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      required
-                      value={prodCost}
-                      onChange={(e) => setProdCost(e.target.value)}
-                      placeholder="e.g. 1.10"
-                      className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={addingProduct}
-                    className="w-full py-2.5 px-4 bg-black text-white hover:bg-gray-800 rounded-full font-medium flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <Plus size={16} />
-                    Add Product
-                  </button>
-                </form>
+                </div>
               </div>
 
               {/* Product list */}
@@ -339,62 +612,123 @@ export default function SettingsPage() {
           {/* Employees Workspace */}
           {activeTab === 'employees' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Employee Form */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm h-fit">
-                <h3 className="text-lg font-medium text-black mb-4">Add Employee</h3>
-                <form onSubmit={handleAddEmployee} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={empName}
-                      onChange={(e) => setEmpName(e.target.value)}
-                      placeholder="e.g. Sarah Connor"
-                      className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                      Role / Position
-                    </label>
-                    <select
-                      value={empRole}
-                      onChange={(e) => setEmpRole(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
+              <div className="space-y-6">
+                {/* Employee Form */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm h-fit">
+                  <h3 className="text-lg font-medium text-black mb-4">Add Employee</h3>
+                  <form onSubmit={handleAddEmployee} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={empName}
+                        onChange={(e) => setEmpName(e.target.value)}
+                        placeholder="e.g. Sarah Connor"
+                        className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Role / Position
+                      </label>
+                      <select
+                        value={empRole}
+                        onChange={(e) => setEmpRole(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
+                      >
+                        <option value="Barista">Barista</option>
+                        <option value="Chef">Chef</option>
+                        <option value="Shift Supervisor">Shift Supervisor</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Associate">Sales Associate</option>
+                        <option value="Other">Other Position</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Monthly Salary ($)
+                      </label>
+                      <input
+                        type="number"
+                        required
+                        value={empSalary}
+                        onChange={(e) => setEmpSalary(e.target.value)}
+                        placeholder="e.g. 3500"
+                        className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={addingEmployee}
+                      className="w-full py-2.5 px-4 bg-black text-white hover:bg-gray-800 rounded-full font-medium flex items-center justify-center gap-2 transition-colors"
                     >
-                      <option value="Barista">Barista</option>
-                      <option value="Chef">Chef</option>
-                      <option value="Shift Supervisor">Shift Supervisor</option>
-                      <option value="Manager">Manager</option>
-                      <option value="Associate">Sales Associate</option>
-                      <option value="Other">Other Position</option>
-                    </select>
+                      <Plus size={16} />
+                      Add Staff Member
+                    </button>
+                  </form>
+                </div>
+
+                {/* CSV Import */}
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-medium text-black">Bulk Import Staff</h3>
+                    <button 
+                      onClick={() => downloadSampleCSV('employees')}
+                      className="text-xs text-gray-500 hover:text-black flex items-center gap-1.5 transition-colors font-medium animate-fadeIn"
+                      type="button"
+                    >
+                      <Download size={14} />
+                      Get Template
+                    </button>
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                      Monthly Salary ($)
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      value={empSalary}
-                      onChange={(e) => setEmpSalary(e.target.value)}
-                      placeholder="e.g. 3500"
-                      className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
-                    />
+                  
+                  <div className="space-y-4">
+                    <div className="border border-dashed border-gray-200 hover:border-gray-300 rounded-xl p-6 text-center cursor-pointer relative transition-colors bg-[#F5F5F5]/40 hover:bg-[#F5F5F5]/70">
+                      <input 
+                        type="file" 
+                        accept=".csv"
+                        onChange={handleEmployeeCsvChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <div className="space-y-2 flex flex-col items-center justify-center">
+                        <FileSpreadsheet className="text-gray-400 w-8 h-8" />
+                        <p className="text-xs font-semibold text-gray-700">
+                          {empCsvFile ? empCsvFile.name : 'Choose CSV file or drag here'}
+                        </p>
+                        <p className="text-[10px] text-gray-400">
+                          Required headers: name, role, salary
+                        </p>
+                      </div>
+                    </div>
+
+                    {empParseError && (
+                      <div className="flex gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600 font-medium">
+                        <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
+                        <span>{empParseError}</span>
+                      </div>
+                    )}
+
+                    {empParsed && (
+                      <div className="p-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-700 font-medium space-y-1">
+                        <p className="font-semibold text-green-800">File parsed successfully!</p>
+                        <p>Detected {empParsed.length} staff member(s) ready for import.</p>
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleImportEmployees}
+                      disabled={!empParsed || importingEmp}
+                      className="w-full py-2.5 px-4 bg-[#2B2644] hover:bg-[#1f1b33] text-white disabled:bg-gray-200 disabled:text-gray-400 rounded-full font-medium flex items-center justify-center gap-2 transition-colors duration-200 text-sm"
+                    >
+                      <Upload size={16} />
+                      {importingEmp ? 'Importing...' : 'Import Staff'}
+                    </button>
                   </div>
-                  <button
-                    type="submit"
-                    disabled={addingEmployee}
-                    className="w-full py-2.5 px-4 bg-black text-white hover:bg-gray-800 rounded-full font-medium flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <Plus size={16} />
-                    Add Staff Member
-                  </button>
-                </form>
+                </div>
               </div>
 
               {/* Employee list */}
