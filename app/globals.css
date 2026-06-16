@@ -41,7 +41,7 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Keyframes for Hero Brand Marquee */
+/* Hero Brand Marquee */
 @keyframes marquee {
   0% {
     transform: translateX(0%);
@@ -55,22 +55,6 @@ html, body {
   display: flex;
   width: max-content;
   animation: marquee 22s linear infinite;
-}
-
-/* Keyframes for Backers Marquee */
-@keyframes backers-marquee {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.backers-track {
-  display: flex;
-  width: max-content;
-  animation: backers-marquee 30s linear infinite;
 }
 
 /* Scrollbar styling */

@@ -1,76 +1,74 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="relative flex-1 flex items-center justify-center overflow-hidden">
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
+    <section className="flex-1 px-6 pt-20 pb-6 flex items-end">
+      {/* Rounded card with video background */}
+      <div
+        className="relative w-full rounded-2xl overflow-hidden"
+        style={{ height: 'calc(100vh - 96px)' }}
+      >
+        {/* Background Video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260423_161253_c72b1869-400f-45ed-ac0c-52f68c2ed5bd.mp4"
+        />
 
-      {/* Decorative gradient orb */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-to-br from-[#2B2644]/8 via-purple-200/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 max-w-[88rem] w-full mx-auto px-6 text-center">
-        {/* Pill badge */}
-        <div className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-1.5 mb-8 shadow-sm">
-          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          <span className="text-sm text-gray-700 font-medium">Digital Twin Technology</span>
-        </div>
-
-        {/* Headline */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-[-0.04em] text-black leading-[0.95] mb-6 max-w-5xl mx-auto">
-          Stop Guessing.
-          <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2B2644] to-gray-700">
+        {/* Content overlay */}
+        <div className="relative z-10 flex flex-col items-start justify-start h-full p-8 md:p-12 pt-28 md:pt-36">
+          {/* Headline */}
+          <h1
+            className="text-black text-5xl md:text-6xl font-medium leading-tight max-w-xl mb-4"
+            style={{ letterSpacing: '-0.04em' }}
+          >
+            Stop Guessing.
+            <br />
             Simulate First.
-          </span>
-        </h1>
+          </h1>
 
-        {/* Subtitle */}
-        <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Model your business decisions before they cost money. 
-          TwinOS creates a digital replica of your operations, letting you 
-          test scenarios with real-time AI-powered insights.
-        </p>
+          {/* Subtitle */}
+          <p
+            className="text-black/70 text-base md:text-lg max-w-md mb-8 leading-relaxed"
+            style={{ fontFamily: "'Inter', ui-sans-serif, system-ui, sans-serif" }}
+          >
+            Model your business decisions before they cost money. TwinOS creates
+            a digital replica of your operations with real-time AI-powered insights.
+          </p>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          {/* Pill button with arrow circle */}
           <Link
             href="/dashboard"
-            className="group inline-flex items-center gap-2 bg-black text-white text-base font-medium px-8 py-3.5 rounded-full hover:bg-gray-800 transition-all duration-300 shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/15"
+            className="group inline-flex items-center gap-3 bg-black text-white text-base md:text-lg font-medium pl-8 pr-2 py-2 rounded-full hover:bg-gray-800 transition-colors duration-200"
           >
-            Start Free Simulation
-            <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
+            Start Simulating
+            <span className="bg-white rounded-full p-2 group-hover:bg-gray-100 transition-colors">
+              <ArrowRight className="w-5 h-5 text-black" />
+            </span>
           </Link>
-          <a
-            href="#how-it-works"
-            className="group inline-flex items-center gap-2 bg-white text-black text-base font-medium px-8 py-3.5 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
-          >
-            <Play size={16} className="text-gray-500" />
-            See How It Works
-          </a>
-        </div>
 
-        {/* Stats row */}
-        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-14">
-          {[
-            { value: '10K+', label: 'Simulations Run' },
-            { value: '94%', label: 'Prediction Accuracy' },
-            { value: '3.2x', label: 'Average ROI' },
-            { value: '<5min', label: 'Setup Time' },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="text-2xl md:text-3xl font-semibold tracking-tight text-black">{stat.value}</div>
-              <div className="text-sm text-gray-400 mt-1">{stat.label}</div>
+          {/* Brand Marquee */}
+          <div className="mt-24 w-full max-w-md overflow-hidden">
+            <div className="marquee-track">
+              {[0, 1].map((dup) => (
+                <div key={dup} className="flex">
+                  <span className="mx-7 shrink-0 text-black/60 whitespace-nowrap" style={{ fontFamily: 'Georgia, serif', fontWeight: 700, letterSpacing: '-0.02em', fontSize: 15 }}>McKinsey</span>
+                  <span className="mx-7 shrink-0 text-black/60 whitespace-nowrap" style={{ fontFamily: 'Arial, sans-serif', fontWeight: 900, letterSpacing: '0.08em', fontSize: 13, textTransform: 'uppercase' }}>Deloitte</span>
+                  <span className="mx-7 shrink-0 text-black/60 whitespace-nowrap" style={{ fontFamily: "'Trebuchet MS', sans-serif", fontWeight: 600, letterSpacing: '0.01em', fontSize: 15, fontStyle: 'italic' }}>Accenture</span>
+                  <span className="mx-7 shrink-0 text-black/60 whitespace-nowrap" style={{ fontFamily: "'Courier New', monospace", fontWeight: 700, letterSpacing: '0.12em', fontSize: 13, textTransform: 'uppercase' }}>Bain</span>
+                  <span className="mx-7 shrink-0 text-black/60 whitespace-nowrap" style={{ fontFamily: "Palatino, 'Book Antiqua', serif", fontWeight: 400, letterSpacing: '-0.01em', fontSize: 16 }}>Goldman Sachs</span>
+                  <span className="mx-7 shrink-0 text-black/60 whitespace-nowrap" style={{ fontFamily: "Impact, 'Arial Narrow', sans-serif", fontWeight: 400, letterSpacing: '0.04em', fontSize: 14 }}>Bloomberg</span>
+                  <span className="mx-7 shrink-0 text-black/60 whitespace-nowrap" style={{ fontFamily: 'Verdana, sans-serif', fontWeight: 700, letterSpacing: '-0.03em', fontSize: 13 }}>Gartner</span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>
