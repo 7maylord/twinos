@@ -1,52 +1,84 @@
 'use client';
 
-import { Sparkles, Check } from 'lucide-react';
+import { Sparkles, Check, AlertTriangle } from 'lucide-react';
 
-export function AIRecommendationCard() {
+interface AIRecommendationProps {
+  scenarioName: string;
+  projectedRevenue: number;
+  projectedProfit: number;
+  baselineRevenue: number;
+  baselineProfit: number;
+}
+
+export function AIRecommendationCard({
+  scenarioName,
+  projectedRevenue,
+  projectedProfit,
+  baselineRevenue,
+  baselineProfit,
+}: AIRecommendationProps) {
+  const isProfitableDelta = projectedProfit > baselineProfit;
+  const isNetPositive = projectedProfit > 0;
+  
+  const profitDelta = projectedProfit - baselineProfit;
+  const revenueDelta = projectedRevenue - baselineRevenue;
+
   return (
-    <div className="bg-[#2B2644] text-white border border-transparent rounded-2xl p-6 shadow-md shadow-[#2B2644]/10">
-      <div className="flex items-center gap-2 mb-4">
-        <Sparkles className="text-white" size={24} />
-        <h3 className="text-white font-medium tracking-tight text-lg">AI Recommendation</h3>
-      </div>
-      
-      <div className="space-y-4">
-        <p className="text-white/80 leading-relaxed text-sm">
-          Based on the simulation results, this scenario shows strong potential. The projected revenue increase of $450K would significantly improve profitability while maintaining acceptable inventory levels.
-        </p>
+    <div className="bg-[#2B2644] text-white border border-transparent rounded-2xl p-6 shadow-md shadow-[#2B2644]/10 h-full flex flex-col justify-between">
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="text-white" size={24} />
+          <h3 className="text-white font-medium tracking-tight text-lg">AI Recommendation</h3>
+        </div>
         
-        <div className="bg-white/10 rounded-xl p-4 border border-white/10">
-          <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-            <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-xs font-bold text-[#2B2644]">✓</span>
-            Proceed with Confidence
-          </h4>
-          <p className="text-white/85 text-xs leading-relaxed">
-            This strategy aligns with your business goals. The 340% ROI on marketing spend indicates strong market demand. Recommend immediate implementation with phased rollout.
+        <div className="space-y-4">
+          <p className="text-white/80 leading-relaxed text-sm">
+            {isProfitableDelta 
+              ? `Based on the simulation results, "${scenarioName}" shows strong potential. The projected profit increase of $${profitDelta.toLocaleString()} improves your operating margins significantly compared to the baseline.`
+              : `Caution: "${scenarioName}" projects a profit drop of $${Math.abs(profitDelta).toLocaleString()} compared to the baseline. Review your payroll additions or pricing models to protect margins.`
+            }
           </p>
-        </div>
+          
+          <div className={`rounded-xl p-4 border ${isNetPositive ? 'bg-white/10 border-white/10' : 'bg-red-500/10 border-red-500/20'}`}>
+            <h4 className="text-white font-medium mb-3 flex items-center gap-2">
+              {isNetPositive ? (
+                <span className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-xs font-bold text-[#2B2644]">✓</span>
+              ) : (
+                <AlertTriangle size={18} className="text-red-400" />
+              )}
+              {isNetPositive ? 'Proceed with Phased Rollout' : 'Simulation Projects Net Loss'}
+            </h4>
+            <p className="text-white/85 text-xs leading-relaxed">
+              {isNetPositive 
+                ? `This strategy successfully moves the business to net profitability. The projected revenue of $${projectedRevenue.toLocaleString()} validates the price adjustment despite small demand drops.`
+                : `Even with price adjustments, the business is projected to run a net monthly loss of $${Math.abs(projectedProfit).toLocaleString()}. We recommend raising prices further or scaling back staffing levels.`
+              }
+            </p>
+          </div>
 
-        <div className="space-y-2">
-          <h4 className="text-white font-semibold text-xs uppercase tracking-wider text-white/60">Key Considerations:</h4>
-          <ul className="space-y-2">
-            <li className="flex gap-2 text-xs text-white/80">
-              <Check size={14} className="text-white/60 flex-shrink-0 mt-0.5" />
-              <span>Supply chain can handle increased volume</span>
-            </li>
-            <li className="flex gap-2 text-xs text-white/80">
-              <Check size={14} className="text-white/60 flex-shrink-0 mt-0.5" />
-              <span>Hiring timeline is realistic (6 months)</span>
-            </li>
-            <li className="flex gap-2 text-xs text-white/80">
-              <Check size={14} className="text-white/60 flex-shrink-0 mt-0.5" />
-              <span>Cash flow impact remains positive</span>
-            </li>
-          </ul>
+          <div className="space-y-2">
+            <h4 className="text-white/60 font-semibold text-xs uppercase tracking-wider">Key Considerations:</h4>
+            <ul className="space-y-2">
+              <li className="flex gap-2 text-xs text-white/80">
+                <Check size={14} className="text-white/60 flex-shrink-0 mt-0.5" />
+                <span>{revenueDelta >= 0 ? 'Revenue is projected to grow' : 'Revenue is projected to contract'}</span>
+              </li>
+              <li className="flex gap-2 text-xs text-white/80">
+                <Check size={14} className="text-white/60 flex-shrink-0 mt-0.5" />
+                <span>{isNetPositive ? 'Monthly cashflow turns positive' : 'Monthly cashflow remains negative'}</span>
+              </li>
+              <li className="flex gap-2 text-xs text-white/80">
+                <Check size={14} className="text-white/60 flex-shrink-0 mt-0.5" />
+                <span>Inventory and staff levels are adjusted</span>
+              </li>
+            </ul>
+          </div>
         </div>
-
-        <button className="w-full mt-4 px-4 py-2.5 bg-white text-[#2B2644] hover:bg-gray-100 rounded-full font-medium transition-colors duration-200 text-sm">
-          Approve Scenario
-        </button>
       </div>
+
+      <button className="w-full mt-6 px-4 py-2.5 bg-white text-[#2B2644] hover:bg-gray-100 rounded-full font-medium transition-colors duration-200 text-sm">
+        {isNetPositive ? 'Approve & Deploy Scenario' : 'Revise Adjustments'}
+      </button>
     </div>
   );
 }

@@ -11,17 +11,21 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const data = [
-  { month: 'Jan', baseline: 180000, projected: 180000 },
-  { month: 'Feb', baseline: 210000, projected: 215000 },
-  { month: 'Mar', baseline: 195000, projected: 225000 },
-  { month: 'Apr', baseline: 240000, projected: 285000 },
-  { month: 'May', baseline: 265000, projected: 340000 },
-  { month: 'Jun', baseline: 285000, projected: 415000 },
-  { month: 'Jul', baseline: 310000, projected: 480000 },
-];
+interface MonthlyRevenueData {
+  month: string;
+  baselineRevenue: number;
+  projectedRevenue: number;
+}
 
-export function RevenueComparisonChart() {
+export function RevenueComparisonChart({ data }: { data: MonthlyRevenueData[] }) {
+  const formatYAxis = (value: number) => {
+    if (value === 0) return '$0';
+    if (Math.abs(value) >= 1000) {
+      return `$${(value / 1000).toFixed(0)}K`;
+    }
+    return `$${value}`;
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
       <h3 className="text-black font-medium tracking-tight text-lg mb-6">Revenue Comparison</h3>
@@ -29,8 +33,9 @@ export function RevenueComparisonChart() {
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
           <XAxis dataKey="month" stroke="#999999" style={{ fontSize: '12px' }} />
-          <YAxis stroke="#999999" style={{ fontSize: '12px' }} />
+          <YAxis stroke="#999999" style={{ fontSize: '12px' }} tickFormatter={formatYAxis} />
           <Tooltip
+            formatter={(value: any) => [`$${Number(value).toLocaleString()}`, '']}
             contentStyle={{
               backgroundColor: '#FFFFFF',
               border: '1px solid #E5E5E5',
@@ -42,21 +47,21 @@ export function RevenueComparisonChart() {
           <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
           <Line
             type="monotone"
-            dataKey="baseline"
+            dataKey="baselineRevenue"
             stroke="#999999"
             strokeWidth={2}
             dot={false}
-            name="Baseline"
+            name="Baseline Revenue"
             isAnimationActive={true}
             strokeDasharray="4 4"
           />
           <Line
             type="monotone"
-            dataKey="projected"
+            dataKey="projectedRevenue"
             stroke="#2B2644"
             strokeWidth={3}
             dot={{ r: 4, fill: '#2B2644' }}
-            name="Projected (with scenario)"
+            name="Projected Revenue"
             isAnimationActive={true}
           />
         </LineChart>

@@ -11,17 +11,21 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const data = [
-  { month: 'Jan', baseline: 45000, projected: 45000 },
-  { month: 'Feb', baseline: 52000, projected: 56000 },
-  { month: 'Mar', baseline: 48000, projected: 62000 },
-  { month: 'Apr', baseline: 60000, projected: 85000 },
-  { month: 'May', baseline: 66000, projected: 105000 },
-  { month: 'Jun', baseline: 71000, projected: 140000 },
-  { month: 'Jul', baseline: 78000, projected: 168000 },
-];
+interface MonthlyProfitData {
+  month: string;
+  baselineProfit: number;
+  projectedProfit: number;
+}
 
-export function ProfitComparisonChart() {
+export function ProfitComparisonChart({ data }: { data: MonthlyProfitData[] }) {
+  const formatYAxis = (value: number) => {
+    if (value === 0) return '$0';
+    if (Math.abs(value) >= 1000) {
+      return `$${(value / 1000).toFixed(0)}K`;
+    }
+    return `$${value}`;
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
       <h3 className="text-black font-medium tracking-tight text-lg mb-6">Profit Analysis</h3>
@@ -29,8 +33,9 @@ export function ProfitComparisonChart() {
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
           <XAxis dataKey="month" stroke="#999999" style={{ fontSize: '12px' }} />
-          <YAxis stroke="#999999" style={{ fontSize: '12px' }} />
+          <YAxis stroke="#999999" style={{ fontSize: '12px' }} tickFormatter={formatYAxis} />
           <Tooltip
+            formatter={(value: any) => [`$${Number(value).toLocaleString()}`, '']}
             contentStyle={{
               backgroundColor: '#FFFFFF',
               border: '1px solid #E5E5E5',
@@ -40,8 +45,8 @@ export function ProfitComparisonChart() {
             }}
           />
           <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-          <Bar dataKey="baseline" fill="#CCCCCC" name="Baseline Profit" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="projected" fill="#2B2644" name="Projected Profit" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="baselineProfit" fill="#CCCCCC" name="Baseline Profit" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="projectedProfit" fill="#2B2644" name="Projected Profit" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

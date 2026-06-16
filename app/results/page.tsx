@@ -1,13 +1,174 @@
 'use client';
 
-import { ArrowUpRight, ArrowDownLeft, Download, Zap, ArrowLeft } from 'lucide-react';
+import { useState, useEffect, Suspense } from 'react';
+import { ArrowUpRight, ArrowDownLeft, Download, Zap, ArrowLeft, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { RevenueComparisonChart } from '@/components/results/revenue-comparison-chart';
 import { ProfitComparisonChart } from '@/components/results/profit-comparison-chart';
 import { ImpactMetrics } from '@/components/results/impact-metrics';
 import { AIRecommendationCard } from '@/components/results/ai-recommendation-card';
 
-export default function ResultsPage() {
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  cost: number;
+}
+
+interface Employee {
+  id: string;
+  name: string;
+  role: string;
+  salary: number;
+}
+
+interface Business {
+  id: string;
+  name: string;
+  industry: string;
+  baselineRevenue: number;
+  baselineMarketing: number;
+  baselineInventory: number;
+  baselineFixedCosts: number;
+  products: Product[];
+  employees: Employee[];
+}
+
+interface Scenario {
+  id: string;
+  name: string;
+  status: string;
+  createdAt: string;
+  priceIncrease: number;
+  employeeCount: number;
+  marketingBudget: number;
+  supplierDelay: string;
+}
+
+interface SimulationResultRecord {
+  id: string;
+  projectedRevenue: number;
+  projectedProfit: number;
+  projectedHeadcount: number;
+  projectedInventoryRisk: number;
+}
+
+interface SimulationData {
+  scenario: Scenario & { business: Business & { employees: Employee[] } };
+  result: SimulationResultRecord;
+  monthlyData: {
+    month: string;
+    baselineRevenue: number;
+    projectedRevenue: number;
+    baselineProfit: number;
+    projectedProfit: number;
+  }[];
+}
+
+function ResultsContent() {
+  const searchParams = useSearchParams();
+  const scenarioId = searchParams.get('scenarioId');
+  
+  const [data, setData] = useState<SimulationData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchResults() {
+      try {
+        let targetId = scenarioId;
+
+        // If no scenarioId in URL, fetch list to find the latest completed scenario
+        if (!targetId) {
+          const listRes = await fetch('/api/scenarios');
+          if (listRes.ok) {
+            const scenarios = await listRes.json();
+            if (scenarios.length > 0) {
+              targetId = scenarios[0].id;
+            }
+          }
+        }
+
+        if (targetId) {
+          const detailRes = await fetch(`/api/scenarios/${targetId}/results`);
+          if (detailRes.ok) {
+            const detailData = await detailRes.json();
+            setData(detailData);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading scenario results:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchResults();
+  }, [scenarioId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center justify-center text-black">
+        <TrendingUp className="w-10 h-10 text-[#2B2644] animate-bounce mb-4" />
+        <p className="font-semibold text-lg tracking-tight">Calculating scenario projections...</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center justify-center text-black p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 max-w-md text-center shadow-sm">
+          <h2 className="text-xl font-semibold mb-2">No Projections Found</h2>
+          <p className="text-gray-500 mb-6 text-sm">
+            Please build and run a scenario simulation from the builder screen to view outcomes.
+          </p>
+          <Link 
+            href="/scenario-builder"
+            className="py-3 px-6 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors inline-block"
+          >
+            Go to Scenario Builder
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const { scenario, result, monthlyData } = data;
+  const business = scenario.business;
+
+  // Baseline calculations
+  const baselineRevenue = business.baselineRevenue;
+  const baselinePayroll = business.employees.reduce((sum, emp) => sum + emp.salary, 0);
+  const baselineMarketing = business.baselineMarketing;
+  const baselineInventory = business.baselineInventory;
+  const baselineFixedCosts = business.baselineFixedCosts;
+  
+  const baselineExpenses = baselinePayroll + baselineMarketing + baselineInventory + baselineFixedCosts;
+  const baselineProfit = baselineRevenue - baselineExpenses;
+  const baselineProfitMargin = (baselineProfit / baselineRevenue) * 100;
+
+  // Projected calculations
+  const projectedRevenue = result.projectedRevenue;
+  const projectedProfit = result.projectedProfit;
+  const projectedProfitMargin = (projectedProfit / projectedRevenue) * 100;
+
+  // Deltas
+  const revDelta = projectedRevenue - baselineRevenue;
+  const revDeltaPct = (revDelta / baselineRevenue) * 100;
+  
+  const profitMarginDelta = projectedProfitMargin - baselineProfitMargin;
+  
+  // Calculate inventory cost change (inventory scales with demandMultiplier)
+  // Let's retrieve this month's projected inventory cost based on our simulation output
+  const finalMonthData = monthlyData[monthlyData.length - 1];
+  const projectedInventoryCost = baselineInventory * (finalMonthData.projectedRevenue / (baselineRevenue * (1 + scenario.priceIncrease / 100)));
+
+  // ROI: change in profit divided by marketing budget change
+  const profitDelta = projectedProfit - baselineProfit;
+  const marketingDelta = scenario.marketingBudget - baselineMarketing;
+  const roi = marketingDelta > 0 ? (profitDelta / marketingDelta) * 100 : 100;
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] text-black p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -27,7 +188,9 @@ export default function ResultsPage() {
               >
                 Simulation Results
               </h1>
-              <p className="text-gray-500 text-sm">Scenario: "Q3 Growth Initiative" • Run: 14 Jun 2024</p>
+              <p className="text-gray-500 text-sm">
+                Scenario: "{scenario.name}" • Run: {new Date(scenario.createdAt).toLocaleDateString()}
+              </p>
             </div>
           </div>
           
@@ -41,37 +204,51 @@ export default function ResultsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Revenue Impact</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-medium tracking-tight text-black">+$450K</span>
-              <span className="flex items-center gap-1 text-green-600 text-sm font-semibold">
-                <ArrowUpRight size={16} /> +18.2%
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-3xl font-medium tracking-tight text-black">
+                {revDelta >= 0 ? '+' : ''}${(revDelta / 1000).toFixed(0)}K
+              </span>
+              <span className={`flex items-center gap-0.5 text-sm font-semibold ${revDelta >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {revDelta >= 0 ? <ArrowUpRight size={16} /> : <ArrowDownLeft size={16} />} 
+                {revDeltaPct >= 0 ? '+' : ''}{revDeltaPct.toFixed(1)}%
               </span>
             </div>
           </div>
+          
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
+            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Projected Profit</p>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-3xl font-medium tracking-tight text-black">
+                {projectedProfit >= 0 ? '' : '-'}${(Math.abs(projectedProfit) / 1000).toFixed(1)}K
+              </span>
+              <span className={`flex items-center gap-0.5 text-sm font-semibold ${projectedProfit >= baselineProfit ? 'text-green-600' : 'text-red-600'}`}>
+                {projectedProfit >= baselineProfit ? <ArrowUpRight size={16} /> : <ArrowDownLeft size={16} />}
+                {profitDelta >= 0 ? '+' : ''}${(profitDelta / 1000).toFixed(0)}K
+              </span>
+            </div>
+          </div>
+
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Profit Margin</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-medium tracking-tight text-black">+6.2%</span>
-              <span className="flex items-center gap-1 text-green-600 text-sm font-semibold">
-                <ArrowUpRight size={16} /> +2.1pp
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-3xl font-medium tracking-tight text-black">
+                {projectedProfitMargin.toFixed(1)}%
+              </span>
+              <span className={`flex items-center gap-0.5 text-sm font-semibold ${profitMarginDelta >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {profitMarginDelta >= 0 ? <ArrowUpRight size={16} /> : <ArrowDownLeft size={16} />}
+                {profitMarginDelta >= 0 ? '+' : ''}{profitMarginDelta.toFixed(1)}pp
               </span>
             </div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Inventory Risk</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-medium tracking-tight text-black">-$125K</span>
-              <span className="flex items-center gap-1 text-red-650 text-sm font-semibold">
-                <ArrowDownLeft size={16} /> -9.3%
-              </span>
-            </div>
-          </div>
+
           <div className="bg-[#2B2644] text-white rounded-2xl p-6 shadow-md shadow-[#2B2644]/10">
-            <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">ROI</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-medium tracking-tight text-white">340%</span>
-              <span className="flex items-center gap-1 text-green-400 text-sm font-semibold">
-                <Zap size={16} className="fill-current" /> Excellent
+            <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">Inventory Risk</p>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-3xl font-medium tracking-tight text-white">
+                {(result.projectedInventoryRisk * 100).toFixed(0)}%
+              </span>
+              <span className={`flex items-center gap-1 text-sm font-semibold ${result.projectedInventoryRisk <= 0.5 ? 'text-green-400' : 'text-amber-400'}`}>
+                {result.projectedInventoryRisk <= 0.5 ? 'Low' : 'Moderate'}
               </span>
             </div>
           </div>
@@ -79,46 +256,90 @@ export default function ResultsPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RevenueComparisonChart />
-          <ProfitComparisonChart />
+          <RevenueComparisonChart data={monthlyData} />
+          <ProfitComparisonChart data={monthlyData} />
         </div>
 
         {/* Impact Metrics */}
-        <ImpactMetrics />
+        <ImpactMetrics 
+          baselineHeadcount={business.employees.length}
+          projectedHeadcount={result.projectedHeadcount}
+          baselineInventory={baselineInventory}
+          projectedInventory={Math.round(projectedInventoryCost)}
+          supplierDelay={scenario.supplierDelay}
+        />
 
         {/* AI Recommendation */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <AIRecommendationCard />
+            <AIRecommendationCard 
+              scenarioName={scenario.name}
+              projectedRevenue={projectedRevenue}
+              projectedProfit={projectedProfit}
+              baselineRevenue={baselineRevenue}
+              baselineProfit={baselineProfit}
+            />
           </div>
           
           {/* Next Steps */}
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <h3 className="text-black font-medium tracking-tight mb-5 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#2B2644]"></span>
-              Next Steps
+              Execution Timeline
             </h3>
             <ul className="space-y-4">
               <li className="flex gap-3 items-start">
                 <span className="text-[#2B2644] font-semibold text-sm">1.</span>
-                <span className="text-gray-600 text-sm leading-relaxed">Review profit margins and adjust pricing strategy</span>
+                <span className="text-gray-600 text-sm leading-relaxed">
+                  {scenario.priceIncrease > 0 
+                    ? `Initiate menu price adjustments up by ${scenario.priceIncrease}%`
+                    : 'Maintain pricing structure'
+                  }
+                </span>
               </li>
               <li className="flex gap-3 items-start">
                 <span className="text-[#2B2644] font-semibold text-sm">2.</span>
-                <span className="text-gray-600 text-sm leading-relaxed">Implement inventory management improvements</span>
+                <span className="text-gray-600 text-sm leading-relaxed">
+                  {scenario.employeeCount > business.employees.length
+                    ? `Begin hiring campaign for ${scenario.employeeCount - business.employees.length} new employee(s)`
+                    : scenario.employeeCount < business.employees.length
+                    ? `Optimize staff rosters to target ${scenario.employeeCount} active headcount`
+                    : 'Keep staffing levels constant'
+                  }
+                </span>
               </li>
               <li className="flex gap-3 items-start">
                 <span className="text-[#2B2644] font-semibold text-sm">3.</span>
-                <span className="text-gray-600 text-sm leading-relaxed">Scale marketing budget across new channels</span>
+                <span className="text-gray-600 text-sm leading-relaxed">
+                  Adjust monthly marketing spend allocation to ${scenario.marketingBudget.toLocaleString()}
+                </span>
               </li>
               <li className="flex gap-3 items-start">
                 <span className="text-[#2B2644] font-semibold text-sm">4.</span>
-                <span className="text-gray-600 text-sm leading-relaxed">Plan hiring timeline for 35 new employees</span>
+                <span className="text-gray-600 text-sm leading-relaxed">
+                  {scenario.supplierDelay !== 'none'
+                    ? 'Buffer supply inventory to mitigate delay risk'
+                    : 'Maintain standard inventory replenishment frequency'
+                  }
+                </span>
               </li>
             </ul>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center justify-center text-black">
+        <TrendingUp className="w-10 h-10 text-[#2B2644] animate-bounce mb-4" />
+        <p className="font-semibold text-lg tracking-tight">Loading simulation results...</p>
+      </div>
+    }>
+      <ResultsContent />
+    </Suspense>
   );
 }
