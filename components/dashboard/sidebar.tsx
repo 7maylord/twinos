@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, Zap, Home, Settings, LogOut, ShieldAlert, GitCompare } from 'lucide-react';
+import { BarChart3, Zap, Home, Settings, LogOut, ShieldAlert, GitCompare, Target } from 'lucide-react';
 import { LogoIcon } from '../logo';
 
 export default function Sidebar() {
@@ -56,6 +56,18 @@ export default function Sidebar() {
         >
           <GitCompare className="w-5 h-5" />
           <span className="font-medium text-base">Compare Scenarios</span>
+        </Link>
+
+        <Link
+          href="/dashboard/optimize"
+          className={`flex items-center gap-3 px-4 py-2.5 transition-all duration-200 ${
+            isActive('/dashboard/optimize')
+              ? 'bg-black text-white rounded-full font-medium'
+              : 'text-gray-600 hover:text-black hover:bg-gray-200/50 rounded-full'
+          }`}
+        >
+          <Target className="w-5 h-5" />
+          <span className="font-medium text-base">Counterfactual Explorer</span>
         </Link>
 
         <Link
