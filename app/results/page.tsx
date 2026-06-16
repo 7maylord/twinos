@@ -64,6 +64,12 @@ interface SimulationData {
     baselineProfit: number;
     projectedProfit: number;
   }[];
+  recommendation?: {
+    summary: string;
+    headline: string;
+    details: string;
+    considerations: string[];
+  } | null;
 }
 
 function ResultsContent() {
@@ -90,10 +96,21 @@ function ResultsContent() {
         }
 
         if (targetId) {
-          const detailRes = await fetch(`/api/scenarios/${targetId}/results`);
+          const [detailRes, recoRes] = await Promise.all([
+            fetch(`/api/scenarios/${targetId}/results`),
+            fetch(`/api/recommendations?scenarioId=${targetId}`)
+          ]);
+
           if (detailRes.ok) {
             const detailData = await detailRes.json();
-            setData(detailData);
+            let recoData = null;
+            if (recoRes && recoRes.ok) {
+              recoData = await recoRes.json();
+            }
+            setData({
+              ...detailData,
+              recommendation: recoData,
+            });
           }
         }
       } catch (err) {
@@ -177,7 +194,7 @@ function ResultsContent() {
           <div className="flex items-center gap-4">
             <Link 
               href="/dashboard"
-              className="p-2.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-full transition-colors duration-200"
+              className="p-2.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-full transition-colors duration-200 no-print"
             >
               <ArrowLeft size={18} className="text-black" />
             </Link>
@@ -194,7 +211,10 @@ function ResultsContent() {
             </div>
           </div>
           
-          <button className="flex items-center gap-2 px-6 py-2.5 bg-black hover:bg-gray-800 text-white rounded-full font-medium transition-colors duration-200">
+          <button 
+            onClick={() => window.print()} 
+            className="flex items-center gap-2 px-6 py-2.5 bg-black hover:bg-gray-800 text-white rounded-full font-medium transition-colors duration-200 no-print"
+          >
             <Download size={18} />
             Export Report
           </button>
@@ -278,6 +298,7 @@ function ResultsContent() {
               projectedProfit={projectedProfit}
               baselineRevenue={baselineRevenue}
               baselineProfit={baselineProfit}
+              recommendation={data.recommendation}
             />
           </div>
           
