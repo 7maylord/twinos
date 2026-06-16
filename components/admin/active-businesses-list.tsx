@@ -1,6 +1,6 @@
 'use client';
 
-import { MoreVertical, TrendingUp } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 
 const businesses = [
   { id: 1, name: 'TechCore Industries', simulations: 45, status: 'Active', users: 12 },
@@ -12,34 +12,34 @@ const businesses = [
 
 export function ActiveBusinessesList() {
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-800/30 backdrop-blur border border-slate-700 rounded-lg p-6 animate-fade-up">
-      <h3 className="text-white font-semibold mb-6">Active Businesses</h3>
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <h3 className="text-black font-medium tracking-tight text-lg mb-6">Active Businesses</h3>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-slate-700">
-              <th className="text-left py-3 px-4 text-slate-400 text-sm font-medium">Business Name</th>
-              <th className="text-left py-3 px-4 text-slate-400 text-sm font-medium">Simulations</th>
-              <th className="text-left py-3 px-4 text-slate-400 text-sm font-medium">Users</th>
-              <th className="text-left py-3 px-4 text-slate-400 text-sm font-medium">Status</th>
+            <tr className="border-b border-gray-150">
+              <th className="text-left py-3 px-4 text-gray-500 text-xs font-semibold uppercase tracking-wider">Business Name</th>
+              <th className="text-left py-3 px-4 text-gray-500 text-xs font-semibold uppercase tracking-wider">Simulations</th>
+              <th className="text-left py-3 px-4 text-gray-500 text-xs font-semibold uppercase tracking-wider">Users</th>
+              <th className="text-left py-3 px-4 text-gray-500 text-xs font-semibold uppercase tracking-wider">Status</th>
             </tr>
           </thead>
           <tbody>
             {businesses.map((business) => (
-              <tr key={business.id} className="border-b border-slate-700 hover:bg-slate-700/30 transition-colors">
+              <tr key={business.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
                 <td className="py-4 px-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-indigo-600/20"></div>
-                    <span className="text-slate-200">{business.name}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-gray-100 flex-shrink-0"></div>
+                    <span className="text-black font-medium text-sm">{business.name}</span>
                   </div>
                 </td>
-                <td className="py-4 px-4 text-slate-300">{business.simulations}</td>
-                <td className="py-4 px-4 text-slate-300">{business.users}</td>
+                <td className="py-4 px-4 text-gray-650 text-sm">{business.simulations}</td>
+                <td className="py-4 px-4 text-gray-650 text-sm">{business.users}</td>
                 <td className="py-4 px-4">
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${
                     business.status === 'Active'
-                      ? 'bg-green-500/20 text-green-400'
-                      : 'bg-slate-600/20 text-slate-400'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-650'
                   }`}>
                     {business.status}
                   </span>

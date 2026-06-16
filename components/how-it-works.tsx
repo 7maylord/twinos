@@ -1,105 +1,83 @@
-'use client'
+'use client';
 
-import { Upload, Settings, Play, BarChart3 } from 'lucide-react'
+import { Upload, Sliders, Play, CheckCircle, ArrowRight } from 'lucide-react';
 
 const steps = [
   {
     number: '01',
     icon: Upload,
     title: 'Connect Your Data',
-    description: 'Securely connect your business data sources and integrate with existing systems in minutes.',
+    description: 'Upload historical data or connect your existing tools. TwinOS maps your business variables and builds your digital twin automatically.',
   },
   {
     number: '02',
-    icon: Settings,
-    title: 'Configure Twin',
-    description: 'Define your digital twin parameters and simulation scenarios with our intuitive no-code builder.',
+    icon: Sliders,
+    title: 'Configure Scenarios',
+    description: 'Use the intuitive Scenario Builder to define what-if variables — pricing, headcount, market conditions — with simple drag-and-drop controls.',
   },
   {
     number: '03',
     icon: Play,
     title: 'Run Simulations',
-    description: 'Execute unlimited what-if scenarios and watch your twin respond in real-time.',
+    description: 'Execute thousands of simulations in seconds. Our AI engine models every possible outcome and surfaces the most likely results.',
   },
   {
     number: '04',
-    icon: BarChart3,
-    title: 'Act on Insights',
-    description: 'Get detailed reports and recommendations to make confident, data-driven decisions.',
+    icon: CheckCircle,
+    title: 'Decide & Execute',
+    description: 'Review AI-recommended optimal strategies, compare scenarios side-by-side, and make data-driven decisions with full confidence.',
   },
-]
+];
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="max-w-7xl mx-auto relative z-10">
+    <section id="how-it-works" className="py-24 md:py-32 bg-white">
+      <div className="max-w-[88rem] mx-auto px-6">
         {/* Section Header */}
-        <div className="text-center mb-16 animate-fade-up">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            How It Works,{' '}
-            <span className="gradient-text">Simple & Intuitive</span>
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-[#F5F5F5] border border-gray-200 rounded-full px-4 py-1.5 mb-6">
+            <ArrowRight size={14} className="text-[#2B2644]" />
+            <span className="text-sm text-gray-700 font-medium">Simple Process</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-semibold tracking-[-0.03em] text-black mb-4">
+            From Data to Decision
+            <br />
+            <span className="text-gray-400">in Four Steps</span>
           </h2>
-          <p className="text-lg text-foreground/60 max-w-2xl mx-auto">
-            Get up and running in four simple steps. No complex setup or technical expertise required.
+          <p className="text-lg text-gray-500 max-w-xl mx-auto">
+            No complex setup required. Get from raw data to actionable insights faster than ever.
           </p>
         </div>
 
-        {/* Steps Timeline */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-          {/* Connection Lines */}
-          <div className="hidden lg:block absolute top-20 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-accent to-transparent pointer-events-none"></div>
+        {/* Steps */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {steps.map((step, index) => (
+            <div key={step.title} className="relative group">
+              {/* Connector line (hidden on last) */}
+              {index < steps.length - 1 && (
+                <div className="hidden lg:block absolute top-12 left-[calc(50%+2rem)] w-[calc(100%-2rem)] h-px bg-gradient-to-r from-gray-200 to-transparent z-0" />
+              )}
 
-          {steps.map((step, index) => {
-            const Icon = step.icon
-            return (
-              <div key={step.number} className="relative animate-fade-up" style={{ animationDelay: `${index * 0.1}s` }}>
-                {/* Step Card */}
-                <div className="glassmorphic p-8 rounded-2xl h-full relative z-10">
-                  {/* Number Badge */}
-                  <div className="absolute -top-6 left-8">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center border-4 border-background">
-                      <span className="text-white font-bold text-sm">{step.number}</span>
-                    </div>
-                  </div>
-
-                  {/* Icon */}
-                  <div className="mt-6 mb-4">
-                    <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center">
-                      <Icon className="text-primary" size={24} />
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-                  <p className="text-foreground/70 leading-relaxed text-sm">{step.description}</p>
+              <div className="relative z-10 bg-[#F5F5F5] rounded-2xl p-7 border border-gray-100 hover:border-gray-200 transition-all duration-300 hover:shadow-lg hover:shadow-gray-200/50 h-full">
+                {/* Step number */}
+                <div className="text-xs font-semibold text-gray-300 tracking-wider mb-4">STEP {step.number}</div>
+                
+                {/* Icon */}
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-5 shadow-sm border border-gray-100 group-hover:bg-[#2B2644] transition-colors duration-300">
+                  <step.icon size={22} className="text-[#2B2644] group-hover:text-white transition-colors duration-300" />
                 </div>
 
-                {/* Vertical Line for Mobile */}
-                {index !== steps.length - 1 && (
-                  <div className="lg:hidden absolute left-6 top-24 w-0.5 h-12 bg-gradient-to-b from-primary to-accent/0"></div>
-                )}
+                <h3 className="text-lg font-semibold tracking-tight text-black mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-[15px] text-gray-500 leading-relaxed">
+                  {step.description}
+                </p>
               </div>
-            )
-          })}
-        </div>
-
-        {/* Feature Highlight */}
-        <div className="mt-16 glassmorphic p-10 rounded-2xl text-center border border-primary/30 animate-fade-up" style={{ animationDelay: '0.4s' }}>
-          <p className="text-foreground/80 mb-4">
-            Integrate with <span className="text-primary font-semibold">100+ platforms</span> including Salesforce, SAP, and custom APIs.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {['Salesforce', 'SAP', 'Oracle', 'Tableau', 'Power BI'].map((platform) => (
-              <span key={platform} className="px-4 py-2 bg-card rounded-full text-sm text-foreground/70">
-                {platform}
-              </span>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

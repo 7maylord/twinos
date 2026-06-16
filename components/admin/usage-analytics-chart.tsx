@@ -22,35 +22,29 @@ const data = [
 
 export function UsageAnalyticsChart() {
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-800/30 backdrop-blur border border-slate-700 rounded-lg p-6 animate-fade-up">
-      <h3 className="text-white font-semibold mb-6">API Usage (Last 7 Days)</h3>
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <h3 className="text-black font-medium tracking-tight text-lg mb-6">API Usage (Last 7 Days)</h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
-          <defs>
-            <linearGradient id="colorUsage" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-          <XAxis dataKey="day" stroke="#94a3b8" />
-          <YAxis stroke="#94a3b8" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
+          <XAxis dataKey="day" stroke="#999999" style={{ fontSize: '12px' }} />
+          <YAxis stroke="#999999" style={{ fontSize: '12px' }} />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1e293b',
-              border: '1px solid #475569',
-              borderRadius: '8px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E5E5',
+              borderRadius: '12px',
+              color: '#000000',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
             }}
-            labelStyle={{ color: '#e2e8f0' }}
           />
           <Line
             type="monotone"
             dataKey="requests"
-            stroke="#06b6d4"
-            strokeWidth={2}
-            dot={false}
-            fillOpacity={1}
-            fill="url(#colorUsage)"
+            stroke="#2B2644"
+            strokeWidth={3}
+            dot={{ r: 4, fill: '#2B2644' }}
+            isAnimationActive={true}
           />
         </LineChart>
       </ResponsiveContainer>

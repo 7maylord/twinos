@@ -22,24 +22,25 @@ const data = [
 
 export function SimulationStatsChart() {
   return (
-    <div className="bg-gradient-to-br from-slate-800/50 to-slate-800/30 backdrop-blur border border-slate-700 rounded-lg p-6 animate-fade-up">
-      <h3 className="text-white font-semibold mb-6">Monthly Simulations</h3>
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <h3 className="text-black font-medium tracking-tight text-lg mb-6">Monthly Simulations</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-          <XAxis dataKey="month" stroke="#94a3b8" />
-          <YAxis stroke="#94a3b8" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
+          <XAxis dataKey="month" stroke="#999999" style={{ fontSize: '12px' }} />
+          <YAxis stroke="#999999" style={{ fontSize: '12px' }} />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1e293b',
-              border: '1px solid #475569',
-              borderRadius: '8px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E5E5E5',
+              borderRadius: '12px',
+              color: '#000000',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
             }}
-            labelStyle={{ color: '#e2e8f0' }}
           />
-          <Legend />
-          <Bar dataKey="simulations" fill="#06b6d4" name="Simulations Run" radius={[8, 8, 0, 0]} />
-          <Bar dataKey="users" fill="#6366f1" name="Active Users" radius={[8, 8, 0, 0]} />
+          <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+          <Bar dataKey="simulations" fill="#2B2644" name="Simulations Run" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="users" fill="#CCCCCC" name="Active Users" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

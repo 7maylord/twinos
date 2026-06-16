@@ -1,5 +1,5 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'TwinOS | AI-Powered Digital Twin Platform',
@@ -9,24 +9,24 @@ export const metadata: Metadata = {
     description: 'Stop guessing. Simulate business decisions before they cost money.',
     type: 'website',
   },
-}
+};
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#0f172a',
-}
+  themeColor: '#F5F5F5',
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className="bg-gradient-to-b from-background via-[#1a1f36] to-background text-foreground">
+      <body className="bg-[#F5F5F5] text-black">
         {children}
       </body>
     </html>
-  )
+  );
 }

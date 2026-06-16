@@ -1,73 +1,78 @@
-'use client'
+'use client';
 
-import { ArrowRight, Sparkles } from 'lucide-react'
+import Link from 'next/link';
+import { ArrowRight, Play } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden mesh-gradient">
-      {/* Animated background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-primary/20 to-accent/10 rounded-full blur-3xl opacity-30 animate-float"></div>
-        <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-gradient-to-tl from-accent/20 to-primary/10 rounded-full blur-3xl opacity-20 animate-float" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 right-0 w-96 h-96 bg-gradient-to-l from-accent-bright/10 to-transparent rounded-full blur-3xl opacity-25" style={{ animationDelay: '2s' }}></div>
-      </div>
+    <section className="relative flex-1 flex items-center justify-center overflow-hidden">
+      {/* Subtle grid pattern */}
+      <div className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }}
+      />
 
-      <div className="max-w-5xl mx-auto text-center relative z-10">
-        {/* Premium Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 glassmorphic-accent rounded-full mb-8 animate-fade-up group hover-lift cursor-pointer">
-          <Sparkles size={16} className="text-accent group-hover:animate-spin" />
-          <span className="text-sm font-semibold bg-gradient-to-r from-accent to-accent-bright bg-clip-text text-transparent">Next Generation Digital Twins</span>
+      {/* Decorative gradient orb */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-to-br from-[#2B2644]/8 via-purple-200/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative z-10 max-w-[88rem] w-full mx-auto px-6 text-center">
+        {/* Pill badge */}
+        <div className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-1.5 mb-8 shadow-sm">
+          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+          <span className="text-sm text-gray-700 font-medium">Digital Twin Technology</span>
         </div>
 
-        {/* Main Headline - Premium Typography */}
-        <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black mb-8 leading-tight animate-fade-up" style={{ animationDelay: '0.1s' }}>
-          <span className="block mb-2">Stop Guessing.</span>
-          <span className="gradient-text-bright text-glow inline-block">Simulate Business Decisions</span>
-          <span className="block">Before They Cost Money</span>
+        {/* Headline */}
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-[-0.04em] text-black leading-[0.95] mb-6 max-w-5xl mx-auto">
+          Stop Guessing.
+          <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2B2644] to-gray-700">
+            Simulate First.
+          </span>
         </h1>
 
-        {/* Premium Subheadline */}
-        <p className="text-lg sm:text-xl lg:text-2xl text-foreground/75 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-up" style={{ animationDelay: '0.2s' }}>
-          Transform business decisions with AI-powered simulations. Reduce risk, accelerate growth, and unlock unprecedented ROI.
+        {/* Subtitle */}
+        <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Model your business decisions before they cost money. 
+          TwinOS creates a digital replica of your operations, letting you 
+          test scenarios with real-time AI-powered insights.
         </p>
 
-        {/* Premium CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-          <button className="relative px-10 py-5 bg-gradient-to-r from-primary via-primary-light to-primary-dark text-white rounded-2xl font-bold text-lg flex items-center gap-3 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300 transform hover:scale-105 group overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse-glow rounded-2xl opacity-0 group-hover:opacity-100"></div>
-            <span className="relative">Start Simulating Now</span>
-            <ArrowRight size={22} className="relative group-hover:translate-x-2 transition-transform" />
-          </button>
-          <button className="relative px-10 py-5 glassmorphic-light rounded-2xl font-bold text-lg hover-lift group overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-accent/20 to-accent-bright/20 opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity"></div>
-            <span className="relative">See Live Demo</span>
-          </button>
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <Link
+            href="/dashboard"
+            className="group inline-flex items-center gap-2 bg-black text-white text-base font-medium px-8 py-3.5 rounded-full hover:bg-gray-800 transition-all duration-300 shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/15"
+          >
+            Start Free Simulation
+            <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <a
+            href="#how-it-works"
+            className="group inline-flex items-center gap-2 bg-white text-black text-base font-medium px-8 py-3.5 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+          >
+            <Play size={16} className="text-gray-500" />
+            See How It Works
+          </a>
         </div>
 
-        {/* Premium Trust Indicators */}
-        <div className="mt-20 pt-12 border-t border-white/5 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 text-foreground/70 animate-fade-up" style={{ animationDelay: '0.4s' }}>
-          <div className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary/30 to-accent/20 rounded-xl flex items-center justify-center group-hover:shadow-lg group-hover:shadow-primary/20 transition-all">
-              <span className="text-sm font-black text-primary">500+</span>
+        {/* Stats row */}
+        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-14">
+          {[
+            { value: '10K+', label: 'Simulations Run' },
+            { value: '94%', label: 'Prediction Accuracy' },
+            { value: '3.2x', label: 'Average ROI' },
+            { value: '<5min', label: 'Setup Time' },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="text-2xl md:text-3xl font-semibold tracking-tight text-black">{stat.value}</div>
+              <div className="text-sm text-gray-400 mt-1">{stat.label}</div>
             </div>
-            <span className="text-sm font-medium">Enterprise Clients</span>
-          </div>
-          <div className="hidden sm:block w-px h-8 bg-white/10"></div>
-          <div className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-accent/30 to-accent-bright/20 rounded-xl flex items-center justify-center group-hover:shadow-lg group-hover:shadow-accent/20 transition-all">
-              <span className="text-sm font-black text-accent">99.9%</span>
-            </div>
-            <span className="text-sm font-medium">Uptime SLA</span>
-          </div>
-          <div className="hidden sm:block w-px h-8 bg-white/10"></div>
-          <div className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-accent-bright/30 to-primary/20 rounded-xl flex items-center justify-center group-hover:shadow-lg group-hover:shadow-accent-bright/20 transition-all">
-              <span className="text-sm font-black text-accent-bright">ISO</span>
-            </div>
-            <span className="text-sm font-medium">27001 Certified</span>
-          </div>
+          ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -56,7 +56,7 @@ export default function RecommendationPanel() {
                 {rec.priority.toUpperCase()}
               </span>
             </div>
-            <p className="text-xs text-gray-600 mb-3">{rec.description}</p>
+            <p className="text-xs text-gray-650 mb-3">{rec.description}</p>
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-green-700">{rec.impact}</p>
               <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-black transition-colors translate-x-0 group-hover:translate-x-1" />

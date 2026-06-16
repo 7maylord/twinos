@@ -1,25 +1,25 @@
-'use client'
+'use client';
 
-import { Menu, Bell, User } from 'lucide-react'
+import { Menu, Bell, User } from 'lucide-react';
 
 export default function DashboardHeader() {
   return (
-    <header className="sticky top-0 bg-card border-b border-card-border px-6 lg:px-8 py-4 flex items-center justify-between z-40">
+    <header className="sticky top-0 bg-[#F5F5F5]/80 backdrop-blur border-b border-gray-200 px-6 lg:px-8 py-5 flex items-center justify-between z-40">
       <div className="flex items-center gap-4">
-        <button className="md:hidden p-2 hover:bg-card-border rounded-lg transition-colors">
-          <Menu className="w-5 h-5 text-muted" />
+        <button className="md:hidden p-2 hover:bg-gray-200/50 rounded-full transition-colors">
+          <Menu className="w-5 h-5 text-gray-700" />
         </button>
-        <h1 className="text-xl font-semibold text-foreground">Analytics</h1>
+        <h1 className="text-xl font-medium tracking-tight text-black">Analytics</h1>
       </div>
 
-      <div className="flex items-center gap-4">
-        <button className="p-2 hover:bg-card-border rounded-lg transition-colors">
-          <Bell className="w-5 h-5 text-muted" />
+      <div className="flex items-center gap-2">
+        <button className="p-2.5 hover:bg-gray-200/50 rounded-full transition-colors">
+          <Bell className="w-5 h-5 text-gray-700" />
         </button>
-        <button className="p-2 hover:bg-card-border rounded-lg transition-colors">
-          <User className="w-5 h-5 text-muted" />
+        <button className="p-2.5 hover:bg-gray-200/50 rounded-full transition-colors">
+          <User className="w-5 h-5 text-gray-700" />
         </button>
       </div>
     </header>
-  )
+  );
 }

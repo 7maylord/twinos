@@ -1,59 +1,54 @@
-'use client'
+'use client';
 
-import { ArrowRight, CheckCircle } from 'lucide-react'
+import Link from 'next/link';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 export default function CTA() {
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10 rounded-3xl blur-3xl pointer-events-none"></div>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-30 animate-glow pointer-events-none"></div>
-
-      <div className="max-w-4xl mx-auto relative z-10">
-        <div className="glassmorphic border border-primary/50 p-12 sm:p-16 rounded-3xl text-center backdrop-blur-xl">
-          {/* Headline */}
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 animate-fade-up">
-            Ready to Transform Your{' '}
-            <span className="gradient-text">Decision-Making?</span>
-          </h2>
-
-          {/* Subheadline */}
-          <p className="text-lg text-foreground/70 mb-8 max-w-2xl mx-auto animate-fade-up" style={{ animationDelay: '0.1s' }}>
-            Join leading enterprises that use TwinOS to simulate strategies, reduce risk, and accelerate growth.
-          </p>
-
-          {/* Features List */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 text-left max-w-xl mx-auto animate-fade-up" style={{ animationDelay: '0.2s' }}>
-            {[
-              'Free 14-day trial',
-              'No credit card required',
-              'Full platform access',
-              'Dedicated support team',
-            ].map((feature) => (
-              <div key={feature} className="flex items-center gap-3">
-                <CheckCircle size={20} className="text-accent flex-shrink-0" />
-                <span className="text-foreground/80">{feature}</span>
-              </div>
-            ))}
+    <section className="py-24 md:py-32 bg-white">
+      <div className="max-w-[88rem] mx-auto px-6">
+        <div className="relative bg-[#2B2644] rounded-3xl p-12 md:p-20 text-center overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-10 right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-10 left-20 w-48 h-48 bg-purple-400/10 rounded-full blur-3xl" />
           </div>
 
-          {/* CTA Button */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-            <button className="px-10 py-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl font-semibold flex items-center gap-2 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300 transform hover:scale-105 group w-full sm:w-auto justify-center">
-              Start Simulating Now
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="px-10 py-4 glassmorphic rounded-xl font-semibold hover:bg-card/80 transition-colors w-full sm:w-auto">
-              Schedule Demo
-            </button>
-          </div>
+          <div className="relative z-10">
+            <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 mb-8">
+              <Sparkles size={14} className="text-purple-300" />
+              <span className="text-sm text-white/80 font-medium">Free to Start</span>
+            </div>
 
-          {/* Trust Badge */}
-          <p className="mt-8 text-sm text-foreground/60">
-            🔒 Enterprise-grade security • GDPR compliant • ISO 27001 certified
-          </p>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-[-0.03em] text-white mb-5 max-w-3xl mx-auto leading-tight">
+              Ready to Transform
+              <br />
+              Your Business Decisions?
+            </h2>
+
+            <p className="text-lg text-white/50 max-w-xl mx-auto mb-10">
+              Join thousands of companies already using TwinOS to simulate, 
+              optimize, and execute business strategies with confidence.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/dashboard"
+                className="group inline-flex items-center gap-2 bg-white text-[#2B2644] text-base font-semibold px-8 py-3.5 rounded-full hover:bg-gray-100 transition-all duration-300 shadow-xl shadow-black/20"
+              >
+                Start Free Trial
+                <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+              <a
+                href="#features"
+                className="inline-flex items-center gap-2 text-white/70 hover:text-white text-base font-medium transition-colors"
+              >
+                Learn More
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

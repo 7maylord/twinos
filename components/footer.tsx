@@ -1,79 +1,64 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { Mail, Linkedin, Twitter, Github } from 'lucide-react'
+import Link from 'next/link';
+import { LogoIcon } from './logo';
 
-const footerSections = [
-  {
-    title: 'Product',
-    links: ['Features', 'Pricing', 'Security', 'Roadmap', 'Status'],
-  },
-  {
-    title: 'Company',
-    links: ['About', 'Blog', 'Careers', 'Press', 'Contact'],
-  },
-  {
-    title: 'Resources',
-    links: ['Documentation', 'API Docs', 'Guides', 'Community', 'Support'],
-  },
-  {
-    title: 'Legal',
-    links: ['Privacy', 'Terms', 'Compliance', 'Cookies', 'License'],
-  },
-]
+const footerLinks = {
+  Product: [
+    { label: 'Features', href: '#features' },
+    { label: 'Scenario Builder', href: '/scenario-builder' },
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Results', href: '/results' },
+  ],
+  Company: [
+    { label: 'About', href: '#' },
+    { label: 'Blog', href: '#' },
+    { label: 'Careers', href: '#' },
+    { label: 'Contact', href: '#' },
+  ],
+  Resources: [
+    { label: 'Documentation', href: '#' },
+    { label: 'API Reference', href: '#' },
+    { label: 'Help Center', href: '#' },
+    { label: 'Status', href: '#' },
+  ],
+  Legal: [
+    { label: 'Privacy Policy', href: '#' },
+    { label: 'Terms of Service', href: '#' },
+    { label: 'Cookie Policy', href: '#' },
+  ],
+};
 
 export default function Footer() {
   return (
-    <footer className="border-t border-card-border/50 py-16 px-4 sm:px-6 lg:px-8 relative">
-      <div className="max-w-7xl mx-auto">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
-          {/* Brand Section */}
-          <div className="lg:col-span-1">
-            <Link href="#" className="flex items-center gap-2 mb-6 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
-              <span className="text-xl font-bold gradient-text">TwinOS</span>
+    <footer className="bg-[#F5F5F5] border-t border-gray-200/50">
+      <div className="max-w-[88rem] mx-auto px-6 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
+          {/* Logo & Description */}
+          <div className="col-span-2">
+            <Link href="/" className="flex items-center gap-2.5 mb-4">
+              <LogoIcon className="w-6 h-6 text-black" />
+              <span className="text-xl font-semibold tracking-tight text-black">TwinOS</span>
             </Link>
-            <p className="text-foreground/60 text-sm mb-6">
-              AI-powered digital twin platform for smarter business decisions.
+            <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
+              The operating system for business decisions. 
+              Simulate, analyze, and optimize before you commit.
             </p>
-            {/* Social Links */}
-            <div className="flex gap-3">
-              {[
-                { icon: Linkedin, href: '#' },
-                { icon: Twitter, href: '#' },
-                { icon: Github, href: '#' },
-                { icon: Mail, href: '#' },
-              ].map((social) => {
-                const Icon = social.icon
-                return (
-                  <a
-                    key={social.href}
-                    href={social.href}
-                    className="w-10 h-10 glassmorphic rounded-lg flex items-center justify-center hover:bg-primary/20 hover:border-primary/50 transition-all group"
-                  >
-                    <Icon size={18} className="text-foreground/60 group-hover:text-primary transition-colors" />
-                  </a>
-                )
-              })}
-            </div>
           </div>
 
-          {/* Footer Sections */}
-          {footerSections.map((section) => (
-            <div key={section.title}>
-              <h4 className="font-semibold mb-4 text-foreground">{section.title}</h4>
-              <ul className="space-y-3">
-                {section.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-foreground/60 hover:text-primary transition-colors text-sm"
+          {/* Link Columns */}
+          {Object.entries(footerLinks).map(([category, links]) => (
+            <div key={category}>
+              <h4 className="text-xs font-semibold text-gray-400 tracking-wider uppercase mb-4">{category}</h4>
+              <ul className="space-y-2.5">
+                {links.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-gray-500 hover:text-black transition-colors"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -81,26 +66,18 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Bottom Footer */}
-        <div className="border-t border-card-border/50 pt-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-foreground/60">
-              © 2024 TwinOS. All rights reserved.
-            </p>
-            <div className="flex gap-6">
-              <a href="#" className="text-sm text-foreground/60 hover:text-foreground transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-sm text-foreground/60 hover:text-foreground transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="text-sm text-foreground/60 hover:text-foreground transition-colors">
-                Cookie Settings
-              </a>
-            </div>
+        {/* Bottom bar */}
+        <div className="mt-14 pt-6 border-t border-gray-200/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-gray-400">
+            © {new Date().getFullYear()} TwinOS. All rights reserved.
+          </p>
+          <div className="flex items-center gap-5">
+            <a href="#" className="text-xs text-gray-400 hover:text-black transition-colors">Twitter</a>
+            <a href="#" className="text-xs text-gray-400 hover:text-black transition-colors">LinkedIn</a>
+            <a href="#" className="text-xs text-gray-400 hover:text-black transition-colors">GitHub</a>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

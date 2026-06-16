@@ -1,6 +1,7 @@
 'use client';
 
-import { ArrowUpRight, ArrowDownLeft, Download, Zap } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, Download, Zap, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import { RevenueComparisonChart } from '@/components/results/revenue-comparison-chart';
 import { ProfitComparisonChart } from '@/components/results/profit-comparison-chart';
 import { ImpactMetrics } from '@/components/results/impact-metrics';
@@ -8,15 +9,29 @@ import { AIRecommendationCard } from '@/components/results/ai-recommendation-car
 
 export default function ResultsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-6 lg:p-8">
+    <div className="min-h-screen bg-[#F5F5F5] text-black p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Simulation Results</h1>
-            <p className="text-slate-400">Scenario: "Q3 Growth Initiative" • Run: 14 Jun 2024</p>
+          <div className="flex items-center gap-4">
+            <Link 
+              href="/dashboard"
+              className="p-2.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-full transition-colors duration-200"
+            >
+              <ArrowLeft size={18} className="text-black" />
+            </Link>
+            <div>
+              <h1 
+                className="text-3xl md:text-4xl font-medium tracking-tight text-black mb-1"
+                style={{ letterSpacing: '-0.03em' }}
+              >
+                Simulation Results
+              </h1>
+              <p className="text-gray-500 text-sm">Scenario: "Q3 Growth Initiative" • Run: 14 Jun 2024</p>
+            </div>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white rounded-lg font-medium transition-all">
+          
+          <button className="flex items-center gap-2 px-6 py-2.5 bg-black hover:bg-gray-800 text-white rounded-full font-medium transition-colors duration-200">
             <Download size={18} />
             Export Report
           </button>
@@ -24,39 +39,39 @@ export default function ResultsPage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-lg p-6 hover:bg-slate-800/60 transition-colors">
-            <p className="text-slate-400 text-sm mb-2">Revenue Impact</p>
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
+            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Revenue Impact</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white">+$450K</span>
-              <span className="flex items-center gap-1 text-green-400 text-sm">
+              <span className="text-3xl font-medium tracking-tight text-black">+$450K</span>
+              <span className="flex items-center gap-1 text-green-600 text-sm font-semibold">
                 <ArrowUpRight size={16} /> +18.2%
               </span>
             </div>
           </div>
-          <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-lg p-6 hover:bg-slate-800/60 transition-colors">
-            <p className="text-slate-400 text-sm mb-2">Profit Margin</p>
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
+            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Profit Margin</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white">+6.2%</span>
-              <span className="flex items-center gap-1 text-green-400 text-sm">
+              <span className="text-3xl font-medium tracking-tight text-black">+6.2%</span>
+              <span className="flex items-center gap-1 text-green-600 text-sm font-semibold">
                 <ArrowUpRight size={16} /> +2.1pp
               </span>
             </div>
           </div>
-          <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-lg p-6 hover:bg-slate-800/60 transition-colors">
-            <p className="text-slate-400 text-sm mb-2">Inventory Risk</p>
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
+            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Inventory Risk</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white">-$125K</span>
-              <span className="flex items-center gap-1 text-red-400 text-sm">
+              <span className="text-3xl font-medium tracking-tight text-black">-$125K</span>
+              <span className="flex items-center gap-1 text-red-650 text-sm font-semibold">
                 <ArrowDownLeft size={16} /> -9.3%
               </span>
             </div>
           </div>
-          <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-lg p-6 hover:bg-slate-800/60 transition-colors">
-            <p className="text-slate-400 text-sm mb-2">ROI</p>
+          <div className="bg-[#2B2644] text-white rounded-2xl p-6 shadow-md shadow-[#2B2644]/10">
+            <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">ROI</p>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white">340%</span>
-              <span className="flex items-center gap-1 text-green-400 text-sm">
-                <Zap size={16} /> Excellent
+              <span className="text-3xl font-medium tracking-tight text-white">340%</span>
+              <span className="flex items-center gap-1 text-green-400 text-sm font-semibold">
+                <Zap size={16} className="fill-current" /> Excellent
               </span>
             </div>
           </div>
@@ -78,27 +93,27 @@ export default function ResultsPage() {
           </div>
           
           {/* Next Steps */}
-          <div className="bg-gradient-to-br from-slate-800/50 to-slate-800/30 backdrop-blur border border-slate-700 rounded-lg p-6">
-            <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+            <h3 className="text-black font-medium tracking-tight mb-5 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#2B2644]"></span>
               Next Steps
             </h3>
-            <ul className="space-y-3">
-              <li className="flex gap-3">
-                <span className="text-cyan-400 font-semibold">1.</span>
-                <span className="text-slate-300 text-sm">Review profit margins and adjust pricing strategy</span>
+            <ul className="space-y-4">
+              <li className="flex gap-3 items-start">
+                <span className="text-[#2B2644] font-semibold text-sm">1.</span>
+                <span className="text-gray-600 text-sm leading-relaxed">Review profit margins and adjust pricing strategy</span>
               </li>
-              <li className="flex gap-3">
-                <span className="text-cyan-400 font-semibold">2.</span>
-                <span className="text-slate-300 text-sm">Implement inventory management improvements</span>
+              <li className="flex gap-3 items-start">
+                <span className="text-[#2B2644] font-semibold text-sm">2.</span>
+                <span className="text-gray-600 text-sm leading-relaxed">Implement inventory management improvements</span>
               </li>
-              <li className="flex gap-3">
-                <span className="text-cyan-400 font-semibold">3.</span>
-                <span className="text-slate-300 text-sm">Scale marketing budget across new channels</span>
+              <li className="flex gap-3 items-start">
+                <span className="text-[#2B2644] font-semibold text-sm">3.</span>
+                <span className="text-gray-600 text-sm leading-relaxed">Scale marketing budget across new channels</span>
               </li>
-              <li className="flex gap-3">
-                <span className="text-cyan-400 font-semibold">4.</span>
-                <span className="text-slate-300 text-sm">Plan hiring timeline for 35 new employees</span>
+              <li className="flex gap-3 items-start">
+                <span className="text-[#2B2644] font-semibold text-sm">4.</span>
+                <span className="text-gray-600 text-sm leading-relaxed">Plan hiring timeline for 35 new employees</span>
               </li>
             </ul>
           </div>
