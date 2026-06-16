@@ -1,3 +1,4 @@
+dev.db
 # Dependencies
 node_modules
 .pnp
@@ -29,3 +30,5 @@ yarn-error.log*
 .vercel
 
 TwinOS_PRD.md
+
+/generated/prisma

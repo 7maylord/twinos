@@ -1,0 +1,90 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/client"
+}
+
+model User {
+  id         String     @id @default(uuid())
+  email      String     @unique
+  createdAt  DateTime   @default(now())
+  businesses Business[]
+}
+
+model Business {
+  id                String             @id @default(uuid())
+  ownerId           String
+  owner             User               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name              String
+  industry          String?
+  tenantId          String?
+  baselineRevenue   Float              @default(180000.0) // Monthly baseline revenue
+  baselineMarketing Float              @default(25000.0)  // Monthly baseline marketing
+  baselineInventory Float              @default(40000.0)  // Monthly baseline inventory cost
+  baselineFixedCosts Float             @default(30000.0)  // Monthly baseline fixed costs
+  createdAt         DateTime           @default(now())
+  products          Product[]
+  employees         Employee[]
+  scenarios         Scenario[]
+}
+
+model Product {
+  id         String   @id @default(uuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name       String
+  price      Float
+  cost       Float
+  tenantId   String?
+}
+
+model Employee {
+  id         String   @id @default(uuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name       String
+  role       String
+  salary     Float
+  tenantId   String?
+}
+
+model Scenario {
+  id                String             @id @default(uuid())
+  businessId        String
+  business          Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  name              String
+  status            String             @default("COMPLETED") // PENDING, COMPLETED, FAILED
+  tenantId          String?
+  createdAt         DateTime           @default(now())
+  
+  // Scenario inputs / sliders
+  priceIncrease     Float              @default(0.0) // 0-100%
+  employeeCount     Int                @default(10)  // total employee count simulated
+  marketingBudget   Float              @default(10000.0) // absolute marketing budget simulated
+  supplierDelay     String             @default("none")  // none, minor, moderate, severe
+  
+  simulationResults SimulationResult[]
+}
+
+model SimulationResult {
+  id                String   @id @default(uuid())
+  scenarioId        String
+  scenario          Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  
+  // Simulation outputs
+  projectedRevenue  Float
+  projectedProfit   Float
+  projectedHeadcount Int
+  projectedInventoryRisk Float
+  
+  // Detailed projection metrics (stored as JSON string)
+  // For rendering monthly charts: baseline vs projected
+  monthlyDataJson   String   // Stores stringified JSON array
+  
+  tenantId          String?
+  generatedAt       DateTime @default(now())
+}
+

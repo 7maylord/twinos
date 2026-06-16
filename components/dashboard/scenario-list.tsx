@@ -1,92 +1,161 @@
 'use client';
 
-import { TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { TrendingUp, Clock, CheckCircle, Plus } from 'lucide-react';
 import Link from 'next/link';
 
-const scenarios = [
-  {
-    name: 'Q3 Growth Strategy',
-    impact: '+18.5%',
-    status: 'Active',
-    date: '2 days ago',
-  },
-  {
-    name: 'Price Optimization',
-    impact: '+12.3%',
-    status: 'Completed',
-    date: '1 week ago',
-  },
-  {
-    name: 'Market Expansion',
-    impact: '+25.7%',
-    status: 'Pending',
-    date: '3 days ago',
-  },
-  {
-    name: 'Cost Reduction',
-    impact: '+8.2%',
-    status: 'Completed',
-    date: '2 weeks ago',
-  },
-];
+interface SimulationResult {
+  id: string;
+  projectedRevenue: number;
+  projectedProfit: number;
+  projectedHeadcount: number;
+  projectedInventoryRisk: number;
+}
+
+interface Scenario {
+  id: string;
+  name: string;
+  status: string;
+  createdAt: string;
+  priceIncrease: number;
+  employeeCount: number;
+  marketingBudget: number;
+  supplierDelay: string;
+  simulationResults?: SimulationResult[];
+}
 
 export default function ScenarioList() {
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchScenarios() {
+      try {
+        const res = await fetch('/api/scenarios');
+        if (res.ok) {
+          const data = await res.json();
+          setScenarios(data);
+        }
+      } catch (err) {
+        console.error('Error fetching scenarios:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchScenarios();
+  }, []);
+
+  const formatDistanceToNow = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-      <div className="mb-6">
-        <h2 className="text-lg font-medium tracking-tight text-black">Recent Scenarios</h2>
-        <p className="text-sm text-gray-500">Your simulated business scenarios</p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-lg font-medium tracking-tight text-black">Recent Scenarios</h2>
+          <p className="text-sm text-gray-500">Your simulated business scenarios</p>
+        </div>
+        <Link 
+          href="/scenario-builder"
+          className="flex items-center gap-1.5 py-2 px-4 bg-black text-white rounded-full text-xs font-semibold hover:bg-gray-800 transition-colors"
+        >
+          <Plus size={14} />
+          New Scenario
+        </Link>
       </div>
 
-      <div className="space-y-3">
-        {scenarios.map((scenario, index) => {
-          return (
-            <div
-              key={index}
-              className="flex items-center justify-between p-4 rounded-xl border border-gray-150 hover:border-black/30 hover:bg-gray-50/50 transition-all duration-200 group cursor-pointer"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#2B2644]/10 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-[#2B2644]" />
-                </div>
-                <div>
-                  <p className="font-medium text-black group-hover:text-[#2B2644] transition-colors">{scenario.name}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>{scenario.date}</span>
+      {loading ? (
+        <div className="space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse"></div>
+          ))}
+        </div>
+      ) : scenarios.length === 0 ? (
+        <div className="text-center py-8 border border-dashed border-gray-200 rounded-xl">
+          <p className="text-gray-400 text-sm">No scenarios created yet.</p>
+          <Link 
+            href="/scenario-builder" 
+            className="text-xs font-semibold text-[#2B2644] underline mt-1 inline-block"
+          >
+            Create your first simulation
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {scenarios.map((scenario) => {
+            const latestResult = scenario.simulationResults?.[0];
+            
+            // Baseline profit was $28,500 based on seed (180,000 revenue - 96,500 payroll - 25,000 marketing - 40,000 inventory - 30,000 fixed)
+            // Wait, let's calculate the impact compared to the baseline profit of $28,500 (which is -$11,500 if operating at net loss)
+            // Let's show profit impact or revenue impact percentage.
+            // Profit impact: let's calculate profit difference if profit is positive or negative.
+            // For general representation, let's use the profit difference:
+            const baselineProfit = -11500; // 180000 - 96500 - 25000 - 40000 - 30000
+            const projectedProfit = latestResult ? latestResult.projectedProfit : 0;
+            const profitDelta = latestResult ? (projectedProfit - baselineProfit) : 0;
+            
+            // Format impact text, e.g. +$45.5K profit increase or +15% revenue
+            const baselineRevenue = 180000;
+            const projectedRevenue = latestResult ? latestResult.projectedRevenue : baselineRevenue;
+            const revDeltaPercent = ((projectedRevenue - baselineRevenue) / baselineRevenue) * 100;
+            const impactText = revDeltaPercent >= 0 ? `+${revDeltaPercent.toFixed(1)}% rev` : `${revDeltaPercent.toFixed(1)}% rev`;
+
+            return (
+              <Link
+                key={scenario.id}
+                href={`/results?scenarioId=${scenario.id}`}
+                className="flex items-center justify-between p-4 rounded-xl border border-gray-150 hover:border-black/30 hover:bg-gray-50/50 transition-all duration-200 group cursor-pointer"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[#2B2644]/10 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-[#2B2644]" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-black group-hover:text-[#2B2644] transition-colors">
+                      {scenario.name}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{formatDistanceToNow(scenario.createdAt)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <p className="text-lg font-medium text-green-600">{scenario.impact}</p>
-                  <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                    scenario.status === 'Completed'
-                      ? 'bg-green-100 text-green-700'
-                      : scenario.status === 'Active'
-                      ? 'bg-[#2B2644]/10 text-[#2B2644]'
-                      : 'bg-yellow-100 text-yellow-700'
-                  }`}>
-                    {scenario.status}
-                  </span>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <p className="text-lg font-medium text-green-600">
+                      {latestResult ? impactText : '--'}
+                    </p>
+                    <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                      scenario.status === 'COMPLETED'
+                        ? 'bg-green-100 text-green-700'
+                        : scenario.status === 'PENDING'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-[#2B2644]/10 text-[#2B2644]'
+                    }`}>
+                      {scenario.status}
+                    </span>
+                  </div>
+                  <div>
+                    {scenario.status === 'COMPLETED' && (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    )}
+                  </div>
                 </div>
-                <div>
-                  {scenario.status === 'Completed' && (
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <Link 
-        href="/results"
-        className="w-full inline-block text-center mt-6 py-3 px-4 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors duration-200"
-      >
-        View Results Screen
-      </Link>
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
