@@ -2,15 +2,19 @@
 
 import { MoreVertical } from 'lucide-react';
 
-const businesses = [
-  { id: 1, name: 'TechCore Industries', simulations: 45, status: 'Active', users: 12 },
-  { id: 2, name: 'Retail Solutions Inc', simulations: 38, status: 'Active', users: 8 },
-  { id: 3, name: 'Manufacturing Pro', simulations: 52, status: 'Active', users: 15 },
-  { id: 4, name: 'Finance Analytics', simulations: 31, status: 'Active', users: 6 },
-  { id: 5, name: 'Supply Chain Co', simulations: 29, status: 'Inactive', users: 4 },
-];
+interface BusinessItem {
+  id: string | number;
+  name: string;
+  simulations: number;
+  users: number;
+  status: string;
+}
 
-export function ActiveBusinessesList() {
+interface ActiveBusinessesListProps {
+  businesses?: BusinessItem[];
+}
+
+export function ActiveBusinessesList({ businesses = [] }: ActiveBusinessesListProps) {
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
       <h3 className="text-black font-medium tracking-tight text-lg mb-6">Active Businesses</h3>

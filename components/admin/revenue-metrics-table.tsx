@@ -2,15 +2,20 @@
 
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
-const metrics = [
-  { id: 1, category: 'Enterprise Plan', mrrValue: '$145K', growth: '+12%', trend: 'up' },
-  { id: 2, category: 'Professional Plan', mrrValue: '$89K', growth: '+8%', trend: 'up' },
-  { id: 3, category: 'Starter Plan', mrrValue: '$34K', growth: '+2%', trend: 'up' },
-  { id: 4, category: 'Add-ons & Services', mrrValue: '$12K', growth: '-1%', trend: 'down' },
-  { id: 5, category: 'Annual Subscriptions', mrrValue: '$18K', growth: '+5%', trend: 'up' },
-];
+interface MetricItem {
+  id: string | number;
+  category: string;
+  mrrValue: string;
+  growth: string;
+  trend: 'up' | 'down';
+}
 
-export function RevenueMetricsTable() {
+interface RevenueMetricsTableProps {
+  metrics?: MetricItem[];
+  totalMRR?: number;
+}
+
+export function RevenueMetricsTable({ metrics = [], totalMRR = 298000 }: RevenueMetricsTableProps) {
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
       <h3 className="text-black font-medium tracking-tight text-lg mb-6">Revenue Breakdown (MRR)</h3>
@@ -51,7 +56,7 @@ export function RevenueMetricsTable() {
       <div className="mt-6 pt-6 border-t border-gray-150">
         <div className="flex justify-between items-center">
           <span className="text-gray-700 font-medium text-sm">Total MRR</span>
-          <span className="text-2xl font-medium tracking-tight text-black">$298K</span>
+          <span className="text-2xl font-medium tracking-tight text-black">${(totalMRR / 1000).toFixed(0)}K</span>
         </div>
       </div>
     </div>
