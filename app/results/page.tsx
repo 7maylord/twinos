@@ -8,6 +8,7 @@ import { RevenueComparisonChart } from '@/components/results/revenue-comparison-
 import { ProfitComparisonChart } from '@/components/results/profit-comparison-chart';
 import { ImpactMetrics } from '@/components/results/impact-metrics';
 import { AIRecommendationCard } from '@/components/results/ai-recommendation-card';
+import { runSimulation } from '@/lib/simulation-engine';
 
 interface Product {
   id: string;
@@ -78,6 +79,7 @@ function ResultsContent() {
   
   const [data, setData] = useState<SimulationData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [horizon, setHorizon] = useState<'30d' | '90d' | '6m' | '12m'>('6m');
 
   useEffect(() => {
     async function fetchResults() {
@@ -274,11 +276,87 @@ function ResultsContent() {
           </div>
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RevenueComparisonChart data={monthlyData} />
-          <ProfitComparisonChart data={monthlyData} />
-        </div>
+        {/* Forecast Horizon Tabs */}
+        {(() => {
+          // Calculate active projection data on-the-fly
+          const getChartData = () => {
+            if (horizon === '6m') return monthlyData;
+
+            const totalSalary = business.employees.reduce((sum, emp) => sum + emp.salary, 0);
+            const averageEmployeeSalary = business.employees.length > 0 ? totalSalary / business.employees.length : 4000;
+
+            const output = runSimulation(
+              {
+                baselineRevenue: business.baselineRevenue,
+                baselineMarketing: business.baselineMarketing,
+                baselineInventory: business.baselineInventory,
+                baselineFixedCosts: business.baselineFixedCosts,
+                baselineHeadcount: business.employees.length || 24,
+                averageEmployeeSalary,
+              },
+              {
+                priceIncrease: scenario.priceIncrease,
+                employeeCount: scenario.employeeCount,
+                marketingBudget: scenario.marketingBudget,
+                supplierDelay: scenario.supplierDelay,
+                horizon,
+              }
+            );
+            return output.monthlyData;
+          };
+
+          const chartData = getChartData();
+
+          return (
+            <>
+              <div className="flex items-center justify-between gap-4 bg-white border border-gray-200 rounded-2xl p-4 shadow-sm no-print">
+                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Forecast Projection Horizon
+                </span>
+                <div className="flex bg-[#F5F5F5] p-1 rounded-xl border border-gray-200">
+                  <button
+                    onClick={() => setHorizon('30d')}
+                    className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                      horizon === '30d' ? 'bg-black text-white shadow-sm' : 'text-gray-600 hover:text-black'
+                    }`}
+                  >
+                    30d (Weekly)
+                  </button>
+                  <button
+                    onClick={() => setHorizon('90d')}
+                    className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                      horizon === '90d' ? 'bg-black text-white shadow-sm' : 'text-gray-600 hover:text-black'
+                    }`}
+                  >
+                    90d
+                  </button>
+                  <button
+                    onClick={() => setHorizon('6m')}
+                    className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                      horizon === '6m' ? 'bg-black text-white shadow-sm' : 'text-gray-600 hover:text-black'
+                    }`}
+                  >
+                    6 Months
+                  </button>
+                  <button
+                    onClick={() => setHorizon('12m')}
+                    className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                      horizon === '12m' ? 'bg-black text-white shadow-sm' : 'text-gray-600 hover:text-black'
+                    }`}
+                  >
+                    12 Months
+                  </button>
+                </div>
+              </div>
+
+              {/* Charts */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <RevenueComparisonChart data={chartData} />
+                <ProfitComparisonChart data={chartData} />
+              </div>
+            </>
+          );
+        })()}
 
         {/* Impact Metrics */}
         <ImpactMetrics 
