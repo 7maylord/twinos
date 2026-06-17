@@ -34,7 +34,7 @@ interface Business {
 export default function SettingsPage() {
   const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'products' | 'employees'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'employees' | 'integrations'>('products');
 
   // Product Form states
   const [prodName, setProdName] = useState('');
@@ -58,6 +58,73 @@ export default function SettingsPage() {
   const [empParsed, setEmpParsed] = useState<any[] | null>(null);
   const [empParseError, setEmpParseError] = useState<string | null>(null);
   const [importingEmp, setImportingEmp] = useState(false);
+
+  // Integrations states
+  const [syncingQbo, setSyncingQbo] = useState(false);
+  const [syncingShopify, setSyncingShopify] = useState(false);
+  const [syncingSquare, setSyncingSquare] = useState(false);
+  
+  const [shopifyStore, setShopifyStore] = useState('');
+  const [qboConnected, setQboConnected] = useState(false);
+  const [shopifyConnected, setShopifyConnected] = useState(false);
+  const [squareConnected, setSquareConnected] = useState(false);
+
+  const handleSyncQbo = async () => {
+    setSyncingQbo(true);
+    try {
+      const res = await fetch('/api/integrations/quickbooks/sync', { method: 'POST' });
+      if (res.ok) {
+        setQboConnected(true);
+        await fetchBusiness();
+        alert('QuickBooks Financial Reports (P&L, Overheads) successfully synced! Your twin baseline revenue, marketing, inventory, and fixed costs have been updated.');
+      } else {
+        alert('Failed to sync with QuickBooks.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error syncing QuickBooks.');
+    } finally {
+      setSyncingQbo(false);
+    }
+  };
+
+  const handleSyncShopify = async () => {
+    setSyncingShopify(true);
+    try {
+      const res = await fetch('/api/integrations/shopify/sync', { method: 'POST' });
+      if (res.ok) {
+        setShopifyConnected(true);
+        await fetchBusiness();
+        alert('Shopify Product Catalog synced! "Shopify Matcha Latte" has been imported into your catalog.');
+      } else {
+        alert('Failed to sync with Shopify.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error syncing Shopify.');
+    } finally {
+      setSyncingShopify(false);
+    }
+  };
+
+  const handleSyncSquare = async () => {
+    setSyncingSquare(true);
+    try {
+      const res = await fetch('/api/integrations/square/sync', { method: 'POST' });
+      if (res.ok) {
+        setSquareConnected(true);
+        await fetchBusiness();
+        alert('Square POS Labor Logs synced! "Square Shift Barista" has been imported into your payroll roster.');
+      } else {
+        alert('Failed to sync with Square POS.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error syncing Square POS.');
+    } finally {
+      setSyncingSquare(false);
+    }
+  };
 
   // Fetch business profile and relations
   const fetchBusiness = async () => {
@@ -439,6 +506,17 @@ export default function SettingsPage() {
               <Users size={16} />
               Staff & Payroll ({business.employees.length})
             </button>
+            <button
+              onClick={() => setActiveTab('integrations')}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'integrations'
+                  ? 'border-black text-black'
+                  : 'border-transparent text-gray-500 hover:text-black'
+              }`}
+            >
+              <FileSpreadsheet size={16} />
+              Accounting & ERP Integrations
+            </button>
           </div>
 
           {/* Products Workspace */}
@@ -773,6 +851,115 @@ export default function SettingsPage() {
                       )}
                     </tbody>
                   </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Integrations Workspace */}
+          {activeTab === 'integrations' && (
+            <div className="space-y-6">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h3 className="text-lg font-medium text-black mb-2">Connected Accounts & Automations</h3>
+                <p className="text-gray-500 text-sm mb-6">
+                  Sync financial and catalog baselines from QuickBooks, Shopify, and POS registers to keep your business twin accurate.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* QuickBooks Online */}
+                  <div className="border border-gray-200 rounded-xl p-6 bg-[#F5F5F5]/20 flex flex-col justify-between h-[280px]">
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="font-bold text-gray-800 text-sm">QuickBooks Online</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                          qboConnected ? 'bg-green-100 text-green-700' : 'bg-gray-150 text-gray-550'
+                        }`}>
+                          {qboConnected ? 'Connected' : 'Not Connected'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        Syncs Balance Sheet and Profit & Loss statements to populate baseline revenue, operating overheads, marketing spends, and inventory reserves automatically.
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleSyncQbo}
+                      disabled={syncingQbo}
+                      className={`w-full py-2.5 px-4 rounded-full font-medium text-sm flex items-center justify-center gap-2 transition-colors ${
+                        qboConnected
+                          ? 'bg-green-50 border border-green-200 text-green-700 hover:bg-green-100'
+                          : 'bg-black hover:bg-gray-850 text-white'
+                      }`}
+                    >
+                      {syncingQbo ? 'Syncing...' : qboConnected ? 'Re-sync Account' : 'Connect QuickBooks'}
+                    </button>
+                  </div>
+
+                  {/* Shopify */}
+                  <div className="border border-gray-200 rounded-xl p-6 bg-[#F5F5F5]/20 flex flex-col justify-between h-[280px]">
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="font-bold text-gray-800 text-sm">Shopify Admin</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                          shopifyConnected ? 'bg-green-100 text-green-700' : 'bg-gray-150 text-gray-550'
+                        }`}>
+                          {shopifyConnected ? 'Active webhook' : 'Inactive'}
+                        </span>
+                      </div>
+                      <div className="space-y-3">
+                        <p className="text-xs text-gray-500 leading-relaxed">
+                          Imports active products and unit costs to sync your menu catalog and maps historical order volumes to compute dynamic price elasticity levels.
+                        </p>
+                        {!shopifyConnected && (
+                          <input
+                            type="text"
+                            placeholder="my-store.myshopify.com"
+                            value={shopifyStore}
+                            onChange={(e) => setShopifyStore(e.target.value)}
+                            className="w-full px-3 py-2 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none"
+                          />
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleSyncShopify}
+                      disabled={syncingShopify}
+                      className={`w-full py-2.5 px-4 rounded-full font-medium text-sm flex items-center justify-center gap-2 transition-colors ${
+                        shopifyConnected
+                          ? 'bg-green-50 border border-green-200 text-green-700 hover:bg-green-100'
+                          : 'bg-black hover:bg-gray-850 text-white'
+                      }`}
+                    >
+                      {syncingShopify ? 'Syncing...' : shopifyConnected ? 'Sync Products' : 'Enable Shopify Sync'}
+                    </button>
+                  </div>
+
+                  {/* Square POS */}
+                  <div className="border border-gray-200 rounded-xl p-6 bg-[#F5F5F5]/20 flex flex-col justify-between h-[280px]">
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="font-bold text-gray-800 text-sm">Square POS</span>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                          squareConnected ? 'bg-green-100 text-green-700' : 'bg-gray-150 text-gray-550'
+                        }`}>
+                          {squareConnected ? 'Connected' : 'Not Connected'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 leading-relaxed">
+                        Imports shift scheduling, active employee logs, and hourly labor rates. Refines baseline seasonality calculations with precise daily transactions.
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleSyncSquare}
+                      disabled={syncingSquare}
+                      className={`w-full py-2.5 px-4 rounded-full font-medium text-sm flex items-center justify-center gap-2 transition-colors ${
+                        squareConnected
+                          ? 'bg-green-50 border border-green-200 text-green-700 hover:bg-green-100'
+                          : 'bg-black hover:bg-gray-850 text-white'
+                      }`}
+                    >
+                      {syncingSquare ? 'Syncing...' : squareConnected ? 'Re-sync Shifts' : 'Connect Square POS'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
