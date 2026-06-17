@@ -35,6 +35,24 @@
       "recommendedChanges": [
         "Test action plan step."
       ]
+    },
+    {
+      "runId": "test-run-1781738889397",
+      "timestamp": "2026-06-17T23:28:09.397Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
+    },
+    {
+      "runId": "test-run-1781739128611",
+      "timestamp": "2026-06-17T23:32:08.611Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
     }
   ],
   "forecastCache": [
@@ -44,7 +62,7 @@
       "forecastData": {
         "profit": 5000
       },
-      "generatedAt": "2026-06-17T23:12:41.239Z"
+      "generatedAt": "2026-06-17T23:32:08.613Z"
     }
   ]
 }
