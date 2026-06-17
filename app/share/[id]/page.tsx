@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { ArrowUpRight, ArrowDownLeft, Download, Zap, ArrowLeft, TrendingUp, Share2 } from 'lucide-react';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { ArrowUpRight, ArrowDownLeft, Download, Zap, TrendingUp } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { RevenueComparisonChart } from '@/components/results/revenue-comparison-chart';
 import { ProfitComparisonChart } from '@/components/results/profit-comparison-chart';
 import { ImpactMetrics } from '@/components/results/impact-metrics';
@@ -73,43 +72,21 @@ interface SimulationData {
   } | null;
 }
 
-function ResultsContent() {
-  const searchParams = useSearchParams();
-  const scenarioId = searchParams.get('scenarioId');
+function ShareContent() {
+  const params = useParams();
+  const scenarioId = params.id as string;
   
   const [data, setData] = useState<SimulationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [horizon, setHorizon] = useState<'30d' | '90d' | '6m' | '12m'>('6m');
-  const [copied, setCopied] = useState(false);
-
-  const handleShare = () => {
-    if (!data?.scenario?.id) return;
-    const shareUrl = `${window.location.origin}/share/${data.scenario.id}`;
-    navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
-  };
 
   useEffect(() => {
     async function fetchResults() {
       try {
-        let targetId = scenarioId;
-
-        // If no scenarioId in URL, fetch list to find the latest completed scenario
-        if (!targetId) {
-          const listRes = await fetch('/api/scenarios');
-          if (listRes.ok) {
-            const scenarios = await listRes.json();
-            if (scenarios.length > 0) {
-              targetId = scenarios[0].id;
-            }
-          }
-        }
-
-        if (targetId) {
+        if (scenarioId) {
           const [detailRes, recoRes] = await Promise.all([
-            fetch(`/api/scenarios/${targetId}/results`),
-            fetch(`/api/recommendations?scenarioId=${targetId}`)
+            fetch(`/api/scenarios/${scenarioId}/results`),
+            fetch(`/api/recommendations?scenarioId=${scenarioId}`)
           ]);
 
           if (detailRes.ok) {
@@ -125,7 +102,7 @@ function ResultsContent() {
           }
         }
       } catch (err) {
-        console.error('Error loading scenario results:', err);
+        console.error('Error loading shared scenario results:', err);
       } finally {
         setLoading(false);
       }
@@ -138,7 +115,7 @@ function ResultsContent() {
     return (
       <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center justify-center text-black">
         <TrendingUp className="w-10 h-10 text-[#2B2644] animate-bounce mb-4" />
-        <p className="font-semibold text-lg tracking-tight">Calculating scenario projections...</p>
+        <p className="font-semibold text-lg tracking-tight">Loading shared report...</p>
       </div>
     );
   }
@@ -147,16 +124,10 @@ function ResultsContent() {
     return (
       <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center justify-center text-black p-6">
         <div className="bg-white border border-gray-200 rounded-2xl p-8 max-w-md text-center shadow-sm">
-          <h2 className="text-xl font-semibold mb-2">No Projections Found</h2>
+          <h2 className="text-xl font-semibold mb-2">Report Not Found</h2>
           <p className="text-gray-500 mb-6 text-sm">
-            Please build and run a scenario simulation from the builder screen to view outcomes.
+            This shared report link is invalid or has been deleted.
           </p>
-          <Link 
-            href="/scenario-builder"
-            className="py-3 px-6 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors inline-block"
-          >
-            Go to Scenario Builder
-          </Link>
         </div>
       </div>
     );
@@ -186,63 +157,52 @@ function ResultsContent() {
   const revDeltaPct = (revDelta / baselineRevenue) * 100;
   
   const profitMarginDelta = projectedProfitMargin - baselineProfitMargin;
+  const profitDelta = projectedProfit - baselineProfit;
   
-  // Calculate inventory cost change (inventory scales with demandMultiplier)
-  // Let's retrieve this month's projected inventory cost based on our simulation output
   const finalMonthData = monthlyData[monthlyData.length - 1];
   const projectedInventoryCost = baselineInventory * (finalMonthData.projectedRevenue / (baselineRevenue * (1 + scenario.priceIncrease / 100)));
-
-  // ROI: change in profit divided by marketing budget change
-  const profitDelta = projectedProfit - baselineProfit;
-  const marketingDelta = scenario.marketingBudget - baselineMarketing;
-  const roi = marketingDelta > 0 ? (profitDelta / marketingDelta) * 100 : 100;
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] text-black p-6 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/dashboard"
-              className="p-2.5 bg-white hover:bg-gray-100 border border-gray-200 rounded-full transition-colors duration-200 no-print"
-            >
-              <ArrowLeft size={18} className="text-black" />
-            </Link>
+        
+        {/* Banner header for public visibility */}
+        <div className="bg-[#2B2644] text-white rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md shadow-[#2B2644]/10">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-white/10 rounded-full">
+              <TrendingUp size={24} className="text-white" />
+            </div>
             <div>
-              <h1 
-                className="text-3xl md:text-4xl font-medium tracking-tight text-black mb-1"
-                style={{ letterSpacing: '-0.03em' }}
-              >
-                Simulation Results
-              </h1>
-              <p className="text-gray-500 text-sm">
-                Scenario: "{scenario.name}" • Run: {new Date(scenario.createdAt).toLocaleDateString()}
-              </p>
+              <h2 className="text-xl font-bold tracking-tight">TwinOS Shareable Report</h2>
+              <p className="text-white/60 text-xs mt-0.5">Interactive simulation projections for digital twin planning</p>
             </div>
           </div>
-          
-          <div className="flex items-center gap-3 no-print">
-            <button 
-              onClick={handleShare} 
-              className={`flex items-center gap-2 px-6 py-2.5 border rounded-full font-medium transition-all duration-200 ${
-                copied 
-                  ? 'bg-green-600 border-green-600 text-white' 
-                  : 'bg-white hover:bg-gray-50 border-gray-200 text-black shadow-sm'
-              }`}
-            >
-              <Share2 size={18} />
-              {copied ? 'Copied Link!' : 'Share Report'}
-            </button>
-
-            <button 
-              onClick={() => window.print()} 
-              className="flex items-center gap-2 px-6 py-2.5 bg-black hover:bg-gray-800 text-white rounded-full font-medium transition-colors duration-200"
-            >
-              <Download size={18} />
-              Export Report
-            </button>
+          <div className="text-xs bg-white/10 px-3 py-1.5 rounded-full font-medium tracking-wide uppercase">
+            Shared Projection
           </div>
+        </div>
+
+        {/* Header Title section */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h1 
+              className="text-2xl md:text-3xl font-medium tracking-tight text-black mb-1"
+              style={{ letterSpacing: '-0.02em' }}
+            >
+              Scenario: "{scenario.name}"
+            </h1>
+            <p className="text-gray-500 text-sm">
+              Business: {business.name} • Simulated on: {new Date(scenario.createdAt).toLocaleDateString()}
+            </p>
+          </div>
+          
+          <button 
+            onClick={() => window.print()} 
+            className="flex items-center gap-2 px-6 py-2.5 bg-black hover:bg-gray-800 text-white rounded-full font-medium transition-colors duration-200 no-print"
+          >
+            <Download size={18} />
+            Export Report
+          </button>
         </div>
 
         {/* Summary Cards */}
@@ -299,9 +259,8 @@ function ResultsContent() {
           </div>
         </div>
 
-        {/* Forecast Horizon Tabs */}
+        {/* Forecast Horizon Switcher */}
         {(() => {
-          // Calculate active projection data on-the-fly
           const getChartData = () => {
             if (horizon === '6m') return monthlyData;
 
@@ -372,7 +331,6 @@ function ResultsContent() {
                 </div>
               </div>
 
-              {/* Charts */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <RevenueComparisonChart data={chartData} />
                 <ProfitComparisonChart data={chartData} />
@@ -453,15 +411,15 @@ function ResultsContent() {
   );
 }
 
-export default function ResultsPage() {
+export default function SharePage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#F5F5F5] flex flex-col items-center justify-center text-black">
         <TrendingUp className="w-10 h-10 text-[#2B2644] animate-bounce mb-4" />
-        <p className="font-semibold text-lg tracking-tight">Loading simulation results...</p>
+        <p className="font-semibold text-lg tracking-tight">Loading shared report...</p>
       </div>
     }>
-      <ResultsContent />
+      <ShareContent />
     </Suspense>
   );
 }
