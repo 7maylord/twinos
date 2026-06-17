@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:postgres": "node scripts/db-switch.js postgres",
+    "db:sqlite": "node scripts/db-switch.js sqlite"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1071.0",
