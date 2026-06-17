@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { runSimulation } from '@/lib/simulation-engine';
+import { cacheForecast } from '@/lib/dynamodb';
 
 export async function POST(request: Request) {
   try {
@@ -83,6 +84,24 @@ export async function POST(request: Request) {
       where: { id: scenario.id },
       data: { status: 'COMPLETED' },
     });
+
+    // Cache forecast results in DynamoDB / local mock storage
+    try {
+      await cacheForecast({
+        businessId: business.id,
+        metricType: `scenario-run-${scenario.id}`,
+        forecastData: {
+          projectedRevenue: simulationOutput.projectedRevenue,
+          projectedProfit: simulationOutput.projectedProfit,
+          projectedHeadcount: simulationOutput.projectedHeadcount,
+          projectedInventoryRisk: simulationOutput.projectedInventoryRisk,
+          monthlyData: simulationOutput.monthlyData,
+        },
+        generatedAt: new Date().toISOString(),
+      });
+    } catch (dbErr) {
+      console.error('Failed caching forecast output:', dbErr);
+    }
 
     return NextResponse.json({
       scenario,

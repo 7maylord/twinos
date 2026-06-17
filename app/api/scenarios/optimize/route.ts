@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { runSimulation, BaselineMetrics, ScenarioAdjustments } from '@/lib/simulation-engine';
+import { logOptimizationRun } from '@/lib/dynamodb';
 
 export async function POST(request: Request) {
   try {
@@ -166,6 +167,20 @@ export async function POST(request: Request) {
 
     if (actionPlan.length === 0) {
       actionPlan.push("No adjustments needed. The baseline setup currently satisfies your target.");
+    }
+
+    // Log optimization runs in DynamoDB / local mock storage
+    const runId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `run-${Date.now()}`;
+    try {
+      await logOptimizationRun({
+        runId,
+        timestamp: new Date().toISOString(),
+        targetMetric: `${targetType} - ${targetGrowthPct}% Growth`,
+        exploredScenarios: maxIterations,
+        recommendedChanges: actionPlan,
+      });
+    } catch (dbErr) {
+      console.error('Failed logging optimization run:', dbErr);
     }
 
     return NextResponse.json({
