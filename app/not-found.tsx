@@ -2,13 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { Menu, X } from 'lucide-react';
+import { LogoIcon } from '@/components/logo';
 
 export default function NotFound() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
 
   return (
     <div className="not-found-page-wrapper">
@@ -45,197 +43,32 @@ export default function NotFound() {
           background-size: contain;
           background-attachment: fixed;
           color: var(--text-main);
+          padding-top: 80px; /* Offset for fixed navbar */
         }
 
-        .navbar {
-          width: 100%;
-          max-width: 1100px;
-          margin: 0 auto;
-          padding: 28px 40px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          position: relative;
-        }
-
-        .navbar::after {
-          content: '';
+        .decor-icon {
           position: absolute;
-          bottom: 0;
-          left: 40px;
-          right: 40px;
-          height: 1px;
-          background-image: linear-gradient(to right, rgba(0,0,0,0.08) 2px, transparent 2px);
-          background-size: 6px 1px;
+          user-select: none;
+          filter: drop-shadow(0 2px 0 #ffffff) drop-shadow(0 -2px 0 #ffffff) drop-shadow(2px 0 0 #ffffff) drop-shadow(-2px 0 0 #ffffff);
+          animation: floatSlow 5s ease-in-out infinite;
         }
 
-        .logo-container {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          text-decoration: none;
+        .cloud-decor {
+          width: 42px;
+          height: 42px;
+          top: -22px;
+          left: -28px;
+          animation-duration: 5s;
+          animation-delay: 0.3s;
         }
 
-        .logo-img {
-          height: 28px;
-          filter: brightness(0);
-        }
-
-        .logo-text {
-          font-size: 20px;
-          font-weight: 700;
-          letter-spacing: -0.3px;
-          color: #111111;
-        }
-
-        .nav-links {
-          display: flex;
-          align-items: center;
-          gap: 36px;
-        }
-
-        .nav-link {
-          font-size: 14px;
-          font-weight: 400;
-          color: var(--text-main);
-          opacity: 0.65;
-          text-decoration: none;
-          transition: opacity 0.2s ease;
-        }
-
-        .nav-link:hover {
-          opacity: 1;
-        }
-
-        .cta-button {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          background: linear-gradient(180deg, #2c2c2c 0%, #111111 100%);
-          color: #ffffff;
-          font-size: 13px;
-          font-weight: 500;
-          border-radius: 40px;
-          padding: 5px 16px 5px 5px;
-          border: none;
-          cursor: pointer;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-          transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-          text-decoration: none;
-        }
-
-        .cta-button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.22);
-          filter: brightness(1.1);
-        }
-
-        .arrow-circle {
-          width: 24px;
-          height: 24px;
-          background-color: #ffffff;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .arrow-circle-large {
+        .heart-decor {
           width: 32px;
           height: 32px;
-          background-color: #ffffff;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .hamburger {
-          display: none;
-          flex-direction: column;
-          justify-content: space-between;
-          width: 24px;
-          height: 16px;
-          background: transparent;
-          border: none;
-          cursor: pointer;
-          padding: 0;
-          z-index: 100;
-        }
-
-        .hamburger span {
-          width: 24px;
-          height: 2px;
-          background-color: var(--text-main);
-          transition: all 0.3s ease;
-          transform-origin: left center;
-        }
-
-        .hamburger.active span:nth-child(1) {
-          transform: rotate(45deg) translate(2px, 0px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-          width: 0%;
-          opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-          transform: rotate(-45deg) translate(2px, 0px);
-        }
-
-        .mobile-nav-overlay {
-          position: fixed;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          background-color: #ffffff;
-          z-index: 90;
-          display: flex;
-          flex-direction: column;
-          padding: 80px 40px;
-          transform: translateX(100%);
-          transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-
-        .mobile-nav-overlay.open {
-          transform: translateX(0);
-        }
-
-        .mobile-links {
-          display: flex;
-          flex-direction: column;
-          margin-top: 40px;
-        }
-
-        .mobile-link {
-          font-size: 38px;
-          font-weight: 800;
-          letter-spacing: -1.5px;
-          color: var(--text-main);
-          text-decoration: none;
-          padding: 24px 0;
-          border-bottom: 1px solid rgba(0,0,0,0.06);
-        }
-
-        .mobile-cta-wrapper {
-          margin-top: auto;
-          display: flex;
-        }
-
-        .mobile-cta {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          background: linear-gradient(180deg, #2c2c2c 0%, #111111 100%);
-          color: #ffffff;
-          font-size: 16px;
-          font-weight: 600;
-          border-radius: 50px;
-          padding: 8px 24px 8px 8px;
-          text-decoration: none;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+          bottom: -15px;
+          right: 20px;
+          animation-duration: 4.5s;
+          animation-delay: 1s;
         }
 
         .main-content {
@@ -272,31 +105,6 @@ export default function NotFound() {
           line-height: 1.08;
           color: #0f0f0f;
           margin: 0;
-        }
-
-        .decor-icon {
-          position: absolute;
-          user-select: none;
-          filter: drop-shadow(0 2px 0 #ffffff) drop-shadow(0 -2px 0 #ffffff) drop-shadow(2px 0 0 #ffffff) drop-shadow(-2px 0 0 #ffffff);
-          animation: floatSlow 5s ease-in-out infinite;
-        }
-
-        .cloud-decor {
-          width: 42px;
-          height: 42px;
-          top: -22px;
-          left: -28px;
-          animation-duration: 5s;
-          animation-delay: 0.3s;
-        }
-
-        .heart-decor {
-          width: 32px;
-          height: 32px;
-          bottom: -15px;
-          right: 20px;
-          animation-duration: 4.5s;
-          animation-delay: 1s;
         }
 
         .subtext {
@@ -404,23 +212,7 @@ export default function NotFound() {
           .page-container {
             background-size: 90%;
             background-position: center 45%;
-          }
-
-          .navbar {
-            padding: 20px;
-          }
-
-          .navbar::after {
-            left: 20px;
-            right: 20px;
-          }
-
-          .nav-links {
-            display: none;
-          }
-
-          .hamburger {
-            display: flex;
+            padding-top: 70px;
           }
 
           .title {
@@ -481,46 +273,88 @@ export default function NotFound() {
         }
       `}</style>
 
-      <div className="page-container">
-        {/* Navbar */}
-        <header className="navbar">
-          <Link href="/" className="logo-container">
-            <img 
-              src="https://pub-f170a2592d2c4a1485466404c36807be.r2.dev/Tests/logoipsum-415.svg" 
-              alt="TwinOS Logo" 
-              className="logo-img"
-            />
-            <span className="logo-text">TwinOS</span>
-          </Link>
+      {/* Shared Header/Navbar integration */}
+      <nav className="fixed top-0 w-full z-50 bg-[#F5F5F5]/80 backdrop-blur-xl border-b border-gray-200/50">
+        <div className="max-w-[88rem] mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2.5 text-decoration-none">
+              <LogoIcon className="w-7 h-7 text-black" />
+              <span className="text-2xl font-medium tracking-tight text-black">TwinOS</span>
+            </Link>
 
-          <nav className="nav-links">
-            <Link href="/dashboard" className="nav-link">Workspace</Link>
-            <Link href="/scenario-builder" className="nav-link">Scenario Builder</Link>
-            <Link href="/dashboard/optimize" className="nav-link">AI Projections</Link>
-            <Link href="/admin" className="nav-link">Admin Portal</Link>
-          </nav>
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-8">
+              <Link href="/#features" className="text-base text-gray-600 hover:text-black font-medium transition-colors duration-200">
+                Features
+              </Link>
+              <Link href="/#how-it-works" className="text-base text-gray-600 hover:text-black font-medium transition-colors duration-200">
+                How It Works
+              </Link>
+              <Link href="/#testimonials" className="text-base text-gray-600 hover:text-black font-medium transition-colors duration-200">
+                Testimonials
+              </Link>
+            </div>
 
-          <button 
-            className={`hamburger ${mobileMenuOpen ? 'active' : ''}`} 
-            onClick={toggleMobileMenu}
-            aria-label="Toggle Navigation Menu"
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </header>
+            {/* CTA Button */}
+            <div className="hidden md:block">
+              <Link
+                href="/dashboard"
+                className="inline-block bg-black text-white text-base font-medium px-7 py-2.5 rounded-full hover:bg-gray-800 transition-colors duration-200 text-decoration-none"
+              >
+                Start Simulating
+              </Link>
+            </div>
 
-        {/* Mobile Navigation Drawer */}
-        <div className={`mobile-nav-overlay ${mobileMenuOpen ? 'open' : ''}`}>
-          <div className="mobile-links">
-            <Link href="/dashboard" className="mobile-link" onClick={toggleMobileMenu}>Workspace</Link>
-            <Link href="/scenario-builder" className="mobile-link" onClick={toggleMobileMenu}>Scenario Builder</Link>
-            <Link href="/dashboard/optimize" className="mobile-link" onClick={toggleMobileMenu}>AI Projections</Link>
-            <Link href="/admin" className="mobile-link" onClick={toggleMobileMenu}>Admin Portal</Link>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 hover:bg-gray-200/50 rounded-full transition-colors text-black flex items-center justify-center border-none bg-transparent cursor-pointer"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
-        </div>
 
+          {/* Mobile Navigation Panel */}
+          {mobileMenuOpen && (
+            <div className="md:hidden pt-4 pb-2">
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/#features"
+                  className="px-4 py-2.5 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition-colors text-decoration-none"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Features
+                </Link>
+                <Link
+                  href="/#how-it-works"
+                  className="px-4 py-2.5 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition-colors text-decoration-none"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  How It Works
+                </Link>
+                <Link
+                  href="/#testimonials"
+                  className="px-4 py-2.5 text-gray-600 hover:text-black hover:bg-gray-100 rounded-full transition-colors text-decoration-none"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Testimonials
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="mt-2 text-center bg-black text-white px-4 py-2.5 rounded-full font-medium text-decoration-none"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Start Simulating
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+
+      <div className="page-container">
         {/* Main Content Area */}
         <main className="main-content">
           <p className="lost-text">Seems you've wandered off...</p>
@@ -569,7 +403,7 @@ export default function NotFound() {
 
           {/* Navigation Cards */}
           <div className="cards-container">
-            <Link href="/dashboard" className="nav-card">
+            <Link href="/" className="nav-card">
               <div className="card-left">
                 <div className="icon-container">
                   <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#6366f1" strokeWidth="2">
@@ -578,14 +412,14 @@ export default function NotFound() {
                   </svg>
                 </div>
                 <div className="card-text">
-                  <span className="card-title">Workspace Dashboard</span>
+                  <span className="card-title">Home</span>
                   <span className="card-subtitle">Back where it all begins...</span>
                 </div>
               </div>
               <span className="chevron-arrow">&rsaquo;</span>
             </Link>
 
-            <Link href="/dashboard/optimize" className="nav-card">
+            <Link href="/dashboard" className="nav-card">
               <div className="card-left">
                 <div className="icon-container">
                   <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
@@ -594,8 +428,8 @@ export default function NotFound() {
                   </svg>
                 </div>
                 <div className="card-text">
-                  <span className="card-title">Scenario Optimizer</span>
-                  <span className="card-subtitle">Where we optimize your twin</span>
+                  <span className="card-title">Dashboard</span>
+                  <span className="card-subtitle">Simulate your business twins...</span>
                 </div>
               </div>
               <span className="chevron-arrow">&rsaquo;</span>
