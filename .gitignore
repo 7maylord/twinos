@@ -32,3 +32,6 @@ yarn-error.log*
 TwinOS_PRD.md
 
 /generated/prisma
+
+# clerk configuration (can include secrets)
+/.clerk/

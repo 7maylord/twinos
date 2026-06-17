@@ -1,4 +1,50 @@
 {
-  "optimizationRuns": [],
-  "forecastCache": []
+  "optimizationRuns": [
+    {
+      "runId": "test-run-1781737282928",
+      "timestamp": "2026-06-17T23:01:22.928Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
+    },
+    {
+      "runId": "test-run-1781737778464",
+      "timestamp": "2026-06-17T23:09:38.464Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
+    },
+    {
+      "runId": "test-run-1781737862705",
+      "timestamp": "2026-06-17T23:11:02.705Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
+    },
+    {
+      "runId": "test-run-1781737961237",
+      "timestamp": "2026-06-17T23:12:41.237Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
+    }
+  ],
+  "forecastCache": [
+    {
+      "businessId": "test-biz",
+      "metricType": "monthly-projections",
+      "forecastData": {
+        "profit": 5000
+      },
+      "generatedAt": "2026-06-17T23:12:41.239Z"
+    }
+  ]
 }

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:postgres": "node scripts/db-switch.js postgres",
-    "db:sqlite": "node scripts/db-switch.js sqlite"
+    "db:sqlite": "node scripts/db-switch.js sqlite",
+    "test": "tsx scripts/test-all.ts"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1071.0",

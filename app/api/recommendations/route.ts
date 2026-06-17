@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { generateRuleBasedRecommendation } from '@/lib/simulation-engine';
 
 export async function GET(request: Request) {
   try {
@@ -132,50 +133,17 @@ export async function GET(request: Request) {
 
     // Fallback Rule-Based Generation (if OpenAI is missing or failed)
     if (!summaryText) {
-      const isProfitable = projectedProfit > baselineProfit;
-      const isNetPositive = projectedProfit > 0;
-      
-      // 1. Summary
-      if (isProfitable && isNetPositive) {
-        summaryText = `Based on the simulation results, "${scenario.name}" shows strong potential. The projected revenue increase of $${revenueDelta.toLocaleString()} would significantly improve profitability while maintaining acceptable margins.`;
-      } else if (isProfitable) {
-        summaryText = `This scenario reduces your operating deficit by $${profitDelta.toLocaleString()} compared to the baseline, but the business remains in a net monthly loss. Consider raising prices further or reducing overheads.`;
-      } else {
-        summaryText = `Caution: "${scenario.name}" projects a profit drop of $${Math.abs(profitDelta).toLocaleString()} compared to the baseline. Operating costs (such as payroll adjustments) have outpaced your price adjustment gains.`;
-      }
-
-      // 2. Headline & Details
-      if (isNetPositive && isProfitable) {
-        recommendationHeadline = 'Proceed with Confidence';
-        recommendationDetails = `This strategy successfully moves the business to net profitability. The projected revenue of $${projectedRevenue.toLocaleString()} validates the price adjustment despite small demand drops.`;
-      } else if (isNetPositive) {
-        recommendationHeadline = 'Revise Staffing & Prices';
-        recommendationDetails = `Operating profit remains positive but is lower than baseline. We recommend scaling back the headcount additions or increasing prices by another 3-5% to cover salaries.`;
-      } else {
-        recommendationHeadline = 'Simulation Projects Net Loss';
-        recommendationDetails = `The business is projected to run a net monthly loss of $${Math.abs(projectedProfit).toLocaleString()}. We recommend postponing this rollout and revising your employee count adjustments.`;
-      }
-
-      // 3. Considerations
-      if (revenueDelta > 0) {
-        keyConsiderations.push('Revenue is projected to grow due to adjustments.');
-      } else {
-        keyConsiderations.push('Revenue contracts due to price elasticity.');
-      }
-
-      if (projectedHeadcount > employees.length) {
-        keyConsiderations.push(`Hiring timeline for ${projectedHeadcount - employees.length} staff members is realistic.`);
-      } else if (projectedHeadcount < employees.length) {
-        keyConsiderations.push(`Workforce reduction of ${employees.length - projectedHeadcount} will reduce baseline payroll by $${Math.abs(payrollDelta).toLocaleString()}.`);
-      } else {
-        keyConsiderations.push('Hiring overhead is maintained at baseline level.');
-      }
-
-      if (scenario.supplierDelay === 'none') {
-        keyConsiderations.push('Supply chain operates smoothly without delay risks.');
-      } else {
-        keyConsiderations.push(`Inventory delay (${scenario.supplierDelay}) raises stockout risk to ${(projectedInventoryRisk * 100).toFixed(0)}%.`);
-      }
+      const recResult = generateRuleBasedRecommendation({
+        business,
+        baselineHeadcount: employees.length,
+        baselinePayroll,
+        scenario,
+        latestResult,
+      });
+      summaryText = recResult.summary;
+      recommendationHeadline = recResult.headline;
+      recommendationDetails = recResult.details;
+      keyConsiderations = recResult.considerations;
     }
 
     return NextResponse.json({
