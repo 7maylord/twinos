@@ -1,0 +1,55 @@
+import crypto from 'crypto';
+
+const ALGORITHM = 'aes-256-gcm';
+const DEFAULT_KEY = 'twinos-secret-dev-encryption-key-32bytes';
+
+function getEncryptionKey(): Buffer {
+  const secret = process.env.INTEGRATION_ENCRYPTION_KEY || DEFAULT_KEY;
+  return crypto.scryptSync(secret, 'salt-twinos', 32);
+}
+
+export function encrypt(text: string): string {
+  if (!text) return text;
+  try {
+    const key = getEncryptionKey();
+    const iv = crypto.randomBytes(12);
+    const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+    
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    
+    const tag = cipher.getAuthTag().toString('hex');
+    
+    // Store format: iv:tag:encrypted
+    return `${iv.toString('hex')}:${tag}:${encrypted}`;
+  } catch (err) {
+    console.error('Encryption error:', err);
+    throw err;
+  }
+}
+
+export function decrypt(cipherText: string): string {
+  if (!cipherText) return cipherText;
+  try {
+    const parts = cipherText.split(':');
+    if (parts.length !== 3) {
+      return cipherText;
+    }
+    
+    const [ivHex, tagHex, encryptedHex] = parts;
+    const key = getEncryptionKey();
+    const iv = Buffer.from(ivHex, 'hex');
+    const tag = Buffer.from(tagHex, 'hex');
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
+    
+    decipher.setAuthTag(tag);
+    
+    let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    
+    return decrypted;
+  } catch (err) {
+    console.error('Decryption error:', err);
+    return cipherText;
+  }
+}

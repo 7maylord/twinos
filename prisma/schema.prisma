@@ -29,6 +29,23 @@ model Business {
   products          Product[]
   employees         Employee[]
   scenarios         Scenario[]
+
+  // QuickBooks Online Connection Details
+  qboCompanyId               String?
+  qboAccessToken             String?
+  qboRefreshToken            String?
+  qboTokenExpiresAt          DateTime?
+  qboRefreshTokenExpiresAt   DateTime?
+
+  // Shopify Connection Details
+  shopifyStoreDomain         String?
+  shopifyAccessToken         String?
+
+  // Square POS Connection Details
+  squareLocationId           String?
+  squareAccessToken          String?
+  squareRefreshToken         String?
+  squareTokenExpiresAt       DateTime?
 }
 
 model Product {

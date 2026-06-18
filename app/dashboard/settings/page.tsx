@@ -70,11 +70,21 @@ export default function SettingsPage() {
   const [squareConnected, setSquareConnected] = useState(false);
 
   const handleSyncQbo = async () => {
+    if (!qboConnected) {
+      if (business) {
+        window.location.href = `/api/integrations/quickbooks/connect?businessId=${business.id}`;
+      }
+      return;
+    }
+
     setSyncingQbo(true);
     try {
-      const res = await fetch('/api/integrations/quickbooks/sync', { method: 'POST' });
+      const res = await fetch('/api/integrations/quickbooks/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessId: business?.id })
+      });
       if (res.ok) {
-        setQboConnected(true);
         await fetchBusiness();
         alert('QuickBooks Financial Reports (P&L, Overheads) successfully synced! Your twin baseline revenue, marketing, inventory, and fixed costs have been updated.');
       } else {
@@ -91,11 +101,15 @@ export default function SettingsPage() {
   const handleSyncShopify = async () => {
     setSyncingShopify(true);
     try {
-      const res = await fetch('/api/integrations/shopify/sync', { method: 'POST' });
+      const res = await fetch('/api/integrations/shopify/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shopifyStoreDomain: shopifyStore, businessId: business?.id })
+      });
       if (res.ok) {
         setShopifyConnected(true);
         await fetchBusiness();
-        alert('Shopify Product Catalog synced! "Shopify Matcha Latte" has been imported into your catalog.');
+        alert('Shopify Product Catalog synced! Products have been imported into your catalog.');
       } else {
         alert('Failed to sync with Shopify.');
       }
@@ -110,11 +124,15 @@ export default function SettingsPage() {
   const handleSyncSquare = async () => {
     setSyncingSquare(true);
     try {
-      const res = await fetch('/api/integrations/square/sync', { method: 'POST' });
+      const res = await fetch('/api/integrations/square/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessId: business?.id })
+      });
       if (res.ok) {
         setSquareConnected(true);
         await fetchBusiness();
-        alert('Square POS Labor Logs synced! "Square Shift Barista" has been imported into your payroll roster.');
+        alert('Square POS Labor Logs synced! Shift logs have been imported into your payroll roster.');
       } else {
         alert('Failed to sync with Square POS.');
       }
@@ -133,6 +151,12 @@ export default function SettingsPage() {
       if (res.ok) {
         const data = await res.json();
         setBusiness(data);
+        setQboConnected(!!data.qboAccessToken);
+        setShopifyConnected(!!data.shopifyAccessToken);
+        setSquareConnected(!!data.squareAccessToken);
+        if (data.shopifyStoreDomain) {
+          setShopifyStore(data.shopifyStoreDomain);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -143,6 +167,22 @@ export default function SettingsPage() {
 
   useEffect(() => {
     fetchBusiness();
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'integrations' || tab === 'products' || tab === 'employees') {
+        setActiveTab(tab as any);
+      }
+
+      const status = params.get('status');
+      if (status === 'success') {
+        alert('QuickBooks successfully connected!');
+      } else if (status === 'error') {
+        const msg = params.get('message');
+        alert(`Failed to connect QuickBooks: ${msg || 'Unknown error'}`);
+      }
+    }
   }, []);
 
   // CSV Parsing and File download/import helpers
