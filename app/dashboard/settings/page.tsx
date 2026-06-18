@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
 import { Plus, Trash2, Tag, Users, ShieldAlert, Upload, Download, AlertCircle, FileSpreadsheet } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Product {
   id: string;
@@ -86,13 +87,13 @@ export default function SettingsPage() {
       });
       if (res.ok) {
         await fetchBusiness();
-        alert('QuickBooks Financial Reports (P&L, Overheads) successfully synced! Your twin baseline revenue, marketing, inventory, and fixed costs have been updated.');
+        toast.success('QuickBooks Financial Reports (P&L, Overheads) successfully synced! Your twin baseline revenue, marketing, inventory, and fixed costs have been updated.');
       } else {
-        alert('Failed to sync with QuickBooks.');
+        toast.error('Failed to sync with QuickBooks.');
       }
     } catch (err) {
       console.error(err);
-      alert('Error syncing QuickBooks.');
+      toast.error('Error syncing QuickBooks.');
     } finally {
       setSyncingQbo(false);
     }
@@ -109,13 +110,13 @@ export default function SettingsPage() {
       if (res.ok) {
         setShopifyConnected(true);
         await fetchBusiness();
-        alert('Shopify Product Catalog synced! Products have been imported into your catalog.');
+        toast.success('Shopify Product Catalog synced! Products have been imported into your catalog.');
       } else {
-        alert('Failed to sync with Shopify.');
+        toast.error('Failed to sync with Shopify.');
       }
     } catch (err) {
       console.error(err);
-      alert('Error syncing Shopify.');
+      toast.error('Error syncing Shopify.');
     } finally {
       setSyncingShopify(false);
     }
@@ -132,13 +133,13 @@ export default function SettingsPage() {
       if (res.ok) {
         setSquareConnected(true);
         await fetchBusiness();
-        alert('Square POS Labor Logs synced! Shift logs have been imported into your payroll roster.');
+        toast.success('Square POS Labor Logs synced! Shift logs have been imported into your payroll roster.');
       } else {
-        alert('Failed to sync with Square POS.');
+        toast.error('Failed to sync with Square POS.');
       }
     } catch (err) {
       console.error(err);
-      alert('Error syncing Square POS.');
+      toast.error('Error syncing Square POS.');
     } finally {
       setSyncingSquare(false);
     }
@@ -177,10 +178,10 @@ export default function SettingsPage() {
 
       const status = params.get('status');
       if (status === 'success') {
-        alert('QuickBooks successfully connected!');
+        toast.success('QuickBooks successfully connected!');
       } else if (status === 'error') {
         const msg = params.get('message');
-        alert(`Failed to connect QuickBooks: ${msg || 'Unknown error'}`);
+        toast.error(`Failed to connect QuickBooks: ${msg || 'Unknown error'}`);
       }
     }
   }, []);
@@ -346,14 +347,14 @@ export default function SettingsPage() {
         setProdCsvFile(null);
         setProdParsed(null);
         fetchBusiness();
-        alert('Products imported successfully.');
+        toast.success('Products imported successfully.');
       } else {
         const err = await res.json();
-        alert(`Failed to import products: ${err.error || 'Unknown error'}`);
+        toast.error(`Failed to import products: ${err.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error(err);
-      alert('Error importing products.');
+      toast.error('Error importing products.');
     } finally {
       setImportingProd(false);
     }
@@ -373,14 +374,14 @@ export default function SettingsPage() {
         setEmpCsvFile(null);
         setEmpParsed(null);
         fetchBusiness();
-        alert('Employees imported successfully.');
+        toast.success('Employees imported successfully.');
       } else {
         const err = await res.json();
-        alert(`Failed to import employees: ${err.error || 'Unknown error'}`);
+        toast.error(`Failed to import employees: ${err.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error(err);
-      alert('Error importing employees.');
+      toast.error('Error importing employees.');
     } finally {
       setImportingEmp(false);
     }
