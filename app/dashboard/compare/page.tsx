@@ -220,25 +220,29 @@ export default function ComparePage() {
           ) : (
             <div className="space-y-8">
               {/* Metric grid comparison */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Revenue card */}
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                   <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-4">Revenue Projections</h4>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                      <span className="text-gray-500">Baseline</span>
-                      <span className="font-medium text-gray-800">${(baseRevenue / 1000).toFixed(0)}K</span>
+                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2 gap-2">
+                      <span className="text-gray-500 truncate min-w-0" title="Baseline">Baseline</span>
+                      <span className="font-medium text-gray-800 shrink-0">${(baseRevenue / 1000).toFixed(0)}K</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                      <span className="font-medium text-black">A: {detailsA.scenario.name.substring(0, 15)}...</span>
-                      <span className="font-semibold text-[#2B2644]">
+                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2 gap-2">
+                      <span className="font-medium text-black truncate min-w-0" title={`A: ${detailsA.scenario.name}`}>
+                        A: {detailsA.scenario.name}
+                      </span>
+                      <span className="font-semibold text-[#2B2644] shrink-0">
                         ${(detailsA.result.projectedRevenue / 1000).toFixed(0)}K
                       </span>
                     </div>
                     {detailsB && (
-                      <div className="flex justify-between items-center text-sm pb-1">
-                        <span className="text-gray-600">B: {detailsB.scenario.name.substring(0, 15)}...</span>
-                        <span className="font-semibold text-indigo-600">
+                      <div className="flex justify-between items-center text-sm pb-1 gap-2">
+                        <span className="text-gray-600 truncate min-w-0" title={`B: ${detailsB.scenario.name}`}>
+                          B: {detailsB.scenario.name}
+                        </span>
+                        <span className="font-semibold text-indigo-600 shrink-0">
                           ${(detailsB.result.projectedRevenue / 1000).toFixed(0)}K
                         </span>
                       </div>
@@ -250,20 +254,24 @@ export default function ComparePage() {
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                   <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-4">Profit Projections</h4>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                      <span className="text-gray-500">Baseline</span>
-                      <span className="font-medium text-red-500">-${(Math.abs(baseProfit) / 1000).toFixed(1)}K</span>
+                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2 gap-2">
+                      <span className="text-gray-500 truncate min-w-0" title="Baseline">Baseline</span>
+                      <span className="font-medium text-red-500 shrink-0">-${(Math.abs(baseProfit) / 1000).toFixed(1)}K</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                      <span className="font-medium text-black">Scenario A</span>
-                      <span className={`font-semibold ${detailsA.result.projectedProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2 gap-2">
+                      <span className="font-medium text-black truncate min-w-0" title={`A: ${detailsA.scenario.name}`}>
+                        A: {detailsA.scenario.name}
+                      </span>
+                      <span className={`font-semibold shrink-0 ${detailsA.result.projectedProfit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                         {detailsA.result.projectedProfit >= 0 ? '' : '-'}${(Math.abs(detailsA.result.projectedProfit) / 1000).toFixed(1)}K
                       </span>
                     </div>
                     {detailsB && (
-                      <div className="flex justify-between items-center text-sm pb-1">
-                        <span className="text-gray-650">Scenario B</span>
-                        <span className={`font-semibold ${detailsB.result.projectedProfit >= 0 ? 'text-indigo-600' : 'text-red-500'}`}>
+                      <div className="flex justify-between items-center text-sm pb-1 gap-2">
+                        <span className="text-gray-650 truncate min-w-0" title={`B: ${detailsB.scenario.name}`}>
+                          B: {detailsB.scenario.name}
+                        </span>
+                        <span className={`font-semibold shrink-0 ${detailsB.result.projectedProfit >= 0 ? 'text-indigo-600' : 'text-red-500'}`}>
                           {detailsB.result.projectedProfit >= 0 ? '' : '-'}${(Math.abs(detailsB.result.projectedProfit) / 1000).toFixed(1)}K
                         </span>
                       </div>
@@ -275,18 +283,22 @@ export default function ComparePage() {
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                   <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-4">Simulated Headcount</h4>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                      <span className="text-gray-500">Baseline</span>
-                      <span className="font-medium text-gray-800">{baseHeadcount} staff</span>
+                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2 gap-2">
+                      <span className="text-gray-500 truncate min-w-0" title="Baseline">Baseline</span>
+                      <span className="font-medium text-gray-800 shrink-0">{baseHeadcount} staff</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                      <span className="font-medium text-black">Scenario A</span>
-                      <span className="font-semibold text-[#2B2644]">{detailsA.result.projectedHeadcount} staff</span>
+                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2 gap-2">
+                      <span className="font-medium text-black truncate min-w-0" title={`A: ${detailsA.scenario.name}`}>
+                        A: {detailsA.scenario.name}
+                      </span>
+                      <span className="font-semibold text-[#2B2644] shrink-0">{detailsA.result.projectedHeadcount} staff</span>
                     </div>
                     {detailsB && (
-                      <div className="flex justify-between items-center text-sm pb-1">
-                        <span className="text-gray-650">Scenario B</span>
-                        <span className="font-semibold text-indigo-600">{detailsB.result.projectedHeadcount} staff</span>
+                      <div className="flex justify-between items-center text-sm pb-1 gap-2">
+                        <span className="text-gray-650 truncate min-w-0" title={`B: ${detailsB.scenario.name}`}>
+                          B: {detailsB.scenario.name}
+                        </span>
+                        <span className="font-semibold text-indigo-600 shrink-0">{detailsB.result.projectedHeadcount} staff</span>
                       </div>
                     )}
                   </div>
@@ -296,20 +308,24 @@ export default function ComparePage() {
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
                   <h4 className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-4">Stockout Risk</h4>
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                      <span className="text-gray-500">Baseline</span>
-                      <span className="font-medium text-gray-800">{(baseInventoryRisk * 100).toFixed(0)}%</span>
+                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2 gap-2">
+                      <span className="text-gray-500 truncate min-w-0" title="Baseline">Baseline</span>
+                      <span className="font-medium text-gray-800 shrink-0">{(baseInventoryRisk * 100).toFixed(0)}%</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
-                      <span className="font-medium text-black">Scenario A</span>
-                      <span className={`font-semibold ${detailsA.result.projectedInventoryRisk > 0.5 ? 'text-amber-600' : 'text-green-600'}`}>
+                    <div className="flex justify-between items-center text-sm border-b border-gray-100 pb-2 gap-2">
+                      <span className="font-medium text-black truncate min-w-0" title={`A: ${detailsA.scenario.name}`}>
+                        A: {detailsA.scenario.name}
+                      </span>
+                      <span className={`font-semibold shrink-0 ${detailsA.result.projectedInventoryRisk > 0.5 ? 'text-amber-600' : 'text-green-600'}`}>
                         {(detailsA.result.projectedInventoryRisk * 100).toFixed(0)}%
                       </span>
                     </div>
                     {detailsB && (
-                      <div className="flex justify-between items-center text-sm pb-1">
-                        <span className="text-gray-650">Scenario B</span>
-                        <span className={`font-semibold ${detailsB.result.projectedInventoryRisk > 0.5 ? 'text-amber-600' : 'text-green-600'}`}>
+                      <div className="flex justify-between items-center text-sm pb-1 gap-2">
+                        <span className="text-gray-650 truncate min-w-0" title={`B: ${detailsB.scenario.name}`}>
+                          B: {detailsB.scenario.name}
+                        </span>
+                        <span className={`font-semibold shrink-0 ${detailsB.result.projectedInventoryRisk > 0.5 ? 'text-amber-600' : 'text-green-600'}`}>
                           {(detailsB.result.projectedInventoryRisk * 100).toFixed(0)}%
                         </span>
                       </div>

@@ -246,7 +246,7 @@ function ResultsContent() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
             <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Revenue Impact</p>
             <div className="flex items-baseline gap-2 flex-wrap">

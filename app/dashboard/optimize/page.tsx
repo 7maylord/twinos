@@ -195,7 +195,7 @@ export default function OptimizePage() {
           {result && !loading && (
             <div className="space-y-8 animate-fadeIn">
               {/* Card delta layouts */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 
                 {/* Revenue Card */}
                 <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
