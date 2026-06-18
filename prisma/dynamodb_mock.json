@@ -98,6 +98,33 @@
       "recommendedChanges": [
         "Test action plan step."
       ]
+    },
+    {
+      "runId": "test-run-1781745088859",
+      "timestamp": "2026-06-18T01:11:28.859Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
+    },
+    {
+      "runId": "test-run-1781745634757",
+      "timestamp": "2026-06-18T01:20:34.757Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
+    },
+    {
+      "runId": "test-run-1781745659930",
+      "timestamp": "2026-06-18T01:20:59.930Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
     }
   ],
   "forecastCache": [
@@ -107,7 +134,7 @@
       "forecastData": {
         "profit": 5000
       },
-      "generatedAt": "2026-06-18T00:27:28.989Z"
+      "generatedAt": "2026-06-18T01:20:59.932Z"
     },
     {
       "businessId": "d795bb1c-0c9d-4995-a8d8-e43906602d85",
@@ -163,6 +190,116 @@
         ]
       },
       "generatedAt": "2026-06-18T00:32:09.916Z"
+    },
+    {
+      "businessId": "d795bb1c-0c9d-4995-a8d8-e43906602d85",
+      "metricType": "scenario-run-cc1523f3-9295-4732-8cff-43cac491e0ba",
+      "forecastData": {
+        "projectedRevenue": 267231,
+        "projectedProfit": 135739,
+        "projectedHeadcount": 12,
+        "projectedInventoryRisk": 0.46,
+        "monthlyData": [
+          {
+            "month": "Jan",
+            "baselineRevenue": 209000,
+            "projectedRevenue": 211558,
+            "baselineProfit": 14200,
+            "projectedProfit": 80065
+          },
+          {
+            "month": "Feb",
+            "baselineRevenue": 198000,
+            "projectedRevenue": 200423,
+            "baselineProfit": 3200,
+            "projectedProfit": 68931
+          },
+          {
+            "month": "Mar",
+            "baselineRevenue": 220000,
+            "projectedRevenue": 222693,
+            "baselineProfit": 25200,
+            "projectedProfit": 91200
+          },
+          {
+            "month": "Apr",
+            "baselineRevenue": 242000,
+            "projectedRevenue": 244962,
+            "baselineProfit": 47200,
+            "projectedProfit": 113469
+          },
+          {
+            "month": "May",
+            "baselineRevenue": 253000,
+            "projectedRevenue": 256097,
+            "baselineProfit": 58200,
+            "projectedProfit": 124604
+          },
+          {
+            "month": "Jun",
+            "baselineRevenue": 264000,
+            "projectedRevenue": 267231,
+            "baselineProfit": 69200,
+            "projectedProfit": 135739
+          }
+        ]
+      },
+      "generatedAt": "2026-06-18T01:12:26.289Z"
+    },
+    {
+      "businessId": "d795bb1c-0c9d-4995-a8d8-e43906602d85",
+      "metricType": "scenario-run-e03f9f81-4c00-424e-b6d3-57b5edb6a99f",
+      "forecastData": {
+        "projectedRevenue": 267231,
+        "projectedProfit": 135739,
+        "projectedHeadcount": 12,
+        "projectedInventoryRisk": 0.46,
+        "monthlyData": [
+          {
+            "month": "Jan",
+            "baselineRevenue": 209000,
+            "projectedRevenue": 211558,
+            "baselineProfit": 14200,
+            "projectedProfit": 80065
+          },
+          {
+            "month": "Feb",
+            "baselineRevenue": 198000,
+            "projectedRevenue": 200423,
+            "baselineProfit": 3200,
+            "projectedProfit": 68931
+          },
+          {
+            "month": "Mar",
+            "baselineRevenue": 220000,
+            "projectedRevenue": 222693,
+            "baselineProfit": 25200,
+            "projectedProfit": 91200
+          },
+          {
+            "month": "Apr",
+            "baselineRevenue": 242000,
+            "projectedRevenue": 244962,
+            "baselineProfit": 47200,
+            "projectedProfit": 113469
+          },
+          {
+            "month": "May",
+            "baselineRevenue": 253000,
+            "projectedRevenue": 256097,
+            "baselineProfit": 58200,
+            "projectedProfit": 124604
+          },
+          {
+            "month": "Jun",
+            "baselineRevenue": 264000,
+            "projectedRevenue": 267231,
+            "baselineProfit": 69200,
+            "projectedProfit": 135739
+          }
+        ]
+      },
+      "generatedAt": "2026-06-18T01:21:13.756Z"
     }
   ]
 }

@@ -17,25 +17,35 @@ export async function POST(request: Request) {
       businessId = searchParams.get('businessId') || '';
     }
 
+    console.log('[Square Sync] POST request initiated. businessId:', businessId);
+
     // Locate business
     let business = null;
     if (businessId) {
       business = await prisma.business.findUnique({ where: { id: businessId } });
     } else {
+      console.log('[Square Sync] No businessId specified. Finding first business in DB...');
       business = await prisma.business.findFirst();
     }
 
     if (!business) {
+      console.error('[Square Sync] Business twin record not found.');
       return NextResponse.json({ error: 'No business found' }, { status: 404 });
     }
 
     let squareAccessToken = business.squareAccessToken;
+
+    console.log('[Square Sync] Stored token configuration:', {
+      hasStoredToken: !!business.squareAccessToken,
+      locationId: business.squareLocationId
+    });
 
     // Simulate connection if not already connected
     if (!squareAccessToken) {
       const rawToken = `sq_mock_token_${Date.now()}`;
       squareAccessToken = encrypt(rawToken);
 
+      console.log('[Square Sync] Connection bootstrapping. Saving mock token details...');
       await prisma.business.update({
         where: { id: business.id },
         data: {
@@ -46,12 +56,16 @@ export async function POST(request: Request) {
       });
     }
 
+    console.log('[Square Sync] Decrypting access token...');
     const decryptedToken = decrypt(squareAccessToken);
+
+    console.log('[Square Sync] Integration execution check. isMockToken =', decryptedToken.startsWith('sq_mock_token'));
 
     // Dynamic Square integration execution
     if (!decryptedToken.startsWith('sq_mock_token') && !decryptedToken.includes('mock')) {
       const locationId = business.squareLocationId || 'main-location';
       const shiftsUrl = `https://connect.squareup.com/v2/labor/shifts?location_ids=${locationId}`;
+      console.log(`[Square Sync] Running live POS shift fetch. URL: ${shiftsUrl}, Location: ${locationId}`);
       
       try {
         const response = await fetch(shiftsUrl, {
@@ -65,6 +79,7 @@ export async function POST(request: Request) {
         if (response.ok) {
           const resData = await response.json();
           const shifts = resData.shifts || [];
+          console.log(`[Square Sync] Received ${shifts.length} shift logs from live Square API.`);
           
           let importedCount = 0;
           for (const shift of shifts) {
@@ -95,18 +110,23 @@ export async function POST(request: Request) {
             }
           }
 
+          console.log(`[Square Sync] Sync completed successfully. Created ${importedCount} staff records.`);
           return NextResponse.json({
             success: true,
             message: `Square sync complete. Synced ${importedCount} employees from shifts.`,
             business: await prisma.business.findUnique({ where: { id: business.id } })
           });
+        } else {
+          const errText = await response.text();
+          console.error('[Square Sync] Square API returned error response:', errText);
         }
       } catch (err) {
-        console.error('Failed live Square fetch, falling back to sandbox/mock:', err);
+        console.error('[Square Sync] Failed live Square fetch, falling back to sandbox/mock:', err);
       }
     }
 
     // Fallback: Sandbox/Mock sync behavior
+    console.log('[Square Sync] Running sandbox/mock labor log sync...');
     const existing = await prisma.employee.findFirst({
       where: {
         businessId: business.id,
@@ -115,6 +135,7 @@ export async function POST(request: Request) {
     });
 
     if (existing) {
+      console.log('[Square Sync] Mock barista already exists in payroll. Sync skipped.');
       return NextResponse.json({
         success: true,
         message: 'Square labor roster is already synchronized.',
@@ -131,13 +152,14 @@ export async function POST(request: Request) {
       },
     });
 
+    console.log('[Square Sync] Mock barista created in database.');
     return NextResponse.json({
       success: true,
       message: 'Square POS shift logs imported.',
       employee,
     });
   } catch (error: any) {
-    console.error('Square sync error:', error);
+    console.error('[Square Sync] Unhandled exception during Square synchronization:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

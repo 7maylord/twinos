@@ -11,6 +11,7 @@ function getEncryptionKey(): Buffer {
 export function encrypt(text: string): string {
   if (!text) return text;
   try {
+    console.log(`[Encryption] Starting encryption of text (length: ${text.length})`);
     const key = getEncryptionKey();
     const iv = crypto.randomBytes(12);
     const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
@@ -19,11 +20,12 @@ export function encrypt(text: string): string {
     encrypted += cipher.final('hex');
     
     const tag = cipher.getAuthTag().toString('hex');
+    console.log('[Encryption] Encryption completed successfully. Cipher format: iv:tag:encrypted');
     
     // Store format: iv:tag:encrypted
     return `${iv.toString('hex')}:${tag}:${encrypted}`;
   } catch (err) {
-    console.error('Encryption error:', err);
+    console.error('[Encryption] Encryption error:', err);
     throw err;
   }
 }
@@ -32,7 +34,9 @@ export function decrypt(cipherText: string): string {
   if (!cipherText) return cipherText;
   try {
     const parts = cipherText.split(':');
+    console.log(`[Encryption] Decrypting ciphertext (parts length: ${parts.length})`);
     if (parts.length !== 3) {
+      console.log('[Encryption] Ciphertext does not match expected format iv:tag:encrypted, returning as plain text.');
       return cipherText;
     }
     
@@ -47,9 +51,10 @@ export function decrypt(cipherText: string): string {
     let decrypted = decipher.update(encryptedHex, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     
+    console.log('[Encryption] Decryption completed successfully.');
     return decrypted;
   } catch (err) {
-    console.error('Decryption error:', err);
+    console.error('[Encryption] Decryption error:', err);
     return cipherText;
   }
 }
