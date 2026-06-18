@@ -51,6 +51,17 @@ export type BusinessMinAggregateOutputType = {
   baselineInventory: number | null
   baselineFixedCosts: number | null
   createdAt: Date | null
+  qboCompanyId: string | null
+  qboAccessToken: string | null
+  qboRefreshToken: string | null
+  qboTokenExpiresAt: Date | null
+  qboRefreshTokenExpiresAt: Date | null
+  shopifyStoreDomain: string | null
+  shopifyAccessToken: string | null
+  squareLocationId: string | null
+  squareAccessToken: string | null
+  squareRefreshToken: string | null
+  squareTokenExpiresAt: Date | null
 }
 
 export type BusinessMaxAggregateOutputType = {
@@ -64,6 +75,17 @@ export type BusinessMaxAggregateOutputType = {
   baselineInventory: number | null
   baselineFixedCosts: number | null
   createdAt: Date | null
+  qboCompanyId: string | null
+  qboAccessToken: string | null
+  qboRefreshToken: string | null
+  qboTokenExpiresAt: Date | null
+  qboRefreshTokenExpiresAt: Date | null
+  shopifyStoreDomain: string | null
+  shopifyAccessToken: string | null
+  squareLocationId: string | null
+  squareAccessToken: string | null
+  squareRefreshToken: string | null
+  squareTokenExpiresAt: Date | null
 }
 
 export type BusinessCountAggregateOutputType = {
@@ -77,6 +99,17 @@ export type BusinessCountAggregateOutputType = {
   baselineInventory: number
   baselineFixedCosts: number
   createdAt: number
+  qboCompanyId: number
+  qboAccessToken: number
+  qboRefreshToken: number
+  qboTokenExpiresAt: number
+  qboRefreshTokenExpiresAt: number
+  shopifyStoreDomain: number
+  shopifyAccessToken: number
+  squareLocationId: number
+  squareAccessToken: number
+  squareRefreshToken: number
+  squareTokenExpiresAt: number
   _all: number
 }
 
@@ -106,6 +139,17 @@ export type BusinessMinAggregateInputType = {
   baselineInventory?: true
   baselineFixedCosts?: true
   createdAt?: true
+  qboCompanyId?: true
+  qboAccessToken?: true
+  qboRefreshToken?: true
+  qboTokenExpiresAt?: true
+  qboRefreshTokenExpiresAt?: true
+  shopifyStoreDomain?: true
+  shopifyAccessToken?: true
+  squareLocationId?: true
+  squareAccessToken?: true
+  squareRefreshToken?: true
+  squareTokenExpiresAt?: true
 }
 
 export type BusinessMaxAggregateInputType = {
@@ -119,6 +163,17 @@ export type BusinessMaxAggregateInputType = {
   baselineInventory?: true
   baselineFixedCosts?: true
   createdAt?: true
+  qboCompanyId?: true
+  qboAccessToken?: true
+  qboRefreshToken?: true
+  qboTokenExpiresAt?: true
+  qboRefreshTokenExpiresAt?: true
+  shopifyStoreDomain?: true
+  shopifyAccessToken?: true
+  squareLocationId?: true
+  squareAccessToken?: true
+  squareRefreshToken?: true
+  squareTokenExpiresAt?: true
 }
 
 export type BusinessCountAggregateInputType = {
@@ -132,6 +187,17 @@ export type BusinessCountAggregateInputType = {
   baselineInventory?: true
   baselineFixedCosts?: true
   createdAt?: true
+  qboCompanyId?: true
+  qboAccessToken?: true
+  qboRefreshToken?: true
+  qboTokenExpiresAt?: true
+  qboRefreshTokenExpiresAt?: true
+  shopifyStoreDomain?: true
+  shopifyAccessToken?: true
+  squareLocationId?: true
+  squareAccessToken?: true
+  squareRefreshToken?: true
+  squareTokenExpiresAt?: true
   _all?: true
 }
 
@@ -232,6 +298,17 @@ export type BusinessGroupByOutputType = {
   baselineInventory: number
   baselineFixedCosts: number
   createdAt: Date
+  qboCompanyId: string | null
+  qboAccessToken: string | null
+  qboRefreshToken: string | null
+  qboTokenExpiresAt: Date | null
+  qboRefreshTokenExpiresAt: Date | null
+  shopifyStoreDomain: string | null
+  shopifyAccessToken: string | null
+  squareLocationId: string | null
+  squareAccessToken: string | null
+  squareRefreshToken: string | null
+  squareTokenExpiresAt: Date | null
   _count: BusinessCountAggregateOutputType | null
   _avg: BusinessAvgAggregateOutputType | null
   _sum: BusinessSumAggregateOutputType | null
@@ -268,6 +345,17 @@ export type BusinessWhereInput = {
   baselineInventory?: Prisma.FloatFilter<"Business"> | number
   baselineFixedCosts?: Prisma.FloatFilter<"Business"> | number
   createdAt?: Prisma.DateTimeFilter<"Business"> | Date | string
+  qboCompanyId?: Prisma.StringNullableFilter<"Business"> | string | null
+  qboAccessToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  qboRefreshToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  qboTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  shopifyStoreDomain?: Prisma.StringNullableFilter<"Business"> | string | null
+  shopifyAccessToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareLocationId?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareAccessToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareRefreshToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   products?: Prisma.ProductListRelationFilter
   employees?: Prisma.EmployeeListRelationFilter
@@ -285,6 +373,17 @@ export type BusinessOrderByWithRelationInput = {
   baselineInventory?: Prisma.SortOrder
   baselineFixedCosts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  qboCompanyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  qboAccessToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  qboRefreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  qboTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  qboRefreshTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  shopifyStoreDomain?: Prisma.SortOrderInput | Prisma.SortOrder
+  shopifyAccessToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  squareLocationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  squareAccessToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  squareRefreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  squareTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   owner?: Prisma.UserOrderByWithRelationInput
   products?: Prisma.ProductOrderByRelationAggregateInput
   employees?: Prisma.EmployeeOrderByRelationAggregateInput
@@ -305,6 +404,17 @@ export type BusinessWhereUniqueInput = Prisma.AtLeast<{
   baselineInventory?: Prisma.FloatFilter<"Business"> | number
   baselineFixedCosts?: Prisma.FloatFilter<"Business"> | number
   createdAt?: Prisma.DateTimeFilter<"Business"> | Date | string
+  qboCompanyId?: Prisma.StringNullableFilter<"Business"> | string | null
+  qboAccessToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  qboRefreshToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  qboTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  shopifyStoreDomain?: Prisma.StringNullableFilter<"Business"> | string | null
+  shopifyAccessToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareLocationId?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareAccessToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareRefreshToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
   owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   products?: Prisma.ProductListRelationFilter
   employees?: Prisma.EmployeeListRelationFilter
@@ -322,6 +432,17 @@ export type BusinessOrderByWithAggregationInput = {
   baselineInventory?: Prisma.SortOrder
   baselineFixedCosts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  qboCompanyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  qboAccessToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  qboRefreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  qboTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  qboRefreshTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  shopifyStoreDomain?: Prisma.SortOrderInput | Prisma.SortOrder
+  shopifyAccessToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  squareLocationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  squareAccessToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  squareRefreshToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  squareTokenExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.BusinessCountOrderByAggregateInput
   _avg?: Prisma.BusinessAvgOrderByAggregateInput
   _max?: Prisma.BusinessMaxOrderByAggregateInput
@@ -343,6 +464,17 @@ export type BusinessScalarWhereWithAggregatesInput = {
   baselineInventory?: Prisma.FloatWithAggregatesFilter<"Business"> | number
   baselineFixedCosts?: Prisma.FloatWithAggregatesFilter<"Business"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Business"> | Date | string
+  qboCompanyId?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  qboAccessToken?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  qboRefreshToken?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  qboTokenExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Business"> | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Business"> | Date | string | null
+  shopifyStoreDomain?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  shopifyAccessToken?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  squareLocationId?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  squareAccessToken?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  squareRefreshToken?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  squareTokenExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Business"> | Date | string | null
 }
 
 export type BusinessCreateInput = {
@@ -355,6 +487,17 @@ export type BusinessCreateInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutBusinessesInput
   products?: Prisma.ProductCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeCreateNestedManyWithoutBusinessInput
@@ -372,6 +515,17 @@ export type BusinessUncheckedCreateInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutBusinessInput
@@ -387,6 +541,17 @@ export type BusinessUpdateInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutBusinessesNestedInput
   products?: Prisma.ProductUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUpdateManyWithoutBusinessNestedInput
@@ -404,6 +569,17 @@ export type BusinessUncheckedUpdateInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutBusinessNestedInput
@@ -420,6 +596,17 @@ export type BusinessCreateManyInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
 }
 
 export type BusinessUpdateManyMutationInput = {
@@ -432,6 +619,17 @@ export type BusinessUpdateManyMutationInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type BusinessUncheckedUpdateManyInput = {
@@ -445,6 +643,17 @@ export type BusinessUncheckedUpdateManyInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type BusinessListRelationFilter = {
@@ -468,6 +677,17 @@ export type BusinessCountOrderByAggregateInput = {
   baselineInventory?: Prisma.SortOrder
   baselineFixedCosts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  qboCompanyId?: Prisma.SortOrder
+  qboAccessToken?: Prisma.SortOrder
+  qboRefreshToken?: Prisma.SortOrder
+  qboTokenExpiresAt?: Prisma.SortOrder
+  qboRefreshTokenExpiresAt?: Prisma.SortOrder
+  shopifyStoreDomain?: Prisma.SortOrder
+  shopifyAccessToken?: Prisma.SortOrder
+  squareLocationId?: Prisma.SortOrder
+  squareAccessToken?: Prisma.SortOrder
+  squareRefreshToken?: Prisma.SortOrder
+  squareTokenExpiresAt?: Prisma.SortOrder
 }
 
 export type BusinessAvgOrderByAggregateInput = {
@@ -488,6 +708,17 @@ export type BusinessMaxOrderByAggregateInput = {
   baselineInventory?: Prisma.SortOrder
   baselineFixedCosts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  qboCompanyId?: Prisma.SortOrder
+  qboAccessToken?: Prisma.SortOrder
+  qboRefreshToken?: Prisma.SortOrder
+  qboTokenExpiresAt?: Prisma.SortOrder
+  qboRefreshTokenExpiresAt?: Prisma.SortOrder
+  shopifyStoreDomain?: Prisma.SortOrder
+  shopifyAccessToken?: Prisma.SortOrder
+  squareLocationId?: Prisma.SortOrder
+  squareAccessToken?: Prisma.SortOrder
+  squareRefreshToken?: Prisma.SortOrder
+  squareTokenExpiresAt?: Prisma.SortOrder
 }
 
 export type BusinessMinOrderByAggregateInput = {
@@ -501,6 +732,17 @@ export type BusinessMinOrderByAggregateInput = {
   baselineInventory?: Prisma.SortOrder
   baselineFixedCosts?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  qboCompanyId?: Prisma.SortOrder
+  qboAccessToken?: Prisma.SortOrder
+  qboRefreshToken?: Prisma.SortOrder
+  qboTokenExpiresAt?: Prisma.SortOrder
+  qboRefreshTokenExpiresAt?: Prisma.SortOrder
+  shopifyStoreDomain?: Prisma.SortOrder
+  shopifyAccessToken?: Prisma.SortOrder
+  squareLocationId?: Prisma.SortOrder
+  squareAccessToken?: Prisma.SortOrder
+  squareRefreshToken?: Prisma.SortOrder
+  squareTokenExpiresAt?: Prisma.SortOrder
 }
 
 export type BusinessSumOrderByAggregateInput = {
@@ -569,6 +811,10 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type BusinessCreateNestedOneWithoutProductsInput = {
   create?: Prisma.XOR<Prisma.BusinessCreateWithoutProductsInput, Prisma.BusinessUncheckedCreateWithoutProductsInput>
   connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutProductsInput
@@ -621,6 +867,17 @@ export type BusinessCreateWithoutOwnerInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   products?: Prisma.ProductCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutBusinessInput
@@ -636,6 +893,17 @@ export type BusinessUncheckedCreateWithoutOwnerInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutBusinessInput
@@ -680,6 +948,17 @@ export type BusinessScalarWhereInput = {
   baselineInventory?: Prisma.FloatFilter<"Business"> | number
   baselineFixedCosts?: Prisma.FloatFilter<"Business"> | number
   createdAt?: Prisma.DateTimeFilter<"Business"> | Date | string
+  qboCompanyId?: Prisma.StringNullableFilter<"Business"> | string | null
+  qboAccessToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  qboRefreshToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  qboTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
+  shopifyStoreDomain?: Prisma.StringNullableFilter<"Business"> | string | null
+  shopifyAccessToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareLocationId?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareAccessToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareRefreshToken?: Prisma.StringNullableFilter<"Business"> | string | null
+  squareTokenExpiresAt?: Prisma.DateTimeNullableFilter<"Business"> | Date | string | null
 }
 
 export type BusinessCreateWithoutProductsInput = {
@@ -692,6 +971,17 @@ export type BusinessCreateWithoutProductsInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutBusinessesInput
   employees?: Prisma.EmployeeCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutBusinessInput
@@ -708,6 +998,17 @@ export type BusinessUncheckedCreateWithoutProductsInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutBusinessInput
 }
@@ -738,6 +1039,17 @@ export type BusinessUpdateWithoutProductsInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutBusinessesNestedInput
   employees?: Prisma.EmployeeUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUpdateManyWithoutBusinessNestedInput
@@ -754,6 +1066,17 @@ export type BusinessUncheckedUpdateWithoutProductsInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutBusinessNestedInput
 }
@@ -768,6 +1091,17 @@ export type BusinessCreateWithoutEmployeesInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutBusinessesInput
   products?: Prisma.ProductCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutBusinessInput
@@ -784,6 +1118,17 @@ export type BusinessUncheckedCreateWithoutEmployeesInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutBusinessInput
 }
@@ -814,6 +1159,17 @@ export type BusinessUpdateWithoutEmployeesInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutBusinessesNestedInput
   products?: Prisma.ProductUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUpdateManyWithoutBusinessNestedInput
@@ -830,6 +1186,17 @@ export type BusinessUncheckedUpdateWithoutEmployeesInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutBusinessNestedInput
 }
@@ -844,6 +1211,17 @@ export type BusinessCreateWithoutScenariosInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   owner: Prisma.UserCreateNestedOneWithoutBusinessesInput
   products?: Prisma.ProductCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeCreateNestedManyWithoutBusinessInput
@@ -860,6 +1238,17 @@ export type BusinessUncheckedCreateWithoutScenariosInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutBusinessInput
 }
@@ -890,6 +1279,17 @@ export type BusinessUpdateWithoutScenariosInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   owner?: Prisma.UserUpdateOneRequiredWithoutBusinessesNestedInput
   products?: Prisma.ProductUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUpdateManyWithoutBusinessNestedInput
@@ -906,6 +1306,17 @@ export type BusinessUncheckedUpdateWithoutScenariosInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutBusinessNestedInput
 }
@@ -920,6 +1331,17 @@ export type BusinessCreateManyOwnerInput = {
   baselineInventory?: number
   baselineFixedCosts?: number
   createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
 }
 
 export type BusinessUpdateWithoutOwnerInput = {
@@ -932,6 +1354,17 @@ export type BusinessUpdateWithoutOwnerInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   products?: Prisma.ProductUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUpdateManyWithoutBusinessNestedInput
@@ -947,6 +1380,17 @@ export type BusinessUncheckedUpdateWithoutOwnerInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutBusinessNestedInput
@@ -962,6 +1406,17 @@ export type BusinessUncheckedUpdateManyWithoutOwnerInput = {
   baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
   baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1024,6 +1479,17 @@ export type BusinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   baselineInventory?: boolean
   baselineFixedCosts?: boolean
   createdAt?: boolean
+  qboCompanyId?: boolean
+  qboAccessToken?: boolean
+  qboRefreshToken?: boolean
+  qboTokenExpiresAt?: boolean
+  qboRefreshTokenExpiresAt?: boolean
+  shopifyStoreDomain?: boolean
+  shopifyAccessToken?: boolean
+  squareLocationId?: boolean
+  squareAccessToken?: boolean
+  squareRefreshToken?: boolean
+  squareTokenExpiresAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   products?: boolean | Prisma.Business$productsArgs<ExtArgs>
   employees?: boolean | Prisma.Business$employeesArgs<ExtArgs>
@@ -1042,6 +1508,17 @@ export type BusinessSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   baselineInventory?: boolean
   baselineFixedCosts?: boolean
   createdAt?: boolean
+  qboCompanyId?: boolean
+  qboAccessToken?: boolean
+  qboRefreshToken?: boolean
+  qboTokenExpiresAt?: boolean
+  qboRefreshTokenExpiresAt?: boolean
+  shopifyStoreDomain?: boolean
+  shopifyAccessToken?: boolean
+  squareLocationId?: boolean
+  squareAccessToken?: boolean
+  squareRefreshToken?: boolean
+  squareTokenExpiresAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["business"]>
 
@@ -1056,6 +1533,17 @@ export type BusinessSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   baselineInventory?: boolean
   baselineFixedCosts?: boolean
   createdAt?: boolean
+  qboCompanyId?: boolean
+  qboAccessToken?: boolean
+  qboRefreshToken?: boolean
+  qboTokenExpiresAt?: boolean
+  qboRefreshTokenExpiresAt?: boolean
+  shopifyStoreDomain?: boolean
+  shopifyAccessToken?: boolean
+  squareLocationId?: boolean
+  squareAccessToken?: boolean
+  squareRefreshToken?: boolean
+  squareTokenExpiresAt?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["business"]>
 
@@ -1070,9 +1558,20 @@ export type BusinessSelectScalar = {
   baselineInventory?: boolean
   baselineFixedCosts?: boolean
   createdAt?: boolean
+  qboCompanyId?: boolean
+  qboAccessToken?: boolean
+  qboRefreshToken?: boolean
+  qboTokenExpiresAt?: boolean
+  qboRefreshTokenExpiresAt?: boolean
+  shopifyStoreDomain?: boolean
+  shopifyAccessToken?: boolean
+  squareLocationId?: boolean
+  squareAccessToken?: boolean
+  squareRefreshToken?: boolean
+  squareTokenExpiresAt?: boolean
 }
 
-export type BusinessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "industry" | "tenantId" | "baselineRevenue" | "baselineMarketing" | "baselineInventory" | "baselineFixedCosts" | "createdAt", ExtArgs["result"]["business"]>
+export type BusinessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerId" | "name" | "industry" | "tenantId" | "baselineRevenue" | "baselineMarketing" | "baselineInventory" | "baselineFixedCosts" | "createdAt" | "qboCompanyId" | "qboAccessToken" | "qboRefreshToken" | "qboTokenExpiresAt" | "qboRefreshTokenExpiresAt" | "shopifyStoreDomain" | "shopifyAccessToken" | "squareLocationId" | "squareAccessToken" | "squareRefreshToken" | "squareTokenExpiresAt", ExtArgs["result"]["business"]>
 export type BusinessInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   products?: boolean | Prisma.Business$productsArgs<ExtArgs>
@@ -1106,6 +1605,17 @@ export type $BusinessPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     baselineInventory: number
     baselineFixedCosts: number
     createdAt: Date
+    qboCompanyId: string | null
+    qboAccessToken: string | null
+    qboRefreshToken: string | null
+    qboTokenExpiresAt: Date | null
+    qboRefreshTokenExpiresAt: Date | null
+    shopifyStoreDomain: string | null
+    shopifyAccessToken: string | null
+    squareLocationId: string | null
+    squareAccessToken: string | null
+    squareRefreshToken: string | null
+    squareTokenExpiresAt: Date | null
   }, ExtArgs["result"]["business"]>
   composites: {}
 }
@@ -1543,6 +2053,17 @@ export interface BusinessFieldRefs {
   readonly baselineInventory: Prisma.FieldRef<"Business", 'Float'>
   readonly baselineFixedCosts: Prisma.FieldRef<"Business", 'Float'>
   readonly createdAt: Prisma.FieldRef<"Business", 'DateTime'>
+  readonly qboCompanyId: Prisma.FieldRef<"Business", 'String'>
+  readonly qboAccessToken: Prisma.FieldRef<"Business", 'String'>
+  readonly qboRefreshToken: Prisma.FieldRef<"Business", 'String'>
+  readonly qboTokenExpiresAt: Prisma.FieldRef<"Business", 'DateTime'>
+  readonly qboRefreshTokenExpiresAt: Prisma.FieldRef<"Business", 'DateTime'>
+  readonly shopifyStoreDomain: Prisma.FieldRef<"Business", 'String'>
+  readonly shopifyAccessToken: Prisma.FieldRef<"Business", 'String'>
+  readonly squareLocationId: Prisma.FieldRef<"Business", 'String'>
+  readonly squareAccessToken: Prisma.FieldRef<"Business", 'String'>
+  readonly squareRefreshToken: Prisma.FieldRef<"Business", 'String'>
+  readonly squareTokenExpiresAt: Prisma.FieldRef<"Business", 'DateTime'>
 }
     
 

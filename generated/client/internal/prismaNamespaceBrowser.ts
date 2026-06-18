@@ -91,7 +91,18 @@ export const BusinessScalarFieldEnum = {
   baselineMarketing: 'baselineMarketing',
   baselineInventory: 'baselineInventory',
   baselineFixedCosts: 'baselineFixedCosts',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  qboCompanyId: 'qboCompanyId',
+  qboAccessToken: 'qboAccessToken',
+  qboRefreshToken: 'qboRefreshToken',
+  qboTokenExpiresAt: 'qboTokenExpiresAt',
+  qboRefreshTokenExpiresAt: 'qboRefreshTokenExpiresAt',
+  shopifyStoreDomain: 'shopifyStoreDomain',
+  shopifyAccessToken: 'shopifyAccessToken',
+  squareLocationId: 'squareLocationId',
+  squareAccessToken: 'squareAccessToken',
+  squareRefreshToken: 'squareRefreshToken',
+  squareTokenExpiresAt: 'squareTokenExpiresAt'
 } as const
 
 export type BusinessScalarFieldEnum = (typeof BusinessScalarFieldEnum)[keyof typeof BusinessScalarFieldEnum]
