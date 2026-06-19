@@ -125,6 +125,33 @@
       "recommendedChanges": [
         "Test action plan step."
       ]
+    },
+    {
+      "runId": "test-run-1781795961194",
+      "timestamp": "2026-06-18T15:19:21.194Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
+    },
+    {
+      "runId": "test-run-1781813014572",
+      "timestamp": "2026-06-18T20:03:34.572Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
+    },
+    {
+      "runId": "test-run-1781824724044",
+      "timestamp": "2026-06-18T23:18:44.045Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
     }
   ],
   "forecastCache": [
@@ -134,7 +161,7 @@
       "forecastData": {
         "profit": 5000
       },
-      "generatedAt": "2026-06-18T01:20:59.932Z"
+      "generatedAt": "2026-06-18T23:18:44.046Z"
     },
     {
       "businessId": "d795bb1c-0c9d-4995-a8d8-e43906602d85",

@@ -592,6 +592,7 @@ export type ScenarioCreateOrConnectWithoutBusinessInput = {
 
 export type ScenarioCreateManyBusinessInputEnvelope = {
   data: Prisma.ScenarioCreateManyBusinessInput | Prisma.ScenarioCreateManyBusinessInput[]
+  skipDuplicates?: boolean
 }
 
 export type ScenarioUpsertWithWhereUniqueWithoutBusinessInput = {
@@ -1531,6 +1532,7 @@ export type ScenarioCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data used to create many Scenarios.
    */
   data: Prisma.ScenarioCreateManyInput | Prisma.ScenarioCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1549,6 +1551,7 @@ export type ScenarioCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * The data used to create many Scenarios.
    */
   data: Prisma.ScenarioCreateManyInput | Prisma.ScenarioCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

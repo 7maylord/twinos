@@ -538,6 +538,7 @@ export type SimulationResultCreateOrConnectWithoutScenarioInput = {
 
 export type SimulationResultCreateManyScenarioInputEnvelope = {
   data: Prisma.SimulationResultCreateManyScenarioInput | Prisma.SimulationResultCreateManyScenarioInput[]
+  skipDuplicates?: boolean
 }
 
 export type SimulationResultUpsertWithWhereUniqueWithoutScenarioInput = {
@@ -1361,6 +1362,7 @@ export type SimulationResultCreateManyArgs<ExtArgs extends runtime.Types.Extensi
    * The data used to create many SimulationResults.
    */
   data: Prisma.SimulationResultCreateManyInput | Prisma.SimulationResultCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1379,6 +1381,7 @@ export type SimulationResultCreateManyAndReturnArgs<ExtArgs extends runtime.Type
    * The data used to create many SimulationResults.
    */
   data: Prisma.SimulationResultCreateManyInput | Prisma.SimulationResultCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

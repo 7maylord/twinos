@@ -916,6 +916,7 @@ export type BusinessCreateOrConnectWithoutOwnerInput = {
 
 export type BusinessCreateManyOwnerInputEnvelope = {
   data: Prisma.BusinessCreateManyOwnerInput | Prisma.BusinessCreateManyOwnerInput[]
+  skipDuplicates?: boolean
 }
 
 export type BusinessUpsertWithWhereUniqueWithoutOwnerInput = {
@@ -2298,6 +2299,7 @@ export type BusinessCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * The data used to create many Businesses.
    */
   data: Prisma.BusinessCreateManyInput | Prisma.BusinessCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -2316,6 +2318,7 @@ export type BusinessCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * The data used to create many Businesses.
    */
   data: Prisma.BusinessCreateManyInput | Prisma.BusinessCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
