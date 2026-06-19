@@ -23,13 +23,26 @@ if (target === 'postgres') {
   
   // Update lib/db.ts to use standard native client (no sqlite adapter)
   dbLibContent = `import { PrismaClient } from '../generated/client/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 let prismaInstance: PrismaClient;
 
 const getClient = () => {
-  return new PrismaClient();
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error('DATABASE_URL is not set in environment variables');
+  }
+  const pool = new Pool({
+    connectionString: url,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  });
+  const adapter = new PrismaPg(pool);
+  return new PrismaClient({ adapter });
 };
 
 if (process.env.NODE_ENV === 'production') {

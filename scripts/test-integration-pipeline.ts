@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { GET as callbackGet } from '../app/api/integrations/quickbooks/callback/route';
 import { POST as qboSyncPost } from '../app/api/integrations/quickbooks/sync/route';
 import { POST as shopifySyncPost } from '../app/api/integrations/shopify/sync/route';
