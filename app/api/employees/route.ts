@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getActiveBusiness } from '@/lib/auth-helpers';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     
     let targetBusinessId = null;
-    const defaultBusiness = await prisma.business.findFirst();
-    if (defaultBusiness) {
-      targetBusinessId = defaultBusiness.id;
+    const activeBusiness = await getActiveBusiness();
+    if (activeBusiness) {
+      targetBusinessId = activeBusiness.id;
     }
 
     if (Array.isArray(body)) {

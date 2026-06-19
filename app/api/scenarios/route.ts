@@ -1,9 +1,28 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getActiveBusiness } from '@/lib/auth-helpers';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const queryBusinessId = searchParams.get('businessId');
+    
+    let targetBusinessId = queryBusinessId;
+    if (!targetBusinessId) {
+      const activeBusiness = await getActiveBusiness();
+      if (activeBusiness) {
+        targetBusinessId = activeBusiness.id;
+      }
+    }
+
+    if (!targetBusinessId) {
+      return NextResponse.json([]);
+    }
+
     const scenarios = await prisma.scenario.findMany({
+      where: {
+        businessId: targetBusinessId,
+      },
       orderBy: {
         createdAt: 'desc',
       },
@@ -30,11 +49,11 @@ export async function POST(request: Request) {
     // Resolve business ID
     let targetBusinessId = businessId;
     if (!targetBusinessId) {
-      const defaultBusiness = await prisma.business.findFirst();
-      if (!defaultBusiness) {
+      const activeBusiness = await getActiveBusiness();
+      if (!activeBusiness) {
         return NextResponse.json({ error: 'No business found in database. Seed the database first.' }, { status: 400 });
       }
-      targetBusinessId = defaultBusiness.id;
+      targetBusinessId = activeBusiness.id;
     }
 
     const scenario = await prisma.scenario.create({

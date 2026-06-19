@@ -1,14 +1,9 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getActiveBusiness } from '@/lib/auth-helpers';
 
 export async function GET() {
   try {
-    const business = await prisma.business.findFirst({
-      include: {
-        products: true,
-        employees: true,
-      },
-    });
+    const business = await getActiveBusiness();
 
     if (!business) {
       return NextResponse.json({ error: 'Business not found' }, { status: 404 });

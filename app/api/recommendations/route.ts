@@ -62,8 +62,8 @@ export async function GET(request: Request) {
     let recommendationDetails = '';
     let keyConsiderations: string[] = [];
 
-    // Check if OpenAI API Key is configured
-    if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your-openai-api-key-here') {
+    // Check if Gemini API Key is configured
+    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your-gemini-api-key-here') {
       try {
         const prompt = `
           You are an AI Business Consultant for TwinOS.
@@ -89,45 +89,59 @@ export async function GET(request: Request) {
           - Projected Inventory Risk: ${(projectedInventoryRisk * 100).toFixed(0)}%
           
           Write a concise, professional assessment.
-          Return exactly a JSON object in this format (no other text, no markdown block):
-          {
-            "summary": "1-2 sentence high-level summary of the outcome.",
-            "headline": "Short active recommendation header (e.g. 'Proceed with Phased Rollout')",
-            "details": "1-2 sentences of detailed execution advice.",
-            "considerations": ["Consideration 1", "Consideration 2", "Consideration 3"]
-          }
         `;
 
-        const openAiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+        
+        const geminiRes = await fetch(geminiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            response_format: { type: 'json_object' },
-            messages: [
-              { role: 'system', content: 'You return structured JSON assessments for business simulations.' },
-              { role: 'user', content: prompt }
+            contents: [
+              {
+                parts: [
+                  { text: prompt }
+                ]
+              }
             ],
-            temperature: 0.2,
+            generationConfig: {
+              responseMimeType: 'application/json',
+              responseSchema: {
+                type: 'OBJECT',
+                properties: {
+                  summary: { type: 'STRING', description: '1-2 sentence high-level summary of the outcome.' },
+                  headline: { type: 'STRING', description: 'Short active recommendation header (e.g. "Proceed with Phased Rollout")' },
+                  details: { type: 'STRING', description: '1-2 sentences of detailed execution advice.' },
+                  considerations: {
+                    type: 'ARRAY',
+                    items: { type: 'STRING' },
+                    description: 'List of 3 key considerations.'
+                  }
+                },
+                required: ['summary', 'headline', 'details', 'considerations']
+              }
+            }
           }),
         });
 
-        if (openAiRes.ok) {
-          const aiData = await openAiRes.json();
-          const parsedRes = JSON.parse(aiData.choices[0].message.content);
-          
-          summaryText = parsedRes.summary;
-          recommendationHeadline = parsedRes.headline;
-          recommendationDetails = parsedRes.details;
-          keyConsiderations = parsedRes.considerations;
+        if (geminiRes.ok) {
+          const aiData = await geminiRes.json();
+          const rawContent = aiData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawContent) {
+            const parsedRes = JSON.parse(rawContent);
+            summaryText = parsedRes.summary;
+            recommendationHeadline = parsedRes.headline;
+            recommendationDetails = parsedRes.details;
+            keyConsiderations = parsedRes.considerations;
+          }
         } else {
-          console.warn('OpenAI request failed, falling back to rule-based generation.');
+          const errText = await geminiRes.text();
+          console.warn('Gemini request failed, falling back to rule-based generation. Error:', errText);
         }
       } catch (err) {
-        console.error('Error invoking OpenAI:', err);
+        console.error('Error invoking Gemini:', err);
       }
     }
 
