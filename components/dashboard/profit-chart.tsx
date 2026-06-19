@@ -39,11 +39,11 @@ export default function ProfitChart() {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
   const seasonalFactors = [0.95, 0.90, 1.00, 1.10, 1.15, 1.20];
 
-  const baseRev = business?.baselineRevenue || 180000;
-  const marketing = business?.baselineMarketing || 25000;
-  const inventory = business?.baselineInventory || 40000;
-  const fixedCosts = business?.baselineFixedCosts || 30000;
-  const payroll = business?.employees.reduce((sum, emp) => sum + emp.salary, 0) || 96500;
+  const baseRev = business?.baselineRevenue || 0;
+  const marketing = business?.baselineMarketing || 0;
+  const inventory = business?.baselineInventory || 0;
+  const fixedCosts = business?.baselineFixedCosts || 0;
+  const payroll = business?.employees.reduce((sum, emp) => sum + emp.salary, 0) || 0;
 
   const totalCosts = payroll + marketing + inventory + fixedCosts;
 

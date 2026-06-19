@@ -174,8 +174,8 @@ export default function AdminPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <SimulationStatsChart />
-          <UsageAnalyticsChart />
+          <SimulationStatsChart isEmpty={activeBusinesses === 0} />
+          <UsageAnalyticsChart isEmpty={activeBusinesses === 0} />
         </div>
 
         {/* Data Tables */}

@@ -1,39 +1,71 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { TrendingUp, Users, DollarSign, Clock } from 'lucide-react';
 
-const impacts = [
-  {
-    title: 'Revenue Impact',
-    value: '+$450K',
-    description: 'Projected increase',
-    icon: DollarSign,
-    isHighlighted: true,
-  },
-  {
-    title: 'Headcount Impact',
-    value: '+35',
-    description: 'Additional team members',
-    icon: Users,
-    isHighlighted: false,
-  },
-  {
-    title: 'Timeline',
-    value: '6 months',
-    description: 'To reach goals',
-    icon: Clock,
-    isHighlighted: false,
-  },
-  {
-    title: 'ROI',
-    value: '340%',
-    description: 'Return on investment',
-    icon: TrendingUp,
-    isHighlighted: false,
-  },
-];
-
 export default function ImpactCards() {
+  const [business, setBusiness] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchBusiness() {
+      try {
+        const res = await fetch('/api/business');
+        if (res.ok) {
+          const data = await res.json();
+          setBusiness(data);
+        }
+      } catch (err) {
+        console.error('Error fetching business for impact cards:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBusiness();
+  }, []);
+
+  const impacts = [
+    {
+      title: 'Revenue Impact',
+      value: business ? '+$450K' : '$0',
+      description: business ? 'Projected increase' : 'No active twin',
+      icon: DollarSign,
+      isHighlighted: true,
+    },
+    {
+      title: 'Headcount Impact',
+      value: business ? '+35' : '0',
+      description: business ? 'Additional team members' : 'No active twin',
+      icon: Users,
+      isHighlighted: false,
+    },
+    {
+      title: 'Timeline',
+      value: business ? '6 months' : '--',
+      description: business ? 'To reach goals' : 'No active twin',
+      icon: Clock,
+      isHighlighted: false,
+    },
+    {
+      title: 'ROI',
+      value: business ? '340%' : '0%',
+      description: business ? 'Return on investment' : 'No active twin',
+      icon: TrendingUp,
+      isHighlighted: false,
+    },
+  ];
+
+  if (loading) {
+    return (
+      <div className="space-y-4 animate-pulse">
+        <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-28 bg-gray-250 border border-gray-200 rounded-2xl"></div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium tracking-tight text-black mb-4">Live Projections</h3>

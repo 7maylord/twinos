@@ -10,17 +10,24 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const data = [
-  { day: '1', requests: 2400 },
-  { day: '2', requests: 2210 },
-  { day: '3', requests: 2290 },
-  { day: '4', requests: 2000 },
-  { day: '5', requests: 2181 },
-  { day: '6', requests: 2500 },
-  { day: '7', requests: 2100 },
-];
-
-export function UsageAnalyticsChart() {
+export function UsageAnalyticsChart({ isEmpty }: { isEmpty?: boolean }) {
+  const data = isEmpty ? [
+    { day: '1', requests: 0 },
+    { day: '2', requests: 0 },
+    { day: '3', requests: 0 },
+    { day: '4', requests: 0 },
+    { day: '5', requests: 0 },
+    { day: '6', requests: 0 },
+    { day: '7', requests: 0 },
+  ] : [
+    { day: '1', requests: 2400 },
+    { day: '2', requests: 2210 },
+    { day: '3', requests: 2290 },
+    { day: '4', requests: 2000 },
+    { day: '5', requests: 2181 },
+    { day: '6', requests: 2500 },
+    { day: '7', requests: 2100 },
+  ];
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
       <h3 className="text-black font-medium tracking-tight text-lg mb-6">API Usage (Last 7 Days)</h3>

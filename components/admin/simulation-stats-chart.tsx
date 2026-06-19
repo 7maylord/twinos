@@ -11,16 +11,22 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-const data = [
-  { month: 'Jan', simulations: 450, users: 32 },
-  { month: 'Feb', simulations: 520, users: 45 },
-  { month: 'Mar', simulations: 480, users: 38 },
-  { month: 'Apr', simulations: 610, users: 52 },
-  { month: 'May', simulations: 720, users: 68 },
-  { month: 'Jun', simulations: 847, users: 85 },
-];
-
-export function SimulationStatsChart() {
+export function SimulationStatsChart({ isEmpty }: { isEmpty?: boolean }) {
+  const data = isEmpty ? [
+    { month: 'Jan', simulations: 0, users: 0 },
+    { month: 'Feb', simulations: 0, users: 0 },
+    { month: 'Mar', simulations: 0, users: 0 },
+    { month: 'Apr', simulations: 0, users: 0 },
+    { month: 'May', simulations: 0, users: 0 },
+    { month: 'Jun', simulations: 0, users: 0 },
+  ] : [
+    { month: 'Jan', simulations: 450, users: 32 },
+    { month: 'Feb', simulations: 520, users: 45 },
+    { month: 'Mar', simulations: 480, users: 38 },
+    { month: 'Apr', simulations: 610, users: 52 },
+    { month: 'May', simulations: 720, users: 68 },
+    { month: 'Jun', simulations: 847, users: 85 },
+  ];
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
       <h3 className="text-black font-medium tracking-tight text-lg mb-6">Monthly Simulations</h3>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { TrendingUp, Users, DollarSign, Activity } from 'lucide-react';
+import { TrendingUp, Users, DollarSign, Activity, AlertTriangle } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -64,31 +64,23 @@ export default function KPICards() {
     );
   }
 
-  if (!business) {
-    return (
-      <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-2xl">
-        Failed to load business twin. Make sure database is seeded.
-      </div>
-    );
-  }
-
-  const payroll = business.employees.reduce((sum, emp) => sum + emp.salary, 0);
-  const totalExpenses = payroll + business.baselineMarketing + business.baselineInventory + business.baselineFixedCosts;
-  const netProfit = business.baselineRevenue - totalExpenses;
-  const profitMargin = (netProfit / business.baselineRevenue) * 100;
+  const payroll = business ? business.employees.reduce((sum, emp) => sum + emp.salary, 0) : 0;
+  const totalExpenses = business ? (payroll + business.baselineMarketing + business.baselineInventory + business.baselineFixedCosts) : 0;
+  const netProfit = business ? (business.baselineRevenue - totalExpenses) : 0;
+  const profitMargin = business && business.baselineRevenue > 0 ? (netProfit / business.baselineRevenue) * 100 : 0;
 
   const kpis = [
     {
       title: 'Baseline Revenue',
-      value: `$${(business.baselineRevenue / 1000).toFixed(0)}K`,
-      change: 'Static baseline',
+      value: `$${((business?.baselineRevenue || 0) / 1000).toFixed(0)}K`,
+      change: business ? 'Static baseline' : 'No revenue',
       isPositive: true,
       icon: DollarSign,
       isFeatured: true,
     },
     {
       title: 'Active Employees',
-      value: business.employees.length.toString(),
+      value: (business?.employees?.length || 0).toString(),
       change: `Payroll: $${(payroll / 1000).toFixed(1)}K`,
       isPositive: true,
       icon: Users,
@@ -97,7 +89,7 @@ export default function KPICards() {
     {
       title: 'Profit Margin',
       value: `${profitMargin.toFixed(1)}%`,
-      change: netProfit < 0 ? 'Operating at loss' : 'Profitable operations',
+      change: !business ? 'No operations' : netProfit < 0 ? 'Operating at loss' : 'Profitable operations',
       isPositive: netProfit >= 0,
       icon: TrendingUp,
       isFeatured: false,
@@ -105,7 +97,7 @@ export default function KPICards() {
     {
       title: 'Operating Costs',
       value: `$${(totalExpenses / 1000).toFixed(0)}K`,
-      change: `Fixed: $${(business.baselineFixedCosts / 1000).toFixed(0)}K`,
+      change: `Fixed: $${((business?.baselineFixedCosts || 0) / 1000).toFixed(0)}K`,
       isPositive: false,
       icon: Activity,
       isFeatured: false,
@@ -113,7 +105,24 @@ export default function KPICards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="space-y-6">
+      {!business && (
+        <div className="p-6 rounded-2xl border border-amber-200 bg-amber-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-sm shadow-sm transition-all duration-300">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-xl bg-amber-100 text-amber-800 shrink-0">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-amber-950 text-base leading-none mb-1">No Active Digital Twin Found</h4>
+              <p className="text-amber-900/80 text-xs font-medium">Please configure your business profile to activate all metrics, charts, and simulation tools.</p>
+            </div>
+          </div>
+          <a href="/onboarding" className="py-2.5 px-5 bg-amber-950 text-white text-xs font-semibold rounded-full hover:bg-amber-900 transition-colors shadow-sm self-start sm:self-auto shrink-0 text-center">
+            Create Business Twin
+          </a>
+        </div>
+      )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {kpis.map((kpi, index) => {
         const Icon = kpi.icon;
         return (
@@ -155,6 +164,7 @@ export default function KPICards() {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }

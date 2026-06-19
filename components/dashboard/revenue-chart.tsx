@@ -31,7 +31,7 @@ export default function RevenueChart() {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
   const seasonalFactors = [0.95, 0.90, 1.00, 1.10, 1.15, 1.20];
 
-  const baseRev = business?.baselineRevenue || 180000;
+  const baseRev = business?.baselineRevenue || 0;
   const chartData = months.map((month, index) => {
     const sFactor = seasonalFactors[index];
     const revenue = Math.round((baseRev * sFactor) / 1000); // in Thousands
