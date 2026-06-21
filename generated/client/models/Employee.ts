@@ -39,6 +39,7 @@ export type EmployeeMinAggregateOutputType = {
   businessId: string | null
   name: string | null
   role: string | null
+  department: string | null
   salary: number | null
   tenantId: string | null
 }
@@ -48,6 +49,7 @@ export type EmployeeMaxAggregateOutputType = {
   businessId: string | null
   name: string | null
   role: string | null
+  department: string | null
   salary: number | null
   tenantId: string | null
 }
@@ -57,6 +59,7 @@ export type EmployeeCountAggregateOutputType = {
   businessId: number
   name: number
   role: number
+  department: number
   salary: number
   tenantId: number
   _all: number
@@ -76,6 +79,7 @@ export type EmployeeMinAggregateInputType = {
   businessId?: true
   name?: true
   role?: true
+  department?: true
   salary?: true
   tenantId?: true
 }
@@ -85,6 +89,7 @@ export type EmployeeMaxAggregateInputType = {
   businessId?: true
   name?: true
   role?: true
+  department?: true
   salary?: true
   tenantId?: true
 }
@@ -94,6 +99,7 @@ export type EmployeeCountAggregateInputType = {
   businessId?: true
   name?: true
   role?: true
+  department?: true
   salary?: true
   tenantId?: true
   _all?: true
@@ -190,6 +196,7 @@ export type EmployeeGroupByOutputType = {
   businessId: string
   name: string
   role: string
+  department: string | null
   salary: number
   tenantId: string | null
   _count: EmployeeCountAggregateOutputType | null
@@ -222,6 +229,7 @@ export type EmployeeWhereInput = {
   businessId?: Prisma.StringFilter<"Employee"> | string
   name?: Prisma.StringFilter<"Employee"> | string
   role?: Prisma.StringFilter<"Employee"> | string
+  department?: Prisma.StringNullableFilter<"Employee"> | string | null
   salary?: Prisma.FloatFilter<"Employee"> | number
   tenantId?: Prisma.StringNullableFilter<"Employee"> | string | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
@@ -232,6 +240,7 @@ export type EmployeeOrderByWithRelationInput = {
   businessId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  department?: Prisma.SortOrderInput | Prisma.SortOrder
   salary?: Prisma.SortOrder
   tenantId?: Prisma.SortOrderInput | Prisma.SortOrder
   business?: Prisma.BusinessOrderByWithRelationInput
@@ -245,6 +254,7 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   businessId?: Prisma.StringFilter<"Employee"> | string
   name?: Prisma.StringFilter<"Employee"> | string
   role?: Prisma.StringFilter<"Employee"> | string
+  department?: Prisma.StringNullableFilter<"Employee"> | string | null
   salary?: Prisma.FloatFilter<"Employee"> | number
   tenantId?: Prisma.StringNullableFilter<"Employee"> | string | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
@@ -255,6 +265,7 @@ export type EmployeeOrderByWithAggregationInput = {
   businessId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  department?: Prisma.SortOrderInput | Prisma.SortOrder
   salary?: Prisma.SortOrder
   tenantId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.EmployeeCountOrderByAggregateInput
@@ -272,6 +283,7 @@ export type EmployeeScalarWhereWithAggregatesInput = {
   businessId?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   name?: Prisma.StringWithAggregatesFilter<"Employee"> | string
   role?: Prisma.StringWithAggregatesFilter<"Employee"> | string
+  department?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
   salary?: Prisma.FloatWithAggregatesFilter<"Employee"> | number
   tenantId?: Prisma.StringNullableWithAggregatesFilter<"Employee"> | string | null
 }
@@ -280,6 +292,7 @@ export type EmployeeCreateInput = {
   id?: string
   name: string
   role: string
+  department?: string | null
   salary: number
   tenantId?: string | null
   business: Prisma.BusinessCreateNestedOneWithoutEmployeesInput
@@ -290,6 +303,7 @@ export type EmployeeUncheckedCreateInput = {
   businessId: string
   name: string
   role: string
+  department?: string | null
   salary: number
   tenantId?: string | null
 }
@@ -298,6 +312,7 @@ export type EmployeeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   salary?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   business?: Prisma.BusinessUpdateOneRequiredWithoutEmployeesNestedInput
@@ -308,6 +323,7 @@ export type EmployeeUncheckedUpdateInput = {
   businessId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   salary?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -317,6 +333,7 @@ export type EmployeeCreateManyInput = {
   businessId: string
   name: string
   role: string
+  department?: string | null
   salary: number
   tenantId?: string | null
 }
@@ -325,6 +342,7 @@ export type EmployeeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   salary?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -334,6 +352,7 @@ export type EmployeeUncheckedUpdateManyInput = {
   businessId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   salary?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -353,6 +372,7 @@ export type EmployeeCountOrderByAggregateInput = {
   businessId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  department?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
 }
@@ -366,6 +386,7 @@ export type EmployeeMaxOrderByAggregateInput = {
   businessId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  department?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
 }
@@ -375,6 +396,7 @@ export type EmployeeMinOrderByAggregateInput = {
   businessId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  department?: Prisma.SortOrder
   salary?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
 }
@@ -429,6 +451,7 @@ export type EmployeeCreateWithoutBusinessInput = {
   id?: string
   name: string
   role: string
+  department?: string | null
   salary: number
   tenantId?: string | null
 }
@@ -437,6 +460,7 @@ export type EmployeeUncheckedCreateWithoutBusinessInput = {
   id?: string
   name: string
   role: string
+  department?: string | null
   salary: number
   tenantId?: string | null
 }
@@ -475,6 +499,7 @@ export type EmployeeScalarWhereInput = {
   businessId?: Prisma.StringFilter<"Employee"> | string
   name?: Prisma.StringFilter<"Employee"> | string
   role?: Prisma.StringFilter<"Employee"> | string
+  department?: Prisma.StringNullableFilter<"Employee"> | string | null
   salary?: Prisma.FloatFilter<"Employee"> | number
   tenantId?: Prisma.StringNullableFilter<"Employee"> | string | null
 }
@@ -483,6 +508,7 @@ export type EmployeeCreateManyBusinessInput = {
   id?: string
   name: string
   role: string
+  department?: string | null
   salary: number
   tenantId?: string | null
 }
@@ -491,6 +517,7 @@ export type EmployeeUpdateWithoutBusinessInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   salary?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -499,6 +526,7 @@ export type EmployeeUncheckedUpdateWithoutBusinessInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   salary?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -507,6 +535,7 @@ export type EmployeeUncheckedUpdateManyWithoutBusinessInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   salary?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -518,6 +547,7 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   businessId?: boolean
   name?: boolean
   role?: boolean
+  department?: boolean
   salary?: boolean
   tenantId?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
@@ -528,6 +558,7 @@ export type EmployeeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   businessId?: boolean
   name?: boolean
   role?: boolean
+  department?: boolean
   salary?: boolean
   tenantId?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
@@ -538,6 +569,7 @@ export type EmployeeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   businessId?: boolean
   name?: boolean
   role?: boolean
+  department?: boolean
   salary?: boolean
   tenantId?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
@@ -548,11 +580,12 @@ export type EmployeeSelectScalar = {
   businessId?: boolean
   name?: boolean
   role?: boolean
+  department?: boolean
   salary?: boolean
   tenantId?: boolean
 }
 
-export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "name" | "role" | "salary" | "tenantId", ExtArgs["result"]["employee"]>
+export type EmployeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "name" | "role" | "department" | "salary" | "tenantId", ExtArgs["result"]["employee"]>
 export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
 }
@@ -573,6 +606,7 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     businessId: string
     name: string
     role: string
+    department: string | null
     salary: number
     tenantId: string | null
   }, ExtArgs["result"]["employee"]>
@@ -1003,6 +1037,7 @@ export interface EmployeeFieldRefs {
   readonly businessId: Prisma.FieldRef<"Employee", 'String'>
   readonly name: Prisma.FieldRef<"Employee", 'String'>
   readonly role: Prisma.FieldRef<"Employee", 'String'>
+  readonly department: Prisma.FieldRef<"Employee", 'String'>
   readonly salary: Prisma.FieldRef<"Employee", 'Float'>
   readonly tenantId: Prisma.FieldRef<"Employee", 'String'>
 }

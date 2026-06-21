@@ -945,6 +945,7 @@ export const EmployeeScalarFieldEnum = {
   businessId: 'businessId',
   name: 'name',
   role: 'role',
+  department: 'department',
   salary: 'salary',
   tenantId: 'tenantId'
 } as const

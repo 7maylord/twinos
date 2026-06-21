@@ -64,6 +64,7 @@ model Employee {
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   name       String
   role       String
+  department String?
   salary     Float
   tenantId   String?
 }
