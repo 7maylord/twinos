@@ -1,5 +1,6 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { prisma } from './db';
+import { cookies } from 'next/headers';
 
 export async function getActiveUserEmail(): Promise<string> {
   let ownerEmail = 'demo@twinos.com';
@@ -18,6 +19,8 @@ export async function getActiveUserEmail(): Promise<string> {
 
 export async function getActiveBusiness() {
   const email = await getActiveUserEmail();
+  const cookieStore = await cookies();
+  const activeBusinessId = cookieStore.get('active-business-id')?.value;
   
   // Find user by email
   const user = await prisma.user.findUnique({
@@ -31,14 +34,11 @@ export async function getActiveBusiness() {
         orderBy: {
           createdAt: 'desc',
         },
-        take: 1,
       },
     },
   });
 
-  const business = user?.businesses[0];
-  
-  if (!business) {
+  if (!user || user.businesses.length === 0) {
     // Fallback: If no business is linked to this user (e.g. they registered but database was reset/seeded),
     // and they are the demo user, return the seeded Halo Café business.
     if (email === 'demo@twinos.com') {
@@ -52,5 +52,33 @@ export async function getActiveBusiness() {
     return null;
   }
 
-  return business;
+  // If a specific business is selected via cookie, try to find it among the user's businesses
+  if (activeBusinessId) {
+    const selectedBusiness = user.businesses.find(b => b.id === activeBusinessId);
+    if (selectedBusiness) {
+      return selectedBusiness;
+    }
+  }
+
+  // Fallback to the most recently created business
+  return user.businesses[0];
+}
+
+export async function getUserBusinesses() {
+  const email = await getActiveUserEmail();
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: {
+      businesses: {
+        select: {
+          id: true,
+          name: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    },
+  });
+  return user?.businesses || [];
 }
