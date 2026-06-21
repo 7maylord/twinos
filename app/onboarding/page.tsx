@@ -11,7 +11,7 @@ export default function OnboardingPage() {
 
   // Form states
   const [name, setName] = useState('');
-  const [industry, setIndustry] = useState('Restaurant');
+  const [industry, setIndustry] = useState('');
   const [baselineRevenue, setBaselineRevenue] = useState(150000);
   const [baselineFixedCosts, setBaselineFixedCosts] = useState(25000);
   const [baselineMarketing, setBaselineMarketing] = useState(15000);
@@ -121,10 +121,17 @@ export default function OnboardingPage() {
                 onChange={(e) => setIndustry(e.target.value)}
                 className="w-full px-4 py-3 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
               >
+                <option value="" disabled>Select an Industry</option>
+                <option value="Software / SaaS">Software / SaaS</option>
                 <option value="Restaurant">Restaurant & Food Service</option>
                 <option value="E-commerce">E-commerce / Retailer</option>
                 <option value="Logistics">Logistics & Supply Chain</option>
                 <option value="Professional Services">Professional Services</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Real Estate">Real Estate</option>
+                <option value="Education">Education</option>
+                <option value="Financial Services">Financial Services</option>
                 <option value="Other">Other Sector</option>
               </select>
             </div>
@@ -244,7 +251,7 @@ export default function OnboardingPage() {
           {step < 3 ? (
             <button
               onClick={handleNext}
-              disabled={step === 1 && !name.trim()}
+              disabled={step === 1 && (!name.trim() || !industry)}
               className="flex-1 py-3 px-6 bg-black hover:bg-gray-800 text-white rounded-full font-semibold flex items-center justify-center gap-2 transition-colors disabled:bg-gray-400"
             >
               Continue

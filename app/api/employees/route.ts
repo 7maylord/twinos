@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
       const created = [];
       for (const item of body) {
-        const { name, role, salary, businessId } = item;
+        const { name, role, department, salary, businessId } = item;
         if (!name || !role || salary === undefined) continue;
 
         const employee = await prisma.employee.create({
@@ -27,6 +27,7 @@ export async function POST(request: Request) {
             businessId: businessId || targetBusinessId,
             name,
             role,
+            department: department || null,
             salary: Number(salary),
           },
         });
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, count: created.length, data: created });
     }
 
-    const { name, role, salary, businessId } = body;
+    const { name, role, department, salary, businessId } = body;
 
     if (!name || !role || salary === undefined) {
       return NextResponse.json({ error: 'Name, role, and salary are required' }, { status: 400 });
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
         businessId: targetId,
         name,
         role,
+        department: department || null,
         salary: Number(salary),
       },
     });
@@ -58,6 +60,33 @@ export async function POST(request: Request) {
     return NextResponse.json(employee);
   } catch (error: any) {
     console.error('Error creating employee:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, name, role, department, salary } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Employee ID is required' }, { status: 400 });
+    }
+
+    const updateData: Record<string, any> = {};
+    if (name !== undefined) updateData.name = name;
+    if (role !== undefined) updateData.role = role;
+    if (department !== undefined) updateData.department = department || null;
+    if (salary !== undefined) updateData.salary = Number(salary);
+
+    const employee = await prisma.employee.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return NextResponse.json(employee);
+  } catch (error: any) {
+    console.error('Error updating employee:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

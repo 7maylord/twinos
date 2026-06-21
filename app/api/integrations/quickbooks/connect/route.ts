@@ -13,7 +13,8 @@ export async function GET(request: Request) {
     }
 
     const clientId = process.env.QBO_CLIENT_ID || 'mock-client-id';
-    const redirectUri = process.env.QBO_REDIRECT_URI || 'http://localhost:3000/api/integrations/quickbooks/callback';
+    const origin = new URL(request.url).origin;
+    const redirectUri = process.env.QBO_REDIRECT_URI || `${origin}/api/integrations/quickbooks/callback`;
     const state = businessId;
 
     console.log(`[QBO Connect] Configuration: QBO_CLIENT_ID=${process.env.QBO_CLIENT_ID ? 'set' : 'mock'}, QBO_REDIRECT_URI=${redirectUri}`);

@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       data: {
         ownerId: user.id,
         name,
-        industry: industry || 'Restaurant',
+        industry: industry || 'Other',
         baselineRevenue: Number(baselineRevenue || 100000),
         baselineMarketing: Number(baselineMarketing || 10000),
         baselineInventory: Number(baselineInventory || 20000),
@@ -48,25 +48,7 @@ export async function POST(request: Request) {
       },
     });
 
-    // 3. Create a default employee to start with
-    await prisma.employee.create({
-      data: {
-        businessId: business.id,
-        name: 'General Manager',
-        role: 'Manager',
-        salary: 5000.0,
-      },
-    });
 
-    // 4. Create a default product to start with
-    await prisma.product.create({
-      data: {
-        businessId: business.id,
-        name: 'Standard Product A',
-        price: 50.0,
-        cost: 20.0,
-      },
-    });
 
     return NextResponse.json({ business });
   } catch (error: any) {

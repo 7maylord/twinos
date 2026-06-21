@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
-import { Plus, Trash2, Tag, Users, ShieldAlert, Upload, Download, AlertCircle, FileSpreadsheet } from 'lucide-react';
+import { Plus, Trash2, Tag, Users, ShieldAlert, Upload, Download, AlertCircle, FileSpreadsheet, Pencil, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Product {
@@ -17,6 +17,7 @@ interface Employee {
   id: string;
   name: string;
   role: string;
+  department: string | null;
   salary: number;
 }
 
@@ -45,9 +46,24 @@ export default function SettingsPage() {
 
   // Employee Form states
   const [empName, setEmpName] = useState('');
-  const [empRole, setEmpRole] = useState('Barista');
+  const [empRole, setEmpRole] = useState('');
+  const [empDepartment, setEmpDepartment] = useState('');
   const [empSalary, setEmpSalary] = useState('');
   const [addingEmployee, setAddingEmployee] = useState(false);
+
+  // Inline edit states
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [editProdName, setEditProdName] = useState('');
+  const [editProdPrice, setEditProdPrice] = useState('');
+  const [editProdCost, setEditProdCost] = useState('');
+  const [savingProduct, setSavingProduct] = useState(false);
+
+  const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
+  const [editEmpName, setEditEmpName] = useState('');
+  const [editEmpRole, setEditEmpRole] = useState('');
+  const [editEmpDepartment, setEditEmpDepartment] = useState('');
+  const [editEmpSalary, setEditEmpSalary] = useState('');
+  const [savingEmployee, setSavingEmployee] = useState(false);
 
   // CSV Import States
   const [prodCsvFile, setProdCsvFile] = useState<File | null>(null);
@@ -190,7 +206,7 @@ export default function SettingsPage() {
   const downloadSampleCSV = (type: 'products' | 'employees') => {
     const csvContent = type === 'products'
       ? 'name,price,cost\nFilter Coffee,4.50,1.10\nAvocado Toast,12.00,3.50\nCroissant,3.75,0.90\nCold Brew,5.00,1.25'
-      : 'name,role,salary\nAlice Smith,Barista,3200\nBob Johnson,Chef,4200\nCharlie Brown,Shift Supervisor,4800\nDiana Prince,Manager,5500';
+      : 'name,role,department,salary\nAlice Smith,Barista,Operations,3200\nBob Johnson,Chef,Kitchen,4200\nCharlie Brown,Shift Supervisor,Operations,4800\nDiana Prince,Manager,Management,5500';
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -226,7 +242,7 @@ export default function SettingsPage() {
       const hasRole = headers.includes('role');
       const hasSalary = headers.includes('salary');
       if (!hasName || !hasRole || !hasSalary) {
-        throw new Error('Invalid CSV headers. Required: name, role, salary');
+        throw new Error('Invalid CSV headers. Required: name, role, salary. Optional: department');
       }
     }
 
@@ -282,7 +298,8 @@ export default function SettingsPage() {
         }
         records.push({
           name: record.name,
-          role: record.role || 'Barista',
+          role: record.role || 'Staff',
+          department: record.department || null,
           salary: salary
         });
       }
@@ -440,12 +457,15 @@ export default function SettingsPage() {
         body: JSON.stringify({
           name: empName,
           role: empRole,
+          department: empDepartment || null,
           salary: Number(empSalary),
           businessId: business?.id,
         }),
       });
       if (res.ok) {
         setEmpName('');
+        setEmpRole('');
+        setEmpDepartment('');
         setEmpSalary('');
         fetchBusiness();
       }
@@ -453,6 +473,89 @@ export default function SettingsPage() {
       console.error(err);
     } finally {
       setAddingEmployee(false);
+    }
+  };
+
+  // Inline edit handlers
+  const startEditProduct = (product: Product) => {
+    setEditingProductId(product.id);
+    setEditProdName(product.name);
+    setEditProdPrice(String(product.price));
+    setEditProdCost(String(product.cost));
+  };
+
+  const cancelEditProduct = () => {
+    setEditingProductId(null);
+  };
+
+  const handleSaveProduct = async (id: string) => {
+    if (!editProdName.trim() || !editProdPrice || !editProdCost) return;
+    setSavingProduct(true);
+    try {
+      const res = await fetch('/api/products', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          name: editProdName,
+          price: Number(editProdPrice),
+          cost: Number(editProdCost),
+        }),
+      });
+      if (res.ok) {
+        setEditingProductId(null);
+        fetchBusiness();
+        toast.success('Product updated successfully.');
+      } else {
+        toast.error('Failed to update product.');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Error updating product.');
+    } finally {
+      setSavingProduct(false);
+    }
+  };
+
+  const startEditEmployee = (employee: Employee) => {
+    setEditingEmployeeId(employee.id);
+    setEditEmpName(employee.name);
+    setEditEmpRole(employee.role);
+    setEditEmpDepartment(employee.department || '');
+    setEditEmpSalary(String(employee.salary));
+  };
+
+  const cancelEditEmployee = () => {
+    setEditingEmployeeId(null);
+  };
+
+  const handleSaveEmployee = async (id: string) => {
+    if (!editEmpName.trim() || !editEmpRole.trim() || !editEmpSalary) return;
+    setSavingEmployee(true);
+    try {
+      const res = await fetch('/api/employees', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          name: editEmpName,
+          role: editEmpRole,
+          department: editEmpDepartment || null,
+          salary: Number(editEmpSalary),
+        }),
+      });
+      if (res.ok) {
+        setEditingEmployeeId(null);
+        fetchBusiness();
+        toast.success('Employee updated successfully.');
+      } else {
+        toast.error('Failed to update employee.');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Error updating employee.');
+    } finally {
+      setSavingEmployee(false);
     }
   };
 
@@ -697,19 +800,47 @@ export default function SettingsPage() {
                     <tbody className="divide-y divide-gray-50">
                       {business.products.map((product) => {
                         const margin = ((product.price - product.cost) / (product.price || 1)) * 100;
+                        const isEditing = editingProductId === product.id;
                         return (
                           <tr key={product.id} className="text-sm">
-                            <td className="py-3.5 font-medium text-black">{product.name}</td>
-                            <td className="py-3.5 text-right font-medium text-black">${product.price.toFixed(2)}</td>
-                            <td className="py-3.5 text-right text-gray-500">${product.cost.toFixed(2)}</td>
-                            <td className="py-3.5 text-right text-green-600 font-semibold">{margin.toFixed(0)}%</td>
+                            <td className="py-3.5 font-medium text-black">
+                              {isEditing ? (
+                                <input type="text" value={editProdName} onChange={(e) => setEditProdName(e.target.value)} className="w-full px-2 py-1 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm focus:outline-none focus:border-black transition-colors" />
+                              ) : product.name}
+                            </td>
+                            <td className="py-3.5 text-right font-medium text-black">
+                              {isEditing ? (
+                                <input type="number" step="0.01" value={editProdPrice} onChange={(e) => setEditProdPrice(e.target.value)} className="w-24 px-2 py-1 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm text-right focus:outline-none focus:border-black transition-colors" />
+                              ) : `$${product.price.toFixed(2)}`}
+                            </td>
+                            <td className="py-3.5 text-right text-gray-500">
+                              {isEditing ? (
+                                <input type="number" step="0.01" value={editProdCost} onChange={(e) => setEditProdCost(e.target.value)} className="w-24 px-2 py-1 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm text-right focus:outline-none focus:border-black transition-colors" />
+                              ) : `$${product.cost.toFixed(2)}`}
+                            </td>
+                            <td className="py-3.5 text-right text-green-600 font-semibold">
+                              {isEditing ? '—' : `${margin.toFixed(0)}%`}
+                            </td>
                             <td className="py-3.5 text-right">
-                              <button
-                                onClick={() => handleDeleteProduct(product.id)}
-                                className="p-1.5 text-gray-400 hover:text-red-600 transition-colors inline-block"
-                              >
-                                <Trash2 size={16} />
-                              </button>
+                              {isEditing ? (
+                                <div className="flex items-center justify-end gap-1">
+                                  <button onClick={() => handleSaveProduct(product.id)} disabled={savingProduct} className="p-1.5 text-green-600 hover:text-green-700 transition-colors" title="Save">
+                                    <Check size={16} />
+                                  </button>
+                                  <button onClick={cancelEditProduct} className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors" title="Cancel">
+                                    <X size={16} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-end gap-1">
+                                  <button onClick={() => startEditProduct(product)} className="p-1.5 text-gray-400 hover:text-[#2B2644] transition-colors" title="Edit">
+                                    <Pencil size={14} />
+                                  </button>
+                                  <button onClick={() => handleDeleteProduct(product.id)} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors" title="Delete">
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                              )}
                             </td>
                           </tr>
                         );
@@ -753,18 +884,26 @@ export default function SettingsPage() {
                       <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                         Role / Position
                       </label>
-                      <select
+                      <input
+                        type="text"
+                        required
                         value={empRole}
                         onChange={(e) => setEmpRole(e.target.value)}
+                        placeholder="e.g. Lead Developer"
                         className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
-                      >
-                        <option value="Barista">Barista</option>
-                        <option value="Chef">Chef</option>
-                        <option value="Shift Supervisor">Shift Supervisor</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Associate">Sales Associate</option>
-                        <option value="Other">Other Position</option>
-                      </select>
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                        Department
+                      </label>
+                      <input
+                        type="text"
+                        value={empDepartment}
+                        onChange={(e) => setEmpDepartment(e.target.value)}
+                        placeholder="e.g. Engineering"
+                        className="w-full px-4 py-2.5 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black focus:outline-none focus:border-black transition-colors"
+                      />
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
@@ -818,7 +957,7 @@ export default function SettingsPage() {
                           {empCsvFile ? empCsvFile.name : 'Choose CSV file or drag here'}
                         </p>
                         <p className="text-[10px] text-gray-400">
-                          Required headers: name, role, salary
+                          Required headers: name, role, salary · Optional: department
                         </p>
                       </div>
                     </div>
@@ -859,33 +998,69 @@ export default function SettingsPage() {
                       <tr className="border-b border-gray-100 text-xs text-gray-400 font-semibold uppercase">
                         <th className="pb-3">Name</th>
                         <th className="pb-3">Role</th>
+                        <th className="pb-3">Department</th>
                         <th className="pb-3 text-right">Monthly Salary</th>
                         <th className="pb-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {business.employees.map((employee) => (
-                        <tr key={employee.id} className="text-sm">
-                          <td className="py-3.5 font-medium text-black">{employee.name}</td>
-                          <td className="py-3.5 text-gray-600">
-                            <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#2B2644]/10 text-[#2B2644]">
-                              {employee.role}
-                            </span>
-                          </td>
-                          <td className="py-3.5 text-right font-medium text-black">${employee.salary.toLocaleString()}</td>
-                          <td className="py-3.5 text-right">
-                            <button
-                              onClick={() => handleDeleteEmployee(employee.id)}
-                              className="p-1.5 text-gray-400 hover:text-red-600 transition-colors inline-block"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                      {business.employees.map((employee) => {
+                        const isEditing = editingEmployeeId === employee.id;
+                        return (
+                          <tr key={employee.id} className="text-sm">
+                            <td className="py-3.5 font-medium text-black">
+                              {isEditing ? (
+                                <input type="text" value={editEmpName} onChange={(e) => setEditEmpName(e.target.value)} className="w-full px-2 py-1 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm focus:outline-none focus:border-black transition-colors" />
+                              ) : employee.name}
+                            </td>
+                            <td className="py-3.5 text-gray-600">
+                              {isEditing ? (
+                                <input type="text" value={editEmpRole} onChange={(e) => setEditEmpRole(e.target.value)} className="w-full px-2 py-1 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm focus:outline-none focus:border-black transition-colors" />
+                              ) : (
+                                <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#2B2644]/10 text-[#2B2644]">
+                                  {employee.role}
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3.5 text-gray-500">
+                              {isEditing ? (
+                                <input type="text" value={editEmpDepartment} onChange={(e) => setEditEmpDepartment(e.target.value)} placeholder="—" className="w-full px-2 py-1 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm focus:outline-none focus:border-black transition-colors" />
+                              ) : (
+                                employee.department || <span className="text-gray-300">—</span>
+                              )}
+                            </td>
+                            <td className="py-3.5 text-right font-medium text-black">
+                              {isEditing ? (
+                                <input type="number" value={editEmpSalary} onChange={(e) => setEditEmpSalary(e.target.value)} className="w-24 px-2 py-1 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm text-right focus:outline-none focus:border-black transition-colors" />
+                              ) : `$${employee.salary.toLocaleString()}`}
+                            </td>
+                            <td className="py-3.5 text-right">
+                              {isEditing ? (
+                                <div className="flex items-center justify-end gap-1">
+                                  <button onClick={() => handleSaveEmployee(employee.id)} disabled={savingEmployee} className="p-1.5 text-green-600 hover:text-green-700 transition-colors" title="Save">
+                                    <Check size={16} />
+                                  </button>
+                                  <button onClick={cancelEditEmployee} className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors" title="Cancel">
+                                    <X size={16} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-end gap-1">
+                                  <button onClick={() => startEditEmployee(employee)} className="p-1.5 text-gray-400 hover:text-[#2B2644] transition-colors" title="Edit">
+                                    <Pencil size={14} />
+                                  </button>
+                                  <button onClick={() => handleDeleteEmployee(employee.id)} className="p-1.5 text-gray-400 hover:text-red-600 transition-colors" title="Delete">
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                       {business.employees.length === 0 && (
                         <tr>
-                          <td colSpan={4} className="py-8 text-center text-gray-400 text-sm">
+                          <td colSpan={5} className="py-8 text-center text-gray-400 text-sm">
                             No employees defined. Add employees using the form on the left.
                           </td>
                         </tr>
