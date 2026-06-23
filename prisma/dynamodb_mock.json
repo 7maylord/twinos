@@ -152,6 +152,15 @@
       "recommendedChanges": [
         "Test action plan step."
       ]
+    },
+    {
+      "runId": "test-run-1782177687757",
+      "timestamp": "2026-06-23T01:21:27.757Z",
+      "targetMetric": "profit - 20% Growth",
+      "exploredScenarios": 800,
+      "recommendedChanges": [
+        "Test action plan step."
+      ]
     }
   ],
   "forecastCache": [
@@ -161,7 +170,7 @@
       "forecastData": {
         "profit": 5000
       },
-      "generatedAt": "2026-06-18T23:18:44.046Z"
+      "generatedAt": "2026-06-23T01:21:27.760Z"
     },
     {
       "businessId": "d795bb1c-0c9d-4995-a8d8-e43906602d85",

@@ -56,7 +56,7 @@ export async function logOptimizationRun(runData: {
       const { PutCommand } = await import('@aws-sdk/lib-dynamodb');
       await ddb.send(
         new PutCommand({
-          TableName: 'OptimizationRuns',
+          TableName: process.env.DYNAMODB_OPTIMIZATION_TABLE || 'OptimizationRuns',
           Item: runData,
         })
       );
@@ -95,7 +95,7 @@ export async function cacheForecast(forecastData: {
       const { PutCommand } = await import('@aws-sdk/lib-dynamodb');
       await ddb.send(
         new PutCommand({
-          TableName: 'ForecastCache',
+          TableName: process.env.DYNAMODB_FORECAST_TABLE || 'ForecastCache',
           Item: forecastData,
         })
       );

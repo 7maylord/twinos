@@ -35,7 +35,7 @@ async function checkTableExists(tableName: string): Promise<boolean> {
 }
 
 async function createForecastCacheTable() {
-  const tableName = 'ForecastCache';
+  const tableName = process.env.DYNAMODB_FORECAST_TABLE || 'ForecastCache';
   console.log(`Checking if table "${tableName}" exists...`);
   
   if (await checkTableExists(tableName)) {
@@ -66,7 +66,7 @@ async function createForecastCacheTable() {
 }
 
 async function createOptimizationRunsTable() {
-  const tableName = 'OptimizationRuns';
+  const tableName = process.env.DYNAMODB_OPTIMIZATION_TABLE || 'OptimizationRuns';
   console.log(`Checking if table "${tableName}" exists...`);
   
   if (await checkTableExists(tableName)) {
