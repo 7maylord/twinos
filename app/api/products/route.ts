@@ -71,6 +71,16 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
     }
 
+    const activeBusiness = await getActiveBusiness();
+    if (!activeBusiness) {
+      return NextResponse.json({ error: 'No active business' }, { status: 401 });
+    }
+
+    const existing = await prisma.product.findUnique({ where: { id } });
+    if (!existing || existing.businessId !== activeBusiness.id) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    }
+
     const updateData: Record<string, any> = {};
     if (name !== undefined) updateData.name = name;
     if (price !== undefined) updateData.price = Number(price);
@@ -95,6 +105,16 @@ export async function DELETE(request: Request) {
 
     if (!id) {
       return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+    }
+
+    const activeBusiness = await getActiveBusiness();
+    if (!activeBusiness) {
+      return NextResponse.json({ error: 'No active business' }, { status: 401 });
+    }
+
+    const existing = await prisma.product.findUnique({ where: { id } });
+    if (!existing || existing.businessId !== activeBusiness.id) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
     await prisma.product.delete({

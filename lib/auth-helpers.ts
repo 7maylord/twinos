@@ -39,9 +39,16 @@ export async function getActiveBusiness() {
   });
 
   if (!user || user.businesses.length === 0) {
-    // Fallback: If no business is linked to this user (e.g. they registered but database was reset/seeded),
-    // and they are the demo user, return the seeded Halo Café business.
+    // Fallback: If no business is linked to this user (e.g. demo mode or reset DB),
+    // respect the active-business-id cookie first, then fall back to the first business.
     if (email === 'demo@twinos.com') {
+      if (activeBusinessId) {
+        const byId = await prisma.business.findUnique({
+          where: { id: activeBusinessId },
+          include: { products: true, employees: true },
+        });
+        if (byId) return byId;
+      }
       return await prisma.business.findFirst({
         include: {
           products: true,

@@ -73,6 +73,16 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Employee ID is required' }, { status: 400 });
     }
 
+    const activeBusiness = await getActiveBusiness();
+    if (!activeBusiness) {
+      return NextResponse.json({ error: 'No active business' }, { status: 401 });
+    }
+
+    const existing = await prisma.employee.findUnique({ where: { id } });
+    if (!existing || existing.businessId !== activeBusiness.id) {
+      return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
+    }
+
     const updateData: Record<string, any> = {};
     if (name !== undefined) updateData.name = name;
     if (role !== undefined) updateData.role = role;
@@ -98,6 +108,16 @@ export async function DELETE(request: Request) {
 
     if (!id) {
       return NextResponse.json({ error: 'Employee ID is required' }, { status: 400 });
+    }
+
+    const activeBusiness = await getActiveBusiness();
+    if (!activeBusiness) {
+      return NextResponse.json({ error: 'No active business' }, { status: 401 });
+    }
+
+    const existing = await prisma.employee.findUnique({ where: { id } });
+    if (!existing || existing.businessId !== activeBusiness.id) {
+      return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
     }
 
     await prisma.employee.delete({

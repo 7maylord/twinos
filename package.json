@@ -9,7 +9,9 @@
     "lint": "next lint",
     "db:postgres": "node scripts/db-switch.js postgres",
     "db:sqlite": "node scripts/db-switch.js sqlite",
-    "test": "tsx scripts/test-all.ts"
+    "test": "tsx scripts/test-all.ts",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1071.0",
@@ -43,7 +45,8 @@
     "prisma": "^7.8.0",
     "tailwindcss": "^3.4.0",
     "tsx": "^4.22.4",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^4.1.9"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

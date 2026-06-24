@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getActiveBusiness } from '@/lib/auth-helpers';
 import { runSimulation, BaselineMetrics, ScenarioAdjustments, optimizeScenario } from '@/lib/simulation-engine';
 import { logOptimizationRun } from '@/lib/dynamodb';
 
@@ -12,14 +12,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'targetType and targetGrowthPct are required' }, { status: 400 });
     }
 
-    const business = await prisma.business.findFirst({
-      include: {
-        employees: true,
-      },
-    });
+    const business = await getActiveBusiness();
 
     if (!business) {
-      return NextResponse.json({ error: 'No business profile found. Onboarding required.' }, { status: 404 });
+      return NextResponse.json({ error: 'No active business found. Onboarding required.' }, { status: 404 });
     }
 
     const employees = business.employees;

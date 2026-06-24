@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getActiveBusiness } from '@/lib/auth-helpers';
 import { runSimulation } from '@/lib/simulation-engine';
 import { cacheForecast } from '@/lib/dynamodb';
 
@@ -23,11 +24,11 @@ export async function POST(request: Request) {
       }
       let targetBusinessId = businessId;
       if (!targetBusinessId) {
-        const defaultBusiness = await prisma.business.findFirst();
-        if (!defaultBusiness) {
-          return NextResponse.json({ error: 'No business found in database.' }, { status: 400 });
+        const activeBusiness = await getActiveBusiness();
+        if (!activeBusiness) {
+          return NextResponse.json({ error: 'No active business found.' }, { status: 400 });
         }
-        targetBusinessId = defaultBusiness.id;
+        targetBusinessId = activeBusiness.id;
       }
       scenario = await prisma.scenario.create({
         data: {

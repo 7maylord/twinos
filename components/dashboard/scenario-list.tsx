@@ -26,23 +26,34 @@ interface Scenario {
 
 export default function ScenarioList() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [baseline, setBaseline] = useState<{ revenue: number; profit: number } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchScenarios() {
+    async function fetchData() {
       try {
-        const res = await fetch('/api/scenarios');
-        if (res.ok) {
-          const data = await res.json();
-          setScenarios(data);
+        const [scenariosRes, businessRes] = await Promise.all([
+          fetch('/api/scenarios'),
+          fetch('/api/business'),
+        ]);
+        if (scenariosRes.ok) {
+          setScenarios(await scenariosRes.json());
+        }
+        if (businessRes.ok) {
+          const b = await businessRes.json();
+          const totalPayroll = (b.employees || []).reduce((sum: number, e: any) => sum + e.salary, 0);
+          setBaseline({
+            revenue: b.baselineRevenue,
+            profit: b.baselineRevenue - totalPayroll - b.baselineMarketing - b.baselineInventory - b.baselineFixedCosts,
+          });
         }
       } catch (err) {
-        console.error('Error fetching scenarios:', err);
+        console.error('Error fetching scenario list data:', err);
       } finally {
         setLoading(false);
       }
     }
-    fetchScenarios();
+    fetchData();
   }, []);
 
   const formatDistanceToNow = (dateString: string) => {
@@ -95,19 +106,11 @@ export default function ScenarioList() {
           {scenarios.map((scenario) => {
             const latestResult = scenario.simulationResults?.[0];
             
-            // Baseline profit was $28,500 based on seed (180,000 revenue - 96,500 payroll - 25,000 marketing - 40,000 inventory - 30,000 fixed)
-            // Wait, let's calculate the impact compared to the baseline profit of $28,500 (which is -$11,500 if operating at net loss)
-            // Let's show profit impact or revenue impact percentage.
-            // Profit impact: let's calculate profit difference if profit is positive or negative.
-            // For general representation, let's use the profit difference:
-            const baselineProfit = -11500; // 180000 - 96500 - 25000 - 40000 - 30000
-            const projectedProfit = latestResult ? latestResult.projectedProfit : 0;
-            const profitDelta = latestResult ? (projectedProfit - baselineProfit) : 0;
-            
-            // Format impact text, e.g. +$45.5K profit increase or +15% revenue
-            const baselineRevenue = 180000;
+            const baselineRevenue = baseline?.revenue ?? 0;
             const projectedRevenue = latestResult ? latestResult.projectedRevenue : baselineRevenue;
-            const revDeltaPercent = ((projectedRevenue - baselineRevenue) / baselineRevenue) * 100;
+            const revDeltaPercent = baselineRevenue > 0
+              ? ((projectedRevenue - baselineRevenue) / baselineRevenue) * 100
+              : 0;
             const impactText = revDeltaPercent >= 0 ? `+${revDeltaPercent.toFixed(1)}% rev` : `${revDeltaPercent.toFixed(1)}% rev`;
 
             return (

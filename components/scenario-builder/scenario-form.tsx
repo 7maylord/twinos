@@ -50,6 +50,7 @@ export default function ScenarioForm() {
           employeeCount,
           marketingBudget,
           supplierDelay,
+          businessId: business.id,
         }),
       });
 

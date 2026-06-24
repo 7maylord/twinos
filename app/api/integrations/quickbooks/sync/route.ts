@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getActiveBusiness } from '@/lib/auth-helpers';
 import { getValidQboToken } from '@/lib/integrations/quickbooks';
 
 export async function POST(request: Request) {
@@ -19,13 +20,12 @@ export async function POST(request: Request) {
 
     console.log('[QBO Sync] POST request triggered. businessId context:', businessId);
 
-    // Fallback to findFirst if not provided
     let business = null;
     if (businessId) {
       business = await prisma.business.findUnique({ where: { id: businessId } });
     } else {
-      console.log('[QBO Sync] No businessId specified. Finding first business Twin in DB...');
-      business = await prisma.business.findFirst();
+      console.log('[QBO Sync] No businessId specified. Using active business from session...');
+      business = await getActiveBusiness();
     }
 
     if (!business) {

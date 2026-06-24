@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { getActiveBusiness } from '@/lib/auth-helpers';
 import { decrypt, encrypt } from '@/lib/encryption';
 
 export async function POST(request: Request) {
@@ -19,13 +20,12 @@ export async function POST(request: Request) {
 
     console.log('[Square Sync] POST request initiated. businessId:', businessId);
 
-    // Locate business
     let business = null;
     if (businessId) {
       business = await prisma.business.findUnique({ where: { id: businessId } });
     } else {
-      console.log('[Square Sync] No businessId specified. Finding first business in DB...');
-      business = await prisma.business.findFirst();
+      console.log('[Square Sync] No businessId specified. Using active business from session...');
+      business = await getActiveBusiness();
     }
 
     if (!business) {
