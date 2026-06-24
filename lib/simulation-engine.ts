@@ -172,126 +172,175 @@ export function optimizeScenario(
   targetType: 'profit' | 'revenue',
   targetGrowthPct: number
 ): OptimizationResult {
+  const {
+    baselineRevenue,
+    baselineMarketing,
+    baselineHeadcount,
+    averageEmployeeSalary,
+  } = baselineMetrics;
+
   const baseOutput = runSimulation(baselineMetrics, {
     priceIncrease: 0,
-    employeeCount: baselineMetrics.baselineHeadcount,
-    marketingBudget: baselineMetrics.baselineMarketing,
+    employeeCount: baselineHeadcount,
+    marketingBudget: baselineMarketing,
     supplierDelay: 'none',
   });
 
-  const baselineValue = targetType === 'profit' ? baseOutput.projectedProfit : baseOutput.projectedRevenue;
-  
-  // Calculate target value
-  let targetValue = 0;
+  // Use the average across all projected months for a more accurate baseline,
+  // rather than the final (peak-season) month alone.
+  const avgBaselineRevenue = baseOutput.monthlyData.reduce((s, m) => s + m.baselineRevenue, 0) / baseOutput.monthlyData.length;
+  const avgBaselineProfit  = baseOutput.monthlyData.reduce((s, m) => s + m.baselineProfit,  0) / baseOutput.monthlyData.length;
+  const baselineValue = targetType === 'profit' ? avgBaselineProfit : avgBaselineRevenue;
+
+  // Target: if baseline is negative (e.g. a loss-making business), grow relative to revenue
+  // to avoid negative-times-negative yielding a smaller target.
+  let targetValue: number;
   if (baselineValue > 0) {
     targetValue = baselineValue * (1 + targetGrowthPct / 100);
   } else {
-    // If profit is negative, calculate increase relative to baseline revenue to avoid negative math issues
-    targetValue = baselineValue + (baselineMetrics.baselineRevenue * targetGrowthPct / 100);
+    targetValue = baselineValue + (baselineRevenue * targetGrowthPct / 100);
   }
 
-  // Hill climbing state
-  let currentAdjustments: ScenarioAdjustments = {
+  // Constraints — prevent the optimizer from recommending destructive extremes.
+  // Headcount floor: never drop below 60% of baseline (service quality floor).
+  const minHeadcount = Math.max(1, Math.ceil(baselineHeadcount * 0.6));
+  // Marketing ceiling: marketing > 25% of revenue has diminishing / negative ROI for most businesses.
+  const marketingCeilingRatio = 0.25;
+
+  const getScore = (adj: ScenarioAdjustments): number => {
+    const out = runSimulation(baselineMetrics, adj);
+
+    // Score against the average across all periods, consistent with baselineValue.
+    const avgVal = targetType === 'profit'
+      ? out.monthlyData.reduce((s, m) => s + m.projectedProfit,  0) / out.monthlyData.length
+      : out.monthlyData.reduce((s, m) => s + m.projectedRevenue, 0) / out.monthlyData.length;
+
+    const cost = getChangeCost(adj, baselineMarketing, baselineHeadcount);
+
+    // Hard-penalise violations of the business constraints.
+    const headcountPenalty = adj.employeeCount < minHeadcount ? 1e12 : 0;
+    const marketingCeiling = marketingCeilingRatio * (out.projectedRevenue || baselineRevenue);
+    const marketingPenalty  = adj.marketingBudget > marketingCeiling ? Math.pow(adj.marketingBudget - marketingCeiling, 2) * 0.01 : 0;
+
+    if (avgVal < targetValue) {
+      return -Math.pow(targetValue - avgVal, 2) - (cost * 0.01) - headcountPenalty - marketingPenalty;
+    } else {
+      return -cost - headcountPenalty - marketingPenalty;
+    }
+  };
+
+  let bestScore = getScore({
     priceIncrease: 0,
-    employeeCount: baselineMetrics.baselineHeadcount,
-    marketingBudget: baselineMetrics.baselineMarketing,
+    employeeCount: baselineHeadcount,
+    marketingBudget: baselineMarketing,
+    supplierDelay: 'none',
+  });
+  let bestAdjustments: ScenarioAdjustments = {
+    priceIncrease: 0,
+    employeeCount: baselineHeadcount,
+    marketingBudget: baselineMarketing,
     supplierDelay: 'none',
   };
 
   const maxIterations = 800;
-  const getScore = (adj: ScenarioAdjustments) => {
-    const out = runSimulation(baselineMetrics, adj);
-    const val = targetType === 'profit' ? out.projectedProfit : out.projectedRevenue;
-    const cost = getChangeCost(adj, baselineMetrics.baselineMarketing, baselineMetrics.baselineHeadcount);
+  const stepP = 0.5;
+  const stepE = 1;
+  const stepM = 500;
 
-    if (val < targetValue) {
-      // Penalize not meeting target. We want to maximize the metric value.
-      // We subtract a very large penalty based on distance to target, plus a tiny penalty for cost so it doesn't drift.
-      return -Math.pow(targetValue - val, 2) - (cost * 0.01);
-    } else {
-      // Once target is met, we want to maximize the negative change cost (i.e. minimize the change cost)
-      return -cost;
-    }
-  };
-
-  let bestScore = getScore(currentAdjustments);
-  let bestAdjustments = { ...currentAdjustments };
-
-  // Run search
   for (let iter = 0; iter < maxIterations; iter++) {
     let improved = false;
-    
-    // Generate neighbors
-    const stepP = 0.5; // price step
-    const stepE = 1;   // employee count step
-    const stepM = 500; // marketing budget step
 
     const pVals = [bestAdjustments.priceIncrease - stepP, bestAdjustments.priceIncrease, bestAdjustments.priceIncrease + stepP];
     const eVals = [bestAdjustments.employeeCount - stepE, bestAdjustments.employeeCount, bestAdjustments.employeeCount + stepE];
     const mVals = [bestAdjustments.marketingBudget - stepM, bestAdjustments.marketingBudget, bestAdjustments.marketingBudget + stepM];
 
-    const neighbors: ScenarioAdjustments[] = [];
     for (const p of pVals) {
       for (const e of eVals) {
         for (const m of mVals) {
-          // Bounds validation
           if (p < 0 || p > 50) continue;
           if (e < 1 || e > 50) continue;
           if (m < 0 || m > 100000) continue;
 
-          neighbors.push({
+          const candidate: ScenarioAdjustments = {
             priceIncrease: parseFloat(p.toFixed(2)),
             employeeCount: Math.round(e),
             marketingBudget: Math.round(m),
             supplierDelay: 'none',
-          });
+          };
+          const score = getScore(candidate);
+          if (score > bestScore) {
+            bestScore = score;
+            bestAdjustments = candidate;
+            improved = true;
+          }
         }
       }
     }
 
-    // Evaluate neighbors
-    for (const neighbor of neighbors) {
-      const score = getScore(neighbor);
-      if (score > bestScore) {
-        bestScore = score;
-        bestAdjustments = neighbor;
-        improved = true;
-      }
-    }
-
-    if (!improved) {
-      // Converged
-      break;
-    }
+    if (!improved) break;
   }
 
-  // Run simulation for final selection
   const optimalOutput = runSimulation(baselineMetrics, bestAdjustments);
 
-  // Construct recommendations list
+  // --- Contextual action plan ---
+  // Compute the deltas and their financial impact so each recommendation explains WHY.
   const actionPlan: string[] = [];
-  
+
   const pDiff = bestAdjustments.priceIncrease;
-  if (pDiff > 0) {
-    actionPlan.push(`Raise menu prices baseline by ${pDiff.toFixed(1)}% to capture margin growth.`);
+  const eDiff = bestAdjustments.employeeCount - baselineHeadcount;
+  const mDiff = bestAdjustments.marketingBudget - baselineMarketing;
+
+  // Price change
+  if (pDiff >= 0.5) {
+    const revenueUplift = optimalOutput.projectedRevenue - baseOutput.projectedRevenue;
+    const riskNote = pDiff > 15
+      ? ` Price increases above 15% typically trigger meaningful churn — validate with a short pilot before full rollout.`
+      : '';
+    actionPlan.push(
+      `Raise prices by ${pDiff.toFixed(1)}% — the elasticity model projects this adds ~$${Math.round(revenueUplift / 1000)}K revenue in the final period despite the small demand dip.${riskNote}`
+    );
   }
 
-  const eDiff = bestAdjustments.employeeCount - baselineMetrics.baselineHeadcount;
-  if (eDiff > 0) {
-    actionPlan.push(`Hire ${eDiff} additional staff member${eDiff > 1 ? 's' : ''} to scale service capacity.`);
-  } else if (eDiff < 0) {
-    actionPlan.push(`Reduce operational headcount by ${Math.abs(eDiff)} staff member${Math.abs(eDiff) > 1 ? 's' : ''} to save payroll expenses.`);
+  // Headcount change — only surface for profit targets or if the optimizer made a meaningful move.
+  const headcountChanged = Math.abs(eDiff) >= 1;
+  if (headcountChanged && (targetType === 'profit' || Math.abs(eDiff) >= 2)) {
+    const payrollImpact = Math.abs(eDiff) * averageEmployeeSalary;
+    if (eDiff < 0) {
+      const floorNote = bestAdjustments.employeeCount <= Math.ceil(minHeadcount * 1.1)
+        ? ` This is near the operational floor — consider natural attrition before active cuts.`
+        : '';
+      actionPlan.push(
+        `Reduce headcount by ${Math.abs(eDiff)} — saves ~$${Math.round(payrollImpact / 1000)}K/mo in payroll.${floorNote}`
+      );
+    } else {
+      actionPlan.push(
+        `Hire ${eDiff} additional staff — adds ~$${Math.round(payrollImpact / 1000)}K/mo in payroll cost, justified by the projected revenue growth.`
+      );
+    }
   }
 
-  const mDiff = bestAdjustments.marketingBudget - baselineMetrics.baselineMarketing;
-  if (mDiff > 0) {
-    actionPlan.push(`Increase monthly marketing budget by $${mDiff.toLocaleString()} to accelerate customer traction.`);
-  } else if (mDiff < 0) {
-    actionPlan.push(`Trim monthly marketing budget by $${Math.abs(mDiff).toLocaleString()} to eliminate inefficient marketing spend.`);
+  // Marketing change — show ROI, not just direction.
+  if (Math.abs(mDiff) >= 500) {
+    const currentMarketingRatio = (bestAdjustments.marketingBudget / (optimalOutput.projectedRevenue || baselineRevenue)) * 100;
+    if (mDiff > 0) {
+      if (currentMarketingRatio > 20) {
+        actionPlan.push(
+          `Reallocate your $${bestAdjustments.marketingBudget.toLocaleString()} marketing budget toward higher-ROI channels — at ${currentMarketingRatio.toFixed(0)}% of projected revenue, further raw spend increases yield diminishing returns.`
+        );
+      } else {
+        actionPlan.push(
+          `Increase marketing spend by $${mDiff.toLocaleString()}/mo (to $${bestAdjustments.marketingBudget.toLocaleString()} total, ${currentMarketingRatio.toFixed(0)}% of projected revenue) — modelled to drive incremental demand beyond price alone.`
+        );
+      }
+    } else {
+      actionPlan.push(
+        `Cut marketing spend by $${Math.abs(mDiff).toLocaleString()}/mo — the current budget's demand return is too low to justify the cost for this target.`
+      );
+    }
   }
 
   if (actionPlan.length === 0) {
-    actionPlan.push("No adjustments needed. The baseline setup currently satisfies your target.");
+    actionPlan.push('No adjustments required — your current baseline already satisfies this target.');
   }
 
   return {

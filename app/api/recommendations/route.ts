@@ -145,7 +145,7 @@ export async function GET(request: Request) {
       }
     }
 
-    // Fallback Rule-Based Generation (if OpenAI is missing or failed)
+    // Fallback Rule-Based Generation (if Gemini key is missing or the request failed)
     if (!summaryText) {
       const recResult = generateRuleBasedRecommendation({
         business,
