@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, ArrowLeft, Cpu, Activity, Coins, TrendingUp } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function OnboardingPage() {
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      alert('Please enter your business name.');
+      toast.error('Please enter your business name.');
       return;
     }
     setSubmitting(true);
@@ -50,11 +51,11 @@ export default function OnboardingPage() {
         router.push('/dashboard');
       } else {
         const errData = await res.json();
-        alert(`Failed to create business: ${errData.error || 'Unknown error'}`);
+        toast.error(`Failed to create business: ${errData.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error(err);
-      alert('Network error during onboarding.');
+      toast.error('Network error during onboarding.');
     } finally {
       setSubmitting(false);
     }

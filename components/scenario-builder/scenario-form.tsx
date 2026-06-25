@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Play, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function ScenarioForm() {
   const router = useRouter();
@@ -60,11 +61,11 @@ export default function ScenarioForm() {
         router.push(`/results?scenarioId=${data.result.scenarioId}`);
       } else {
         const errorData = await res.json();
-        alert(`Failed to run simulation: ${errorData.error || 'Unknown error'}`);
+        toast.error(`Failed to run simulation: ${errorData.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error('Error submitting simulation:', err);
-      alert('Network error while running simulation.');
+      toast.error('Network error while running simulation.');
     } finally {
       setSubmitting(false);
     }

@@ -6,9 +6,19 @@ Stop guessing the impact of price hikes, hiring sprints, or marketing investment
 
 ---
 
+## 🏗️ Architecture & Infrastructure Focus (H0 Hackathon)
+
+TwinOS is built to leverage a high-performance dual-database AWS cloud architecture, deployed seamlessly on **Vercel**:
+
+- **AWS Aurora PostgreSQL (Primary Data Store):** Acts as the relational ground-truth for the multi-tenant architecture. All core entity data—including **Users, Business Profiles, Product Catalogs, Employee Rosters, and Saved Scenario Configurations**—lives securely on Aurora. It provides robust ACID compliance for our integration syncs (Shopify, Square, QuickBooks).
+- **Amazon DynamoDB (Cache & Telemetry Log):** Acts as our high-velocity storage layer. When the deterministic simulation engine generates complex monthly models, the **Forecast Caches** are written to DynamoDB. When the Counterfactual Optimizer executes its 800+ micro-iterations, the final action plans are logged to a DynamoDB **Optimization Runs** table, providing low-latency analytics without bloating the relational schema.
+- **Vercel (Compute & Edge):** Hosts the Next.js App Router, executing the heavy mathematical simulations and hill-climbing search algorithms natively within its serverless functions.
+
+---
+
 ## What it does
 
-Most SMB owners make high-stakes decisions with nothing more than gut feel or a spreadsheet. TwinOS changes that by letting you model your business mathematically, then run "what-if" experiments against that model — getting projected profit, revenue, headcount, and inventory risk before a single dollar is spent or a single hire is made.
+Most SMB owners make high-stakes decisions with nothing more than gut feel or a spreadsheet. TwinOS changes that by letting you model your business mathematically, then run "what-if" experiments against that model — getting projected profit, revenue, headcount, and inventory risk before a single dollar is spent or a single hire is made.TwinOS is fully multi-tenant, A user can own multiple business twins and switch between them.
 
 ### The four core workflows
 
@@ -113,35 +123,19 @@ The recommended actions are not generic templates. Each item is calculated from 
 
 ---
 
-## Multi-tenancy and data isolation
-
-TwinOS is fully multi-tenant. Every user can own multiple business twins and switch between them.
-
-**Active business resolution** (`lib/auth-helpers.ts → getActiveBusiness()`):
-
-1. Resolve the user's email via Clerk (or fall back to `demo@twinos.com` in keyless mode)
-2. Look up the user's businesses in the primary database (AWS Aurora PostgreSQL or local SQLite)
-3. If an `active-business-id` cookie is set and matches one of the user's businesses, return that one
-4. Otherwise, return the most recently created business
-5. Demo mode fallback also respects the cookie before falling back to `prisma.business.findFirst()`
-
-Every API route that reads or writes business data calls `getActiveBusiness()` — never a raw `prisma.business.findFirst()`. All mutation endpoints (PUT, DELETE on employees and products) verify that the record's `businessId` matches the active business before proceeding, preventing cross-tenant data access.
-
----
-
 ## Technology stack
 
-| Layer        | Technology                       | Role                                                                                 |
-| ------------ | -------------------------------- | ------------------------------------------------------------------------------------ |
-| Framework    | Next.js 16 (App Router)          | Server components, API routes, SSR                                                   |
-| Auth         | Clerk v7                         | Multi-tenant identity, route protection                                              |
-| ORM          | Prisma 7                         | Schema, migrations, type-safe queries                                                |
+| Layer        | Technology                                  | Role                                                                                 |
+| ------------ | ------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Framework    | Next.js 16 (App Router)                     | Server components, API routes, SSR                                                   |
+| Auth         | Clerk v7                                    | Multi-tenant identity, route protection                                              |
+| ORM          | Prisma 7                                    | Schema, migrations, type-safe queries                                                |
 | Primary DB   | AWS Aurora PostgreSQL (prod) / SQLite (dev) | Users, businesses, products, employees, scenarios                                    |
-| Cache / Logs | Amazon DynamoDB                  | Forecast cache, optimization run logs                                                |
-| UI           | React 18, Tailwind CSS, Recharts | Charts, dashboards, responsive layout                                                |
-| AI           | Gemini 1.5 Flash (Google)        | Scenario recommendation narratives; falls back to rule-based engine if key is absent |
-| Integrations | QuickBooks, Shopify, Square      | Live financial, catalog, and payroll sync                                            |
-| Testing      | Vitest                           | Unit tests for all API routes                                                        |
+| Cache / Logs | Amazon DynamoDB                             | Forecast cache, optimization run logs                                                |
+| UI           | React 18, Tailwind CSS, Recharts            | Charts, dashboards, responsive layout                                                |
+| AI           | Gemini 1.5 Flash (Google)                   | Scenario recommendation narratives; falls back to rule-based engine if key is absent |
+| Integrations | QuickBooks, Shopify, Square                 | Live financial, catalog, and payroll sync                                            |
+| Testing      | Vitest                                      | Unit tests for all API routes                                                        |
 
 ---
 
@@ -274,13 +268,6 @@ Each command updates `prisma/schema.prisma`, adjusts the Prisma adapter in `lib/
 pnpm test:unit      # Vitest — API route unit tests (52 tests, ~0.5s)
 pnpm test           # tsx integration tests — simulation engine
 ```
-
-The Vitest suite mocks Prisma and `getActiveBusiness()` to test route behavior in isolation, covering:
-
-- Cross-tenant attack prevention (PUT/DELETE ownership verification)
-- Active business resolution for all routes that previously used `prisma.business.findFirst()`
-- Input validation and error responses
-- Integration sync fallback logic (QuickBooks, Shopify, Square)
 
 ---
 

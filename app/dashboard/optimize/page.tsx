@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Sidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
 import { Target, TrendingUp, RefreshCw, Sparkles, CheckSquare, Download } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   BarChart,
   Bar,
@@ -80,11 +81,11 @@ export default function OptimizePage() {
         setResult(data);
       } else {
         const err = await res.json();
-        alert(`Optimization search failed: ${err.error || 'Unknown error'}`);
+        toast.error(`Optimization search failed: ${err.error || 'Unknown error'}`);
       }
     } catch (e) {
       console.error(e);
-      alert('Network error running optimization.');
+      toast.error('Network error running optimization.');
     } finally {
       setLoading(false);
     }
