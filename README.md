@@ -17,6 +17,7 @@ Connect your real business data by filling out your baseline metrics (revenue, m
 
 **2. Run scenario simulations**
 Configure a hypothetical scenario with four levers:
+
 - **Price increase** (0–50%): how much to raise prices across the board
 - **Headcount** (1–50 staff): simulated employee count
 - **Marketing budget** ($0–$100K/mo): monthly spend
@@ -25,7 +26,7 @@ Configure a hypothetical scenario with four levers:
 The simulation engine applies these adjustments to your baseline and forecasts **projected revenue, profit, headcount, and inventory risk** across a time horizon you choose (30 days, 90 days, 6 months, or 12 months).
 
 **3. Explore the counterfactual**
-Instead of configuring levers manually, tell the optimizer your goal — "increase profit by 20%" or "grow revenue by 35%" — and it reverse-engineers the smallest set of operational changes needed to hit that target. The result is a prioritized, quantified action plan explaining *what* to change, *by how much*, and *why* each change contributes.
+Instead of configuring levers manually, tell the optimizer your goal — "increase profit by 20%" or "grow revenue by 35%" — and it reverse-engineers the smallest set of operational changes needed to hit that target. The result is a prioritized, quantified action plan explaining _what_ to change, _by how much_, and _why_ each change contributes.
 
 **4. Share results**
 Generate a public read-only share link for any scenario result. External advisors or business partners can view the forecast charts and metrics without needing an account.
@@ -94,6 +95,7 @@ When the target isn't yet met, the optimizer aggressively chases the metric. Onc
 ### Constraints
 
 Two hard constraints prevent degenerate recommendations:
+
 - **Headcount floor**: the optimizer will never recommend going below 60% of the current headcount. Cutting below this threshold is penalized with a score of −10¹².
 - **Marketing ceiling**: spending more than 25% of projected revenue on marketing is penalized quadratically. This stops the optimizer from always recommending "max out marketing spend."
 
@@ -104,6 +106,7 @@ The optimizer scores against the **average across all projected periods**, not j
 ### Action plan generation
 
 The recommended actions are not generic templates. Each item is calculated from the actual delta found:
+
 - **Price**: shows the projected revenue uplift in dollars; flags churn risk if increase exceeds 15%
 - **Headcount**: shows the monthly payroll savings or cost; flags if near the operational floor
 - **Marketing**: shows the total budget and its share of projected revenue; recommends ROI reallocation instead of raw spend increase if marketing already exceeds 20% of revenue
@@ -117,7 +120,7 @@ TwinOS is fully multi-tenant. Every user can own multiple business twins and swi
 **Active business resolution** (`lib/auth-helpers.ts → getActiveBusiness()`):
 
 1. Resolve the user's email via Clerk (or fall back to `demo@twinos.com` in keyless mode)
-2. Look up the user's businesses in the database
+2. Look up the user's businesses in the primary database (AWS Aurora PostgreSQL or local SQLite)
 3. If an `active-business-id` cookie is set and matches one of the user's businesses, return that one
 4. Otherwise, return the most recently created business
 5. Demo mode fallback also respects the cookie before falling back to `prisma.business.findFirst()`
@@ -128,17 +131,17 @@ Every API route that reads or writes business data calls `getActiveBusiness()` �
 
 ## Technology stack
 
-| Layer | Technology | Role |
-|---|---|---|
-| Framework | Next.js 16 (App Router) | Server components, API routes, SSR |
-| Auth | Clerk v7 | Multi-tenant identity, route protection |
-| ORM | Prisma 7 | Schema, migrations, type-safe queries |
-| Primary DB | PostgreSQL (prod) / SQLite (dev) | Users, businesses, products, employees, scenarios |
-| Cache / Logs | Amazon DynamoDB | Forecast cache, optimization run logs |
-| UI | React 18, Tailwind CSS, Recharts | Charts, dashboards, responsive layout |
-| AI | Gemini 1.5 Flash (Google) | Scenario recommendation narratives; falls back to rule-based engine if key is absent |
-| Integrations | QuickBooks, Shopify, Square | Live financial, catalog, and payroll sync |
-| Testing | Vitest | Unit tests for all API routes |
+| Layer        | Technology                       | Role                                                                                 |
+| ------------ | -------------------------------- | ------------------------------------------------------------------------------------ |
+| Framework    | Next.js 16 (App Router)          | Server components, API routes, SSR                                                   |
+| Auth         | Clerk v7                         | Multi-tenant identity, route protection                                              |
+| ORM          | Prisma 7                         | Schema, migrations, type-safe queries                                                |
+| Primary DB   | AWS Aurora PostgreSQL (prod) / SQLite (dev) | Users, businesses, products, employees, scenarios                                    |
+| Cache / Logs | Amazon DynamoDB                  | Forecast cache, optimization run logs                                                |
+| UI           | React 18, Tailwind CSS, Recharts | Charts, dashboards, responsive layout                                                |
+| AI           | Gemini 1.5 Flash (Google)        | Scenario recommendation narratives; falls back to rule-based engine if key is absent |
+| Integrations | QuickBooks, Shopify, Square      | Live financial, catalog, and payroll sync                                            |
+| Testing      | Vitest                           | Unit tests for all API routes                                                        |
 
 ---
 
@@ -187,7 +190,7 @@ TwinOS/
 │   ├── schema.prisma
 │   └── seed.ts             # Seeds two demo businesses (Halo Café, Acme Tech)
 ├── scripts/
-│   ├── db-switch.js        # SQLite ↔ PostgreSQL switcher
+│   ├── db-switch.js        # SQLite ↔ AWS Aurora PostgreSQL switcher
 │   └── test-all.ts         # Simulation engine integration tests
 └── vitest.config.ts
 ```
@@ -233,9 +236,9 @@ QBO_CLIENT_ID="..."
 QBO_CLIENT_SECRET="..."
 ```
 
-**Local dev works without any external credentials.** Omitting `CLERK_SECRET_KEY` puts the app in demo mode (no login required). Omitting `GEMINI_API_KEY` makes the recommendation engine fall back to the built-in rule-based generator. Omitting AWS keys switches DynamoDB to a local file-backed mock. Omitting QuickBooks keys puts the integration sync in mock mode.
+**Local dev works without any external credentials.** Omitting `CLERK_SECRET_KEY` puts the app in demo mode (no login required). Omitting `GEMINI_API_KEY` makes the recommendation engine fall back to the built-in rule-based generator. Omitting AWS keys switches Amazon DynamoDB to a local file-backed mock. Omitting QuickBooks keys puts the integration sync in mock mode.
 
-### 3. Set up the database
+### 3. Set up the database (SQLite or AWS Aurora)
 
 ```bash
 npx prisma db push
@@ -254,10 +257,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## Database switching (SQLite ↔ PostgreSQL)
+## Database switching (SQLite ↔ AWS Aurora PostgreSQL)
 
 ```bash
-pnpm db:postgres   # Switch to PostgreSQL (AWS Aurora or local Postgres)
+pnpm db:postgres   # Switch to AWS Aurora PostgreSQL (or local Postgres)
 pnpm db:sqlite     # Switch back to SQLite
 ```
 
@@ -273,6 +276,7 @@ pnpm test           # tsx integration tests — simulation engine
 ```
 
 The Vitest suite mocks Prisma and `getActiveBusiness()` to test route behavior in isolation, covering:
+
 - Cross-tenant attack prevention (PUT/DELETE ownership verification)
 - Active business resolution for all routes that previously used `prisma.business.findFirst()`
 - Input validation and error responses

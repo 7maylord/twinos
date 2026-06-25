@@ -448,6 +448,59 @@ function ResultsContent() {
             </ul>
           </div>
         </div>
+
+        {/* Print-Only Detailed Report Section */}
+        <div className="hidden print:block mt-12 break-before-page">
+          <h2 className="text-2xl font-semibold mb-6 border-b pb-2">Appendix: Detailed Financial Projections</h2>
+          
+          <div className="mb-8">
+            <h3 className="text-lg font-medium mb-3 text-gray-800">Scenario Parameters</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div><span className="text-gray-500 font-medium w-40 inline-block">Price Increase:</span> {scenario.priceIncrease}%</div>
+              <div><span className="text-gray-500 font-medium w-40 inline-block">Headcount Change:</span> {scenario.employeeCount} total staff</div>
+              <div><span className="text-gray-500 font-medium w-40 inline-block">Marketing Budget:</span> ${scenario.marketingBudget.toLocaleString()} / mo</div>
+              <div><span className="text-gray-500 font-medium w-40 inline-block">Supplier Delay:</span> {scenario.supplierDelay}</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium mb-3 text-gray-800">Month-by-Month Projection Data</h3>
+            <table className="w-full text-sm text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-100 border-y border-gray-300">
+                  <th className="py-2 px-3 font-semibold text-gray-700">Month</th>
+                  <th className="py-2 px-3 font-semibold text-gray-700 text-right">Baseline Rev.</th>
+                  <th className="py-2 px-3 font-semibold text-gray-700 text-right">Projected Rev.</th>
+                  <th className="py-2 px-3 font-semibold text-gray-700 text-right">Rev. Delta</th>
+                  <th className="py-2 px-3 font-semibold text-gray-700 text-right">Baseline Profit</th>
+                  <th className="py-2 px-3 font-semibold text-gray-700 text-right">Projected Profit</th>
+                  <th className="py-2 px-3 font-semibold text-gray-700 text-right">Profit Delta</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {monthlyData.map((m, idx) => {
+                  const revDelta = m.projectedRevenue - m.baselineRevenue;
+                  const profitDelta = m.projectedProfit - m.baselineProfit;
+                  return (
+                    <tr key={idx}>
+                      <td className="py-2 px-3 font-medium">{m.month}</td>
+                      <td className="py-2 px-3 text-right">${m.baselineRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                      <td className="py-2 px-3 text-right font-medium">${m.projectedRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                      <td className={`py-2 px-3 text-right font-medium ${revDelta >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {revDelta > 0 ? '+' : ''}${revDelta.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </td>
+                      <td className="py-2 px-3 text-right">${m.baselineProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                      <td className="py-2 px-3 text-right font-medium">${m.projectedProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                      <td className={`py-2 px-3 text-right font-medium ${profitDelta >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {profitDelta > 0 ? '+' : ''}${profitDelta.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );

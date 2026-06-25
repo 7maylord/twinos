@@ -1,3 +1,5 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest, NextFetchEvent } from 'next/server';
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const isProtectedRoute = createRouteMatcher([
@@ -8,16 +10,21 @@ const isProtectedRoute = createRouteMatcher([
   '/onboarding(.*)',
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
+export default function proxy(request: NextRequest, event: NextFetchEvent) {
   // If Clerk secret key is missing, skip authentication route protection to allow local testing
   if (!process.env.CLERK_SECRET_KEY || !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
-    return;
+    return NextResponse.next();
   }
 
-  if (isProtectedRoute(req)) {
-    await auth.protect();
-  }
-});
+  // Otherwise, run Clerk middleware
+  const clerkHandler = clerkMiddleware(async (auth, req) => {
+    if (isProtectedRoute(req)) {
+      await auth.protect();
+    }
+  });
+
+  return clerkHandler(request, event);
+}
 
 export const config = {
   matcher: [

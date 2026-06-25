@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Sidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
-import { Target, TrendingUp, RefreshCw, Sparkles, CheckSquare } from 'lucide-react';
+import { Target, TrendingUp, RefreshCw, Sparkles, CheckSquare, Download } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -110,13 +110,13 @@ export default function OptimizePage() {
   const chartData = getChartData();
 
   return (
-    <div className="flex h-screen bg-[#F5F5F5] text-black overflow-hidden">
-      <Sidebar />
-      <main className="flex-1 overflow-auto">
-        <DashboardHeader />
+    <div className="flex h-screen bg-[#F5F5F5] text-black overflow-hidden print:overflow-visible print:h-auto print:bg-white">
+      <div className="print:hidden h-full"><Sidebar /></div>
+      <main className="flex-1 overflow-auto print:overflow-visible">
+        <div className="print:hidden"><DashboardHeader /></div>
         <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
           {/* Header */}
-          <div>
+          <div className="print:hidden">
             <h1 className="text-3xl font-medium tracking-tight text-black mb-2" style={{ letterSpacing: '-0.03em' }}>
               Counterfactual Explorer
             </h1>
@@ -125,8 +125,14 @@ export default function OptimizePage() {
             </p>
           </div>
 
+          {/* Print Header */}
+          <div className="hidden print:block mb-8 border-b pb-4">
+            <h1 className="text-3xl font-bold tracking-tight text-black mb-1">TwinOS Optimization Report</h1>
+            <p className="text-gray-500 font-medium">Target Goal: Increase {targetType === 'profit' ? 'Profit' : 'Revenue'} by {targetGrowthPct}%</p>
+          </div>
+
           {/* Goal Selector */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm print:hidden">
             <div className="md:col-span-2 space-y-4">
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Specify Financial Growth Goal
@@ -194,6 +200,17 @@ export default function OptimizePage() {
           {/* Results dashboard */}
           {result && !loading && (
             <div className="space-y-8 animate-fadeIn">
+              <div className="flex justify-between items-center print:hidden border-b border-gray-200 pb-4">
+                <h2 className="text-xl font-semibold text-black tracking-tight">Optimization Results</h2>
+                <button 
+                  onClick={() => window.print()}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-black hover:bg-gray-800 text-white rounded-full font-medium transition-colors duration-200 shadow-sm"
+                >
+                  <Download size={18} />
+                  Export Report
+                </button>
+              </div>
+
               {/* Card delta layouts */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 
