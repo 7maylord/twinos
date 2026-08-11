@@ -8,6 +8,17 @@ const isProtectedRoute = createRouteMatcher([
   '/results(.*)',
   '/admin(.*)',
   '/onboarding(.*)',
+  // API routes that read or write tenant-owned data. Excludes
+  // /api/scenarios/:id/results and /api/recommendations, which intentionally
+  // stay public to back the unauthenticated share-link feature.
+  '/api/business(.*)',
+  '/api/employees(.*)',
+  '/api/products(.*)',
+  '/api/scenarios',
+  '/api/scenarios/run',
+  '/api/scenarios/optimize',
+  '/api/integrations(.*)',
+  '/api/admin(.*)',
 ]);
 
 export default function proxy(request: NextRequest, event: NextFetchEvent) {
