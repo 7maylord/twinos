@@ -89,3 +89,28 @@ export async function getUserBusinesses() {
   });
   return user?.businesses || [];
 }
+
+// Confirms a client-supplied businessId actually belongs to the caller, before
+// it's trusted to scope a create/read/write. Mirrors getActiveBusiness()'s trust
+// model: real users are scoped strictly to businesses they own; the keyless demo
+// fallback (no login required) trusts any business that exists, same as today.
+export async function verifyBusinessOwnership(businessId: string): Promise<boolean> {
+  if (!businessId) return false;
+
+  const email = await getActiveUserEmail();
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: { businesses: { select: { id: true } } },
+  });
+
+  if (user && user.businesses.length > 0) {
+    return user.businesses.some((b) => b.id === businessId);
+  }
+
+  if (email === 'demo@twinos.com') {
+    const business = await prisma.business.findUnique({ where: { id: businessId }, select: { id: true } });
+    return !!business;
+  }
+
+  return false;
+}
