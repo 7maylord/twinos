@@ -93,7 +93,14 @@ export async function getUserBusinesses() {
 // Confirms a client-supplied businessId actually belongs to the caller, before
 // it's trusted to scope a create/read/write. Mirrors getActiveBusiness()'s trust
 // model: real users are scoped strictly to businesses they own; the keyless demo
-// fallback (no login required) trusts any business that exists, same as today.
+// deployment (no Clerk keys configured at all — no login required) trusts any
+// business that exists, same as today.
+//
+// getActiveUserEmail() silently falls back to 'demo@twinos.com' whenever Clerk
+// can't resolve an identity — including when Clerk IS configured but the call
+// errored or the session is missing. So the demo-mode trust bypass below must be
+// gated on Clerk actually being unconfigured, not merely on the resolved email —
+// otherwise a Clerk hiccup in production would grant ownership of every business.
 export async function verifyBusinessOwnership(businessId: string): Promise<boolean> {
   if (!businessId) return false;
 
@@ -107,7 +114,8 @@ export async function verifyBusinessOwnership(businessId: string): Promise<boole
     return user.businesses.some((b) => b.id === businessId);
   }
 
-  if (email === 'demo@twinos.com') {
+  const clerkConfigured = !!(process.env.CLERK_SECRET_KEY && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  if (!clerkConfigured && email === 'demo@twinos.com') {
     const business = await prisma.business.findUnique({ where: { id: businessId }, select: { id: true } });
     return !!business;
   }
