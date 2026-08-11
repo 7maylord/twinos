@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { verifyBusinessOwnership } from '@/lib/auth-helpers';
 
 export async function GET(request: Request) {
   try {
@@ -10,6 +11,11 @@ export async function GET(request: Request) {
     if (!businessId) {
       console.warn('[QBO Connect] Missing businessId. Returning 400.');
       return NextResponse.json({ error: 'businessId is required' }, { status: 400 });
+    }
+
+    if (!(await verifyBusinessOwnership(businessId))) {
+      console.warn('[QBO Connect] businessId does not belong to the caller. Returning 404.');
+      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
 
     const clientId = process.env.QBO_CLIENT_ID || 'mock-client-id';

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { encrypt } from '@/lib/encryption';
+import { verifyBusinessOwnership } from '@/lib/auth-helpers';
 
 export async function GET(request: Request) {
   try {
@@ -19,6 +20,11 @@ export async function GET(request: Request) {
     if (!code) {
       console.warn('[QBO Callback] Missing code param. Aborting.');
       return NextResponse.json({ error: 'code is required' }, { status: 400 });
+    }
+
+    if (!(await verifyBusinessOwnership(state))) {
+      console.warn('[QBO Callback] state (businessId) does not belong to the caller. Aborting.');
+      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
 
     console.log('[QBO Callback] Fetching business from database matching ID:', state);
