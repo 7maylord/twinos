@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BUSINESS_A, BUSINESS_B } from './helpers';
 
-const { mockGetActiveBusiness, mockPrisma } = vi.hoisted(() => ({
+const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.hoisted(() => ({
   mockGetActiveBusiness: vi.fn(),
+  mockVerifyBusinessOwnership: vi.fn(),
   mockPrisma: {
     business: {
       findUnique: vi.fn(),
@@ -19,7 +20,10 @@ const { mockGetActiveBusiness, mockPrisma } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@/lib/auth-helpers', () => ({ getActiveBusiness: mockGetActiveBusiness }));
+vi.mock('@/lib/auth-helpers', () => ({
+  getActiveBusiness: mockGetActiveBusiness,
+  verifyBusinessOwnership: mockVerifyBusinessOwnership,
+}));
 vi.mock('@/lib/db', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/integrations/quickbooks', () => ({
   getValidQboToken: vi.fn().mockResolvedValue('mock-token-abc'),
@@ -46,7 +50,8 @@ beforeEach(() => vi.clearAllMocks());
 // ─── QuickBooks ───────────────────────────────────────────────────────────────
 
 describe('POST /api/integrations/quickbooks/sync', () => {
-  it('uses explicit businessId when provided without calling getActiveBusiness', async () => {
+  it('uses explicit businessId when ownership is verified, without calling getActiveBusiness', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
     mockPrisma.business.findUnique.mockResolvedValue(BUSINESS_A);
     mockPrisma.business.update.mockResolvedValue(BUSINESS_A);
 
@@ -56,6 +61,16 @@ describe('POST /api/integrations/quickbooks/sync', () => {
     expect(res.status).toBe(200);
     expect(mockPrisma.business.findUnique).toHaveBeenCalledWith({ where: { id: BUSINESS_A.id } });
     expect(mockGetActiveBusiness).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 when the businessId does not belong to the caller (cross-tenant attack)', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(false);
+
+    const req = makeJsonRequest({ businessId: 'biz-not-mine' });
+    const res = await qboPost(req);
+
+    expect(res.status).toBe(404);
+    expect(mockPrisma.business.findUnique).not.toHaveBeenCalled();
   });
 
   it('falls back to getActiveBusiness when no businessId in request', async () => {
@@ -89,7 +104,8 @@ describe('POST /api/integrations/shopify/sync', () => {
     shopifyStoreDomain: 'test.myshopify.com',
   };
 
-  it('uses explicit businessId when provided without calling getActiveBusiness', async () => {
+  it('uses explicit businessId when ownership is verified, without calling getActiveBusiness', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
     mockPrisma.business.findUnique.mockResolvedValue(shopifyBiz);
     mockPrisma.business.update.mockResolvedValue(shopifyBiz);
     mockPrisma.product.findFirst.mockResolvedValue({ id: 'p-existing' });
@@ -100,6 +116,16 @@ describe('POST /api/integrations/shopify/sync', () => {
     expect(res.status).toBe(200);
     expect(mockPrisma.business.findUnique).toHaveBeenCalledWith({ where: { id: BUSINESS_A.id } });
     expect(mockGetActiveBusiness).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 when the businessId does not belong to the caller (cross-tenant attack)', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(false);
+
+    const req = makeJsonRequest({ businessId: 'biz-not-mine' });
+    const res = await shopifyPost(req);
+
+    expect(res.status).toBe(404);
+    expect(mockPrisma.business.findUnique).not.toHaveBeenCalled();
   });
 
   it('falls back to getActiveBusiness when no businessId', async () => {
@@ -133,7 +159,8 @@ describe('POST /api/integrations/square/sync', () => {
     squareLocationId: 'loc-1',
   };
 
-  it('uses explicit businessId when provided without calling getActiveBusiness', async () => {
+  it('uses explicit businessId when ownership is verified, without calling getActiveBusiness', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
     mockPrisma.business.findUnique.mockResolvedValue(squareBiz);
     mockPrisma.business.update.mockResolvedValue(squareBiz);
     mockPrisma.employee.findFirst.mockResolvedValue({ id: 'e-existing' });
@@ -144,6 +171,16 @@ describe('POST /api/integrations/square/sync', () => {
     expect(res.status).toBe(200);
     expect(mockPrisma.business.findUnique).toHaveBeenCalledWith({ where: { id: BUSINESS_A.id } });
     expect(mockGetActiveBusiness).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 when the businessId does not belong to the caller (cross-tenant attack)', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(false);
+
+    const req = makeJsonRequest({ businessId: 'biz-not-mine' });
+    const res = await squarePost(req);
+
+    expect(res.status).toBe(404);
+    expect(mockPrisma.business.findUnique).not.toHaveBeenCalled();
   });
 
   it('falls back to getActiveBusiness when no businessId', async () => {

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getActiveBusiness } from '@/lib/auth-helpers';
+import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
 import { getValidQboToken } from '@/lib/integrations/quickbooks';
 
 export async function POST(request: Request) {
@@ -22,6 +22,9 @@ export async function POST(request: Request) {
 
     let business = null;
     if (businessId) {
+      if (!(await verifyBusinessOwnership(businessId))) {
+        return NextResponse.json({ error: 'No business found' }, { status: 404 });
+      }
       business = await prisma.business.findUnique({ where: { id: businessId } });
     } else {
       console.log('[QBO Sync] No businessId specified. Using active business from session...');
