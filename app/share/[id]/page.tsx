@@ -9,20 +9,6 @@ import { ImpactMetrics } from '@/components/results/impact-metrics';
 import { AIRecommendationCard } from '@/components/results/ai-recommendation-card';
 import { runSimulation } from '@/lib/simulation-engine';
 
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  cost: number;
-}
-
-interface Employee {
-  id: string;
-  name: string;
-  role: string;
-  salary: number;
-}
-
 interface Business {
   id: string;
   name: string;
@@ -31,8 +17,8 @@ interface Business {
   baselineMarketing: number;
   baselineInventory: number;
   baselineFixedCosts: number;
-  products: Product[];
-  employees: Employee[];
+  employeeCount: number;
+  totalPayroll: number;
 }
 
 interface Scenario {
@@ -55,7 +41,7 @@ interface SimulationResultRecord {
 }
 
 interface SimulationData {
-  scenario: Scenario & { business: Business & { employees: Employee[] } };
+  scenario: Scenario & { business: Business };
   result: SimulationResultRecord;
   monthlyData: {
     month: string;
@@ -138,7 +124,7 @@ function ShareContent() {
 
   // Baseline calculations
   const baselineRevenue = business.baselineRevenue;
-  const baselinePayroll = business.employees.reduce((sum, emp) => sum + emp.salary, 0);
+  const baselinePayroll = business.totalPayroll;
   const baselineMarketing = business.baselineMarketing;
   const baselineInventory = business.baselineInventory;
   const baselineFixedCosts = business.baselineFixedCosts;
@@ -264,8 +250,7 @@ function ShareContent() {
           const getChartData = () => {
             if (horizon === '6m') return monthlyData;
 
-            const totalSalary = business.employees.reduce((sum, emp) => sum + emp.salary, 0);
-            const averageEmployeeSalary = business.employees.length > 0 ? totalSalary / business.employees.length : 4000;
+            const averageEmployeeSalary = business.employeeCount > 0 ? business.totalPayroll / business.employeeCount : 4000;
 
             const output = runSimulation(
               {
@@ -273,7 +258,7 @@ function ShareContent() {
                 baselineMarketing: business.baselineMarketing,
                 baselineInventory: business.baselineInventory,
                 baselineFixedCosts: business.baselineFixedCosts,
-                baselineHeadcount: business.employees.length || 24,
+                baselineHeadcount: business.employeeCount || 24,
                 averageEmployeeSalary,
               },
               {
@@ -340,8 +325,8 @@ function ShareContent() {
         })()}
 
         {/* Impact Metrics */}
-        <ImpactMetrics 
-          baselineHeadcount={business.employees.length}
+        <ImpactMetrics
+          baselineHeadcount={business.employeeCount}
           projectedHeadcount={result.projectedHeadcount}
           baselineInventory={baselineInventory}
           projectedInventory={Math.round(projectedInventoryCost)}
@@ -380,9 +365,9 @@ function ShareContent() {
               <li className="flex gap-3 items-start">
                 <span className="text-[#2B2644] font-semibold text-sm">2.</span>
                 <span className="text-gray-600 text-sm leading-relaxed">
-                  {scenario.employeeCount > business.employees.length
-                    ? `Begin hiring campaign for ${scenario.employeeCount - business.employees.length} new employee(s)`
-                    : scenario.employeeCount < business.employees.length
+                  {scenario.employeeCount > business.employeeCount
+                    ? `Begin hiring campaign for ${scenario.employeeCount - business.employeeCount} new employee(s)`
+                    : scenario.employeeCount < business.employeeCount
                     ? `Optimize staff rosters to target ${scenario.employeeCount} active headcount`
                     : 'Keep staffing levels constant'
                   }

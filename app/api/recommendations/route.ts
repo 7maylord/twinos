@@ -15,9 +15,11 @@ export async function GET(request: Request) {
     const scenario = await prisma.scenario.findUnique({
       where: { id: scenarioId },
       include: {
+        // This endpoint backs the public share link — only ever aggregate payroll,
+        // never raw employee names/salaries.
         business: {
           include: {
-            employees: true,
+            employees: { select: { salary: true } },
           },
         },
         simulationResults: {
@@ -39,11 +41,11 @@ export async function GET(request: Request) {
     }
 
     const business = scenario.business;
-    const employees = business.employees;
-    
+    const employeeCount = business.employees.length;
+
     // Baseline calculations
     const baselineRevenue = business.baselineRevenue;
-    const baselinePayroll = employees.reduce((sum, emp) => sum + emp.salary, 0);
+    const baselinePayroll = business.employees.reduce((sum, emp) => sum + emp.salary, 0);
     const baselineExpenses = baselinePayroll + business.baselineMarketing + business.baselineInventory + business.baselineFixedCosts;
     const baselineProfit = baselineRevenue - baselineExpenses;
 
@@ -55,7 +57,7 @@ export async function GET(request: Request) {
 
     const profitDelta = projectedProfit - baselineProfit;
     const revenueDelta = projectedRevenue - baselineRevenue;
-    const payrollDelta = (projectedHeadcount - employees.length) * (employees.length > 0 ? (baselinePayroll / employees.length) : 4000);
+    const payrollDelta = (projectedHeadcount - employeeCount) * (employeeCount > 0 ? (baselinePayroll / employeeCount) : 4000);
 
     let summaryText = '';
     let recommendationHeadline = '';
@@ -79,7 +81,7 @@ export async function GET(request: Request) {
           SCENARIO ADJUSTMENTS MADE:
           - Scenario Name: "${scenario.name}"
           - Price Increase: ${scenario.priceIncrease}%
-          - Simulated Headcount: ${scenario.employeeCount} staff (Baseline: ${employees.length})
+          - Simulated Headcount: ${scenario.employeeCount} staff (Baseline: ${employeeCount})
           - Simulated Marketing Spend: $${scenario.marketingBudget.toLocaleString()} (Baseline: $${business.baselineMarketing.toLocaleString()})
           - Supplier Delay: ${scenario.supplierDelay}
           
@@ -149,7 +151,7 @@ export async function GET(request: Request) {
     if (!summaryText) {
       const recResult = generateRuleBasedRecommendation({
         business,
-        baselineHeadcount: employees.length,
+        baselineHeadcount: employeeCount,
         baselinePayroll,
         scenario,
         latestResult,

@@ -11,10 +11,19 @@ export async function GET(
     const scenario = await prisma.scenario.findUnique({
       where: { id },
       include: {
+        // This endpoint backs the public share link, so it must only ever surface
+        // aggregate forecast numbers — never raw employee names/salaries or product
+        // cost/pricing data.
         business: {
-          include: {
-            employees: true,
-            products: true,
+          select: {
+            id: true,
+            name: true,
+            industry: true,
+            baselineRevenue: true,
+            baselineMarketing: true,
+            baselineInventory: true,
+            baselineFixedCosts: true,
+            employees: { select: { salary: true } },
           },
         },
         simulationResults: {
@@ -43,8 +52,15 @@ export async function GET(
       console.error('Failed to parse monthly data json:', e);
     }
 
+    const { employees, ...businessRest } = scenario.business;
+    const business = {
+      ...businessRest,
+      employeeCount: employees.length,
+      totalPayroll: employees.reduce((sum, e) => sum + e.salary, 0),
+    };
+
     return NextResponse.json({
-      scenario,
+      scenario: { ...scenario, business },
       result: latestResult,
       monthlyData,
     });
