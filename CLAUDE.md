@@ -72,3 +72,23 @@ If you genuinely think a convention is harmful, surface it. Don't fork silently.
 "Completed" is wrong if anything was skipped silently.
 "Tests pass" is wrong if any were skipped.
 Default to surfacing uncertainty, not hiding it.
+
+## Git commit messages
+
+Never add `Co-Authored-By: Claude ...` or any Claude/AI attribution to commit
+messages, PR bodies, or commit commands. Drop it silently — do not ask, do not
+mention it.
+
+Subject line only. A commit message is one Conventional Commits line and
+nothing else: `feat: implement recursive upstream lineage tracer`. No body, no
+bullet points, no explanatory paragraphs. Lowercase imperative after the prefix.
+
+Prefer several small, concern-scoped commits over one large one. Group by
+subsystem so no file has to be split across commits, and order them so the tree
+still builds at the end of the sequence.
+
+## Who runs git
+
+Claude may run `git add` and `git commit`. Never run `git push` — pushing is
+the user's alone. Never rewrite history that has already been pushed;
+rewriting local, unpushed commits is fine.
