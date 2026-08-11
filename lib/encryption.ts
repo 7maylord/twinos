@@ -1,19 +1,17 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-// Dev-only fallback so local/demo mode works without extra setup. Never used in
-// production — see the throw below.
-const DEV_DEFAULT_KEY = 'twinos-secret-dev-encryption-key-32bytes';
 
 function getEncryptionKey(): Buffer {
+  // No NODE_ENV-based dev fallback: NODE_ENV isn't reliably 'production' on every
+  // deployment target, so gating on it can silently fall through to a hardcoded,
+  // source-committed key in a real deployment. Require the real secret always;
+  // local/demo dev sets INTEGRATION_ENCRYPTION_KEY in .env like any other key.
   const secret = process.env.INTEGRATION_ENCRYPTION_KEY;
   if (!secret) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error(
-        'INTEGRATION_ENCRYPTION_KEY is not set. Refusing to encrypt integration credentials with a key committed to source in production.'
-      );
-    }
-    return crypto.scryptSync(DEV_DEFAULT_KEY, 'salt-twinos', 32);
+    throw new Error(
+      'INTEGRATION_ENCRYPTION_KEY is not set. Add it to your .env — refusing to encrypt integration credentials with a key committed to source.'
+    );
   }
   return crypto.scryptSync(secret, 'salt-twinos', 32);
 }
