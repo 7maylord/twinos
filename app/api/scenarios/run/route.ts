@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getActiveBusiness } from '@/lib/auth-helpers';
+import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
 import { runSimulation } from '@/lib/simulation-engine';
 import { cacheForecast } from '@/lib/dynamodb';
 
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
         where: { id: scenarioId },
         include: { business: { include: { employees: true } } },
       });
-      if (!scenario) {
+      if (!scenario || !(await verifyBusinessOwnership(scenario.businessId))) {
         return NextResponse.json({ error: 'Scenario not found' }, { status: 404 });
       }
     } else {
@@ -23,7 +23,11 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Scenario name is required' }, { status: 400 });
       }
       let targetBusinessId = businessId;
-      if (!targetBusinessId) {
+      if (targetBusinessId) {
+        if (!(await verifyBusinessOwnership(targetBusinessId))) {
+          return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+        }
+      } else {
         const activeBusiness = await getActiveBusiness();
         if (!activeBusiness) {
           return NextResponse.json({ error: 'No active business found.' }, { status: 400 });

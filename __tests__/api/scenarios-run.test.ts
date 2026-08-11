@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BUSINESS_A, makeRequest } from './helpers';
 
-const { mockGetActiveBusiness, mockPrisma } = vi.hoisted(() => ({
+const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.hoisted(() => ({
   mockGetActiveBusiness: vi.fn(),
+  mockVerifyBusinessOwnership: vi.fn(),
   mockPrisma: {
     scenario: {
       create: vi.fn(),
@@ -15,7 +16,10 @@ const { mockGetActiveBusiness, mockPrisma } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@/lib/auth-helpers', () => ({ getActiveBusiness: mockGetActiveBusiness }));
+vi.mock('@/lib/auth-helpers', () => ({
+  getActiveBusiness: mockGetActiveBusiness,
+  verifyBusinessOwnership: mockVerifyBusinessOwnership,
+}));
 vi.mock('@/lib/db', () => ({ prisma: mockPrisma }));
 vi.mock('@/lib/dynamodb', () => ({ cacheForecast: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('@/lib/simulation-engine', () => ({
@@ -61,7 +65,8 @@ describe('POST /api/scenarios/run — new scenario path', () => {
     );
   });
 
-  it('uses the explicit businessId and skips getActiveBusiness', async () => {
+  it('uses the explicit businessId and skips getActiveBusiness when ownership is verified', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
     mockPrisma.scenario.create.mockResolvedValue(BASE_SCENARIO);
     mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
     mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
@@ -70,7 +75,18 @@ describe('POST /api/scenarios/run — new scenario path', () => {
     const res = await POST(req);
 
     expect(res.status).toBe(200);
+    expect(mockVerifyBusinessOwnership).toHaveBeenCalledWith(BUSINESS_A.id);
     expect(mockGetActiveBusiness).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 when the explicit businessId does not belong to the caller (cross-tenant attack)', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(false);
+
+    const req = makeRequest({ name: 'Price Test', priceIncrease: 5, businessId: 'biz-not-mine' });
+    const res = await POST(req);
+
+    expect(res.status).toBe(404);
+    expect(mockPrisma.scenario.create).not.toHaveBeenCalled();
   });
 
   it('returns 400 when no active business and no businessId provided', async () => {
@@ -93,7 +109,8 @@ describe('POST /api/scenarios/run — new scenario path', () => {
 });
 
 describe('POST /api/scenarios/run — existing scenario path', () => {
-  it('runs simulation for an existing scenario without calling getActiveBusiness', async () => {
+  it('runs simulation for an existing scenario owned by the caller, without calling getActiveBusiness', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
     mockPrisma.scenario.findUnique.mockResolvedValue(BASE_SCENARIO);
     mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
     mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
@@ -104,6 +121,7 @@ describe('POST /api/scenarios/run — existing scenario path', () => {
 
     expect(res.status).toBe(200);
     expect(data.scenario.id).toBe('sc-1');
+    expect(mockVerifyBusinessOwnership).toHaveBeenCalledWith(BASE_SCENARIO.businessId);
     expect(mockGetActiveBusiness).not.toHaveBeenCalled();
   });
 
@@ -114,5 +132,16 @@ describe('POST /api/scenarios/run — existing scenario path', () => {
     const res = await POST(req);
 
     expect(res.status).toBe(404);
+  });
+
+  it('returns 404 when the scenario belongs to a different business (cross-tenant attack)', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(false);
+    mockPrisma.scenario.findUnique.mockResolvedValue(BASE_SCENARIO);
+
+    const req = makeRequest({ scenarioId: 'sc-1' });
+    const res = await POST(req);
+
+    expect(res.status).toBe(404);
+    expect(mockPrisma.simulationResult.create).not.toHaveBeenCalled();
   });
 });
