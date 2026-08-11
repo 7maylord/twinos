@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getActiveBusiness } from '@/lib/auth-helpers';
+import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
+
     let targetBusinessId = null;
     const activeBusiness = await getActiveBusiness();
     if (activeBusiness) {
@@ -21,6 +21,7 @@ export async function POST(request: Request) {
       for (const item of body) {
         const { name, role, department, salary, businessId } = item;
         if (!name || !role || salary === undefined) continue;
+        if (businessId && !(await verifyBusinessOwnership(businessId))) continue;
 
         const employee = await prisma.employee.create({
           data: {
@@ -40,6 +41,10 @@ export async function POST(request: Request) {
 
     if (!name || !role || salary === undefined) {
       return NextResponse.json({ error: 'Name, role, and salary are required' }, { status: 400 });
+    }
+
+    if (businessId && !(await verifyBusinessOwnership(businessId))) {
+      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
 
     const targetId = businessId || targetBusinessId;

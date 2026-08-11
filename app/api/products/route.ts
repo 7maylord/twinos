@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getActiveBusiness } from '@/lib/auth-helpers';
+import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
+
     let targetBusinessId = null;
     const activeBusiness = await getActiveBusiness();
     if (activeBusiness) {
@@ -21,6 +21,7 @@ export async function POST(request: Request) {
       for (const item of body) {
         const { name, price, cost, businessId } = item;
         if (!name || price === undefined || cost === undefined) continue;
+        if (businessId && !(await verifyBusinessOwnership(businessId))) continue;
 
         const product = await prisma.product.create({
           data: {
@@ -39,6 +40,10 @@ export async function POST(request: Request) {
 
     if (!name || price === undefined || cost === undefined) {
       return NextResponse.json({ error: 'Name, price, and cost are required' }, { status: 400 });
+    }
+
+    if (businessId && !(await verifyBusinessOwnership(businessId))) {
+      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
     }
 
     const targetId = businessId || targetBusinessId;

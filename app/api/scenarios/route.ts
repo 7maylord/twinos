@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getActiveBusiness } from '@/lib/auth-helpers';
+import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
 
 export async function GET(request: Request) {
   try {
@@ -48,7 +48,11 @@ export async function POST(request: Request) {
 
     // Resolve business ID
     let targetBusinessId = businessId;
-    if (!targetBusinessId) {
+    if (targetBusinessId) {
+      if (!(await verifyBusinessOwnership(targetBusinessId))) {
+        return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+      }
+    } else {
       const activeBusiness = await getActiveBusiness();
       if (!activeBusiness) {
         return NextResponse.json({ error: 'No business found in database. Seed the database first.' }, { status: 400 });
