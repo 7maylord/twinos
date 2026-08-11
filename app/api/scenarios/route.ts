@@ -6,9 +6,13 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const queryBusinessId = searchParams.get('businessId');
-    
+
     let targetBusinessId = queryBusinessId;
-    if (!targetBusinessId) {
+    if (targetBusinessId) {
+      if (!(await verifyBusinessOwnership(targetBusinessId))) {
+        return NextResponse.json([]);
+      }
+    } else {
       const activeBusiness = await getActiveBusiness();
       if (activeBusiness) {
         targetBusinessId = activeBusiness.id;
