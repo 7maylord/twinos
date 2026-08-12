@@ -54,9 +54,9 @@ projectedRevenue = baselineRevenue × priceMultiplier × demandMultiplier × sea
 ```
 
 - **priceMultiplier** = `1 + priceIncrease / 100`
-- **demandMultiplier** accounts for two effects:
-  - Price elasticity: a 10% price increase reduces demand by ~4.5% (inelastic demand)
-  - Marketing lift: increased marketing spend boosts demand proportionally to the delta over baseline (10% elasticity coefficient)
+- **demandMultiplier** accounts for two effects, both scaled by an elasticity coefficient that varies by the business's industry sector (`lib/industry-profiles.ts`; falls back to the constants below when industry is unset or unrecognized):
+  - Price elasticity: a 10% price increase reduces demand by ~4.5% by default (inelastic demand) — e.g. ~2% for Software/SaaS, ~6.5% for E-commerce
+  - Marketing lift: increased marketing spend boosts demand proportionally to the delta over baseline, at a 10% elasticity coefficient by default — e.g. 15% for E-commerce, 6% for Healthcare
 - **seasonalFactor** varies by period — e.g. the 6-month horizon uses `[0.95, 0.90, 1.00, 1.10, 1.15, 1.20]` for Jan–Jun
 
 ### Cost model

@@ -260,6 +260,7 @@ function ShareContent() {
                 baselineFixedCosts: business.baselineFixedCosts,
                 baselineHeadcount: business.employeeCount || 24,
                 averageEmployeeSalary,
+                industry: business.industry,
               },
               {
                 priceIncrease: scenario.priceIncrease,

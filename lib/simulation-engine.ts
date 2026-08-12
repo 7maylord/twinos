@@ -1,3 +1,5 @@
+import { getIndustryProfile } from './industry-profiles';
+
 export interface BaselineMetrics {
   baselineRevenue: number;
   baselineMarketing: number;
@@ -5,6 +7,7 @@ export interface BaselineMetrics {
   baselineFixedCosts: number;
   baselineHeadcount: number;
   averageEmployeeSalary: number;
+  industry?: string | null;
 }
 
 export interface ScenarioAdjustments {
@@ -42,6 +45,7 @@ export function runSimulation(
     baselineFixedCosts,
     baselineHeadcount,
     averageEmployeeSalary,
+    industry,
   } = baseline;
 
   const {
@@ -55,13 +59,16 @@ export function runSimulation(
   // Price Multiplier: 1 + (priceIncrease / 100)
   const priceMultiplier = 1 + priceIncrease / 100;
 
-  // Demand Elasticity: assume elasticity of 0.4 (demand drops by 4% for every 10% price increase)
+  // Demand elasticity varies by industry (see lib/industry-profiles.ts); falls
+  // back to the universal 0.45 / 0.1 constants when industry is unset/unknown.
+  const { priceElasticityCoefficient, marketingElasticityCoefficient } = getIndustryProfile(industry);
+
   // But marketing budget increases demand! Let's say +10% marketing spend over baseline increases demand by 1%
   const marketingDeltaPercent = (marketingBudget - baselineMarketing) / (baselineMarketing || 1);
-  const marketingDemandImpact = marketingDeltaPercent * 0.1; // 10% elasticity for marketing
+  const marketingDemandImpact = marketingDeltaPercent * marketingElasticityCoefficient;
 
   // Combined demand multiplier
-  const priceDemandImpact = -(priceIncrease / 100) * 0.45;
+  const priceDemandImpact = -(priceIncrease / 100) * priceElasticityCoefficient;
   const demandMultiplier = Math.max(0.2, 1 + priceDemandImpact + marketingDemandImpact);
 
   // 2. Define seasonal factors and scale divisor based on forecast horizon selection

@@ -29,6 +29,7 @@ export async function POST(request: Request) {
       baselineFixedCosts: business.baselineFixedCosts,
       baselineHeadcount: employees.length,
       averageEmployeeSalary: averageSalary,
+      industry: business.industry,
     };
 
     // Calculate baseline simulation results (priceIncrease=0, employeeCount=baseline, marketing=baseline, supplierDelay='none')

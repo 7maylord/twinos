@@ -63,6 +63,7 @@ export async function POST(request: Request) {
         baselineFixedCosts: business.baselineFixedCosts,
         baselineHeadcount: employees.length || 24,
         averageEmployeeSalary,
+        industry: business.industry,
       },
       {
         priceIncrease: scenario.priceIncrease,

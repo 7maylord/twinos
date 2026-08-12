@@ -142,6 +142,42 @@ async function main() {
     assert.strictEqual(output12m.monthlyData.length, 12);
   });
 
+  await test('Simulation Engine - Industry elasticity profile affects demand response', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000,
+    };
+
+    const adjustments = {
+      priceIncrease: 20,
+      employeeCount: 10,
+      marketingBudget: 10000,
+      supplierDelay: 'none',
+    };
+
+    // No industry set: preserves the original universal 0.45 elasticity constant.
+    const outputDefault = runSimulation(baseline, adjustments);
+
+    // E-commerce (0.65 elasticity) is more price-sensitive than the default —
+    // the same 20% price increase should yield lower revenue than the default.
+    const outputEcommerce = runSimulation({ ...baseline, industry: 'E-commerce' }, adjustments);
+
+    // Software / SaaS (0.20 elasticity) is less price-sensitive than the default —
+    // the same 20% price increase should yield higher revenue than the default.
+    const outputSaas = runSimulation({ ...baseline, industry: 'Software / SaaS' }, adjustments);
+
+    assert.ok(outputEcommerce.projectedRevenue < outputDefault.projectedRevenue);
+    assert.ok(outputSaas.projectedRevenue > outputDefault.projectedRevenue);
+
+    // Unrecognized industry string falls back to the same default as no industry at all.
+    const outputUnknown = runSimulation({ ...baseline, industry: 'Nonexistent Sector' }, adjustments);
+    assert.strictEqual(outputUnknown.projectedRevenue, outputDefault.projectedRevenue);
+  });
+
   // 2. Hill Climbing & Optimization Engine Tests
   await test('Hill Climbing - Change cost calculation penalties', () => {
     const baseMarketing = 10000;
