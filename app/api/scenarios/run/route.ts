@@ -7,7 +7,19 @@ import { cacheForecast } from '@/lib/dynamodb';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    let { scenarioId, name, priceIncrease, employeeCount, marketingBudget, supplierDelay, businessId } = body;
+    let { scenarioId, name, priceIncrease, employeeCount, marketingBudget, supplierDelay, businessId, priceElasticityOverride, marketingElasticityOverride } = body;
+
+    // Elasticity coefficients are conceptually 0 (fully inelastic) to ~2 (highly
+    // elastic); clamp so a bad/adversarial input can't push economically
+    // nonsensical values (e.g. negative elasticity) into the engine.
+    const clampElasticity = (value: unknown): number | undefined => {
+      if (value === undefined || value === null || value === '') return undefined;
+      const num = Number(value);
+      if (Number.isNaN(num)) return undefined;
+      return Math.min(2, Math.max(0, num));
+    };
+    priceElasticityOverride = clampElasticity(priceElasticityOverride);
+    marketingElasticityOverride = clampElasticity(marketingElasticityOverride);
 
     let scenario;
     if (scenarioId) {
@@ -42,6 +54,8 @@ export async function POST(request: Request) {
           employeeCount: Number(employeeCount || 10),
           marketingBudget: Number(marketingBudget || 0),
           supplierDelay: supplierDelay || 'none',
+          priceElasticityOverride,
+          marketingElasticityOverride,
           status: 'PENDING',
         },
         include: { business: { include: { employees: true } } },
@@ -64,6 +78,8 @@ export async function POST(request: Request) {
         baselineHeadcount: employees.length || 24,
         averageEmployeeSalary,
         industry: business.industry,
+        priceElasticityOverride: scenario.priceElasticityOverride,
+        marketingElasticityOverride: scenario.marketingElasticityOverride,
       },
       {
         priceIncrease: scenario.priceIncrease,

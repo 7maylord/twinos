@@ -71,6 +71,8 @@ export async function GET(
         baselineHeadcount: employeeCount || 24,
         averageEmployeeSalary,
         industry: business.industry,
+        priceElasticityOverride: scenario.priceElasticityOverride,
+        marketingElasticityOverride: scenario.marketingElasticityOverride,
       },
       {
         priceIncrease: scenario.priceIncrease,

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Play, AlertTriangle, Sparkles } from 'lucide-react';
+import { Play, AlertTriangle, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { getScenarioTemplates, applyScenarioTemplate } from '@/lib/scenario-templates';
+import { getIndustryProfile } from '@/lib/industry-profiles';
 
 export default function ScenarioForm() {
   const router = useRouter();
@@ -17,6 +18,10 @@ export default function ScenarioForm() {
   const [marketingBudget, setMarketingBudget] = useState(0);
   const [supplierDelay, setSupplierDelay] = useState('none');
   const [submitting, setSubmitting] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  // Empty string = "use the industry default" (see lib/industry-profiles.ts).
+  const [priceElasticityInput, setPriceElasticityInput] = useState('');
+  const [marketingElasticityInput, setMarketingElasticityInput] = useState('');
 
   useEffect(() => {
     async function fetchBusiness() {
@@ -48,6 +53,8 @@ export default function ScenarioForm() {
     setEmployeeCount(applied.employeeCount);
     setMarketingBudget(applied.marketingBudget);
     setSupplierDelay(applied.supplierDelay);
+    setPriceElasticityInput('');
+    setMarketingElasticityInput('');
   };
 
   const handleRunSimulation = async () => {
@@ -66,6 +73,8 @@ export default function ScenarioForm() {
           marketingBudget,
           supplierDelay,
           businessId: business.id,
+          priceElasticityOverride: priceElasticityInput === '' ? undefined : Number(priceElasticityInput),
+          marketingElasticityOverride: marketingElasticityInput === '' ? undefined : Number(marketingElasticityInput),
         }),
       });
 
@@ -238,6 +247,63 @@ export default function ScenarioForm() {
           <option value="severe">Severe (4+ weeks)</option>
         </select>
       </div>
+
+      {/* Advanced Assumptions */}
+      {business && (
+        <div className="mb-8">
+          <button
+            type="button"
+            onClick={() => setShowAdvanced((v) => !v)}
+            className="flex items-center gap-1.5 text-sm font-semibold text-gray-700"
+          >
+            Advanced Assumptions
+            {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {showAdvanced && (() => {
+            const defaults = getIndustryProfile(business.industry);
+            return (
+              <div className="mt-4 space-y-4 p-4 bg-[#F5F5F5] rounded-xl border border-gray-200">
+                <p className="text-xs text-gray-500">
+                  Override the demand-elasticity assumptions the engine uses for this scenario.
+                  Leave blank to use the {business.industry || 'default'} industry default.
+                </p>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    Price Elasticity Coefficient
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="2"
+                    step="0.05"
+                    disabled={submitting}
+                    value={priceElasticityInput}
+                    onChange={(e) => setPriceElasticityInput(e.target.value)}
+                    placeholder={`Default: ${defaults.priceElasticityCoefficient.toFixed(2)}`}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-black text-sm focus:outline-none focus:border-black transition-colors disabled:opacity-60"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                    Marketing Elasticity Coefficient
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="2"
+                    step="0.05"
+                    disabled={submitting}
+                    value={marketingElasticityInput}
+                    onChange={(e) => setMarketingElasticityInput(e.target.value)}
+                    placeholder={`Default: ${defaults.marketingElasticityCoefficient.toFixed(2)}`}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-black text-sm focus:outline-none focus:border-black transition-colors disabled:opacity-60"
+                  />
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Run Simulation Button */}
       <button

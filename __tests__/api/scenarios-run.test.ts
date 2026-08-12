@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BUSINESS_A, makeRequest } from './helpers';
+import { runSimulation } from '@/lib/simulation-engine';
 
 const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.hoisted(() => ({
   mockGetActiveBusiness: vi.fn(),
@@ -106,6 +107,49 @@ describe('POST /api/scenarios/run — new scenario path', () => {
     expect(res.status).toBe(400);
     expect(mockPrisma.scenario.create).not.toHaveBeenCalled();
   });
+
+  it('clamps out-of-range elasticity overrides and stores/passes the clamped values', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
+    mockPrisma.scenario.create.mockResolvedValue({ ...BASE_SCENARIO, priceElasticityOverride: 2, marketingElasticityOverride: 0.3 });
+    mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
+    mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
+
+    const req = makeRequest({
+      name: 'Custom Elasticity Test',
+      priceIncrease: 5,
+      businessId: BUSINESS_A.id,
+      priceElasticityOverride: 5, // out of the 0-2 range
+      marketingElasticityOverride: 0.3,
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.scenario.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ priceElasticityOverride: 2, marketingElasticityOverride: 0.3 }),
+      })
+    );
+    expect(vi.mocked(runSimulation)).toHaveBeenCalledWith(
+      expect.objectContaining({ priceElasticityOverride: 2, marketingElasticityOverride: 0.3 }),
+      expect.anything()
+    );
+  });
+
+  it('ignores a blank/missing elasticity override instead of storing null-as-zero', async () => {
+    mockGetActiveBusiness.mockResolvedValue(BUSINESS_A);
+    mockPrisma.scenario.create.mockResolvedValue(BASE_SCENARIO);
+    mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
+    mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
+
+    const req = makeRequest({ name: 'No Override Test', priceIncrease: 5, businessId: BUSINESS_A.id });
+    await POST(req);
+
+    expect(mockPrisma.scenario.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ priceElasticityOverride: undefined, marketingElasticityOverride: undefined }),
+      })
+    );
+  });
 });
 
 describe('POST /api/scenarios/run — existing scenario path', () => {
@@ -143,5 +187,24 @@ describe('POST /api/scenarios/run — existing scenario path', () => {
 
     expect(res.status).toBe(404);
     expect(mockPrisma.simulationResult.create).not.toHaveBeenCalled();
+  });
+
+  it('passes a previously-stored elasticity override through to runSimulation on re-run', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
+    mockPrisma.scenario.findUnique.mockResolvedValue({
+      ...BASE_SCENARIO,
+      priceElasticityOverride: 0.55,
+      marketingElasticityOverride: null,
+    });
+    mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
+    mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
+
+    const req = makeRequest({ scenarioId: 'sc-1' });
+    await POST(req);
+
+    expect(vi.mocked(runSimulation)).toHaveBeenCalledWith(
+      expect.objectContaining({ priceElasticityOverride: 0.55, marketingElasticityOverride: null }),
+      expect.anything()
+    );
   });
 });

@@ -31,6 +31,8 @@ interface Scenario {
   employeeCount: number;
   marketingBudget: number;
   supplierDelay: string;
+  priceElasticityOverride?: number | null;
+  marketingElasticityOverride?: number | null;
 }
 
 interface SimulationResultRecord {
@@ -213,7 +215,11 @@ function ShareContent() {
               Revenue Impact
               {data.explain && (
                 <ExplainPopover
-                  title="How Projected Revenue is calculated"
+                  title={
+                    scenario.priceElasticityOverride != null || scenario.marketingElasticityOverride != null
+                      ? 'How Projected Revenue is calculated (using a custom elasticity)'
+                      : 'How Projected Revenue is calculated'
+                  }
                   formula="baselineRevenue × priceMultiplier × demandMultiplier × seasonalFactor"
                   rows={[
                     { label: 'Baseline Revenue', value: `$${baselineRevenue.toLocaleString()}` },
@@ -307,6 +313,8 @@ function ShareContent() {
                 baselineHeadcount: business.employeeCount || 24,
                 averageEmployeeSalary,
                 industry: business.industry,
+                priceElasticityOverride: scenario.priceElasticityOverride,
+                marketingElasticityOverride: scenario.marketingElasticityOverride,
               },
               {
                 priceIncrease: scenario.priceIncrease,

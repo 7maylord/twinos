@@ -83,7 +83,12 @@ model Scenario {
   employeeCount     Int                @default(10)  // total employee count simulated
   marketingBudget   Float              @default(10000.0) // absolute marketing budget simulated
   supplierDelay     String             @default("none")  // none, minor, moderate, severe
-  
+
+  // Optional user-edited elasticity assumptions — override the industry-derived
+  // defaults from lib/industry-profiles.ts when set (see lib/simulation-engine.ts).
+  priceElasticityOverride     Float?
+  marketingElasticityOverride Float?
+
   simulationResults SimulationResult[]
 }
 
