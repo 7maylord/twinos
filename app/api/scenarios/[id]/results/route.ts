@@ -80,13 +80,26 @@ export async function GET(
       }
     );
 
-    const monthlyDataWithBand = monthlyData.map((month: any, i: number) => ({
-      ...month,
-      projectedRevenueLow: confidenceBand.monthlyDataBand[i]?.projectedRevenueLow,
-      projectedRevenueHigh: confidenceBand.monthlyDataBand[i]?.projectedRevenueHigh,
-      projectedProfitLow: confidenceBand.monthlyDataBand[i]?.projectedProfitLow,
-      projectedProfitHigh: confidenceBand.monthlyDataBand[i]?.projectedProfitHigh,
-    }));
+    // Merge in the low/high band and the freshly-computed cost breakdown
+    // ("explain this number"). The headline baseline/projected figures stay
+    // whatever was actually persisted when the scenario was run — only the
+    // supplementary breakdown is recomputed live, since older stored results
+    // predate these fields.
+    const monthlyDataWithBand = monthlyData.map((month: any, i: number) => {
+      const band = confidenceBand.monthlyDataBand[i];
+      return {
+        ...month,
+        projectedRevenueLow: band?.projectedRevenueLow,
+        projectedRevenueHigh: band?.projectedRevenueHigh,
+        projectedProfitLow: band?.projectedProfitLow,
+        projectedProfitHigh: band?.projectedProfitHigh,
+        seasonalFactor: band?.seasonalFactor,
+        projectedPayroll: band?.projectedPayroll,
+        projectedMarketingCost: band?.projectedMarketingCost,
+        projectedInventoryCost: band?.projectedInventoryCost,
+        projectedFixedCosts: band?.projectedFixedCosts,
+      };
+    });
 
     return NextResponse.json({
       scenario: { ...scenario, business },
@@ -98,6 +111,7 @@ export async function GET(
         projectedProfitLow: confidenceBand.projectedProfitLow,
         projectedProfitHigh: confidenceBand.projectedProfitHigh,
       },
+      explain: confidenceBand.expected.explain,
     });
   } catch (error: any) {
     console.error('Error fetching scenario results:', error);

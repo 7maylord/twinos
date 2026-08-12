@@ -245,6 +245,42 @@ async function main() {
     assert.ok(withOverride.projectedRevenue < withIndustryDefault.projectedRevenue);
   });
 
+  await test('Simulation Engine - Explain breakdown reconstructs the headline figures', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000,
+    };
+
+    const adjustments = {
+      priceIncrease: 10,
+      employeeCount: 12,
+      marketingBudget: 12000,
+      supplierDelay: 'none',
+    };
+
+    const output = runSimulation(baseline, adjustments);
+
+    // explain carries the assumption chain used to derive every period's revenue.
+    assert.strictEqual(output.explain.priceMultiplier, 1.1);
+    assert.ok(output.explain.demandMultiplier > 0);
+
+    // Each month's cost breakdown must actually sum to that month's projectedProfit.
+    for (const month of output.monthlyData) {
+      const reconstructedProfit =
+        month.projectedRevenue -
+        month.projectedPayroll -
+        month.projectedMarketingCost -
+        month.projectedInventoryCost -
+        month.projectedFixedCosts;
+      // Allow rounding slack since each component is independently rounded.
+      assert.ok(Math.abs(reconstructedProfit - month.projectedProfit) <= 4);
+    }
+  });
+
   // 2. Hill Climbing & Optimization Engine Tests
   await test('Hill Climbing - Change cost calculation penalties', () => {
     const baseMarketing = 10000;

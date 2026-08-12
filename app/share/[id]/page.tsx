@@ -7,6 +7,7 @@ import { RevenueComparisonChart } from '@/components/results/revenue-comparison-
 import { ProfitComparisonChart } from '@/components/results/profit-comparison-chart';
 import { ImpactMetrics } from '@/components/results/impact-metrics';
 import { AIRecommendationCard } from '@/components/results/ai-recommendation-card';
+import { ExplainPopover } from '@/components/results/explain-popover';
 import { runSimulationWithConfidenceBand } from '@/lib/simulation-engine';
 
 interface Business {
@@ -40,6 +41,14 @@ interface SimulationResultRecord {
   projectedInventoryRisk: number;
 }
 
+interface SimulationExplain {
+  priceElasticityCoefficient: number;
+  marketingElasticityCoefficient: number;
+  priceMultiplier: number;
+  demandMultiplier: number;
+  marketingDeltaPercent: number;
+}
+
 interface SimulationData {
   scenario: Scenario & { business: Business };
   result: SimulationResultRecord;
@@ -49,7 +58,13 @@ interface SimulationData {
     projectedRevenue: number;
     baselineProfit: number;
     projectedProfit: number;
+    seasonalFactor?: number;
+    projectedPayroll?: number;
+    projectedMarketingCost?: number;
+    projectedInventoryCost?: number;
+    projectedFixedCosts?: number;
   }[];
+  explain?: SimulationExplain;
   recommendation?: {
     summary: string;
     headline: string;
@@ -194,7 +209,22 @@ function ShareContent() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Revenue Impact</p>
+            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
+              Revenue Impact
+              {data.explain && (
+                <ExplainPopover
+                  title="How Projected Revenue is calculated"
+                  formula="baselineRevenue × priceMultiplier × demandMultiplier × seasonalFactor"
+                  rows={[
+                    { label: 'Baseline Revenue', value: `$${baselineRevenue.toLocaleString()}` },
+                    { label: 'Price Multiplier', value: data.explain.priceMultiplier.toFixed(3) },
+                    { label: 'Demand Multiplier', value: data.explain.demandMultiplier.toFixed(3) },
+                    { label: 'Seasonal Factor', value: (finalMonthData.seasonalFactor ?? 1).toFixed(2) },
+                    { label: '= Projected Revenue', value: `$${projectedRevenue.toLocaleString()}` },
+                  ]}
+                />
+              )}
+            </p>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-3xl font-medium tracking-tight text-black">
                 {revDelta >= 0 ? '+' : ''}${(revDelta / 1000).toFixed(0)}K
@@ -207,7 +237,23 @@ function ShareContent() {
           </div>
           
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2">Projected Profit</p>
+            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
+              Projected Profit
+              {finalMonthData.projectedPayroll !== undefined && (
+                <ExplainPopover
+                  title="How Projected Profit is calculated"
+                  formula="projectedRevenue − payroll − marketing − inventory − fixed costs"
+                  rows={[
+                    { label: 'Projected Revenue', value: `$${projectedRevenue.toLocaleString()}` },
+                    { label: 'Payroll', value: `-$${(finalMonthData.projectedPayroll ?? 0).toLocaleString()}` },
+                    { label: 'Marketing Spend', value: `-$${(finalMonthData.projectedMarketingCost ?? 0).toLocaleString()}` },
+                    { label: 'Inventory Cost', value: `-$${(finalMonthData.projectedInventoryCost ?? 0).toLocaleString()}` },
+                    { label: 'Fixed Costs', value: `-$${(finalMonthData.projectedFixedCosts ?? 0).toLocaleString()}` },
+                    { label: '= Projected Profit', value: `$${projectedProfit.toLocaleString()}` },
+                  ]}
+                />
+              )}
+            </p>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-3xl font-medium tracking-tight text-black">
                 {projectedProfit >= 0 ? '' : '-'}${(Math.abs(projectedProfit) / 1000).toFixed(1)}K

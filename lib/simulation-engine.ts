@@ -29,6 +29,25 @@ export interface MonthlyProjection {
   projectedRevenue: number;
   baselineProfit: number;
   projectedProfit: number;
+  // Cost breakdown behind projectedProfit, for this period, rounded the same
+  // way as the headline figures. projectedRevenue - these four = projectedProfit.
+  projectedPayroll: number;
+  projectedMarketingCost: number;
+  projectedInventoryCost: number;
+  projectedFixedCosts: number;
+  seasonalFactor: number;
+}
+
+// The assumption chain behind every period's projectedRevenue: baselineRevenue
+// x priceMultiplier x demandMultiplier x seasonalFactor. Constant across the
+// whole run (seasonalFactor is the only piece that varies by period, and lives
+// on each MonthlyProjection instead).
+export interface SimulationExplain {
+  priceElasticityCoefficient: number;
+  marketingElasticityCoefficient: number;
+  priceMultiplier: number;
+  demandMultiplier: number;
+  marketingDeltaPercent: number;
 }
 
 export interface SimulationOutput {
@@ -37,6 +56,7 @@ export interface SimulationOutput {
   projectedHeadcount: number;
   projectedInventoryRisk: number;
   monthlyData: MonthlyProjection[];
+  explain: SimulationExplain;
 }
 
 export function runSimulation(
@@ -141,6 +161,11 @@ export function runSimulation(
       projectedRevenue: Math.round(monthProjectedRevenue),
       baselineProfit: Math.round(monthBaselineProfit),
       projectedProfit: Math.round(monthProjectedProfit),
+      projectedPayroll: Math.round(projectedPayroll),
+      projectedMarketingCost: Math.round(marketingBudget / divisor),
+      projectedInventoryCost: Math.round(projectedInventoryCost),
+      projectedFixedCosts: Math.round(baselineFixedCosts / divisor),
+      seasonalFactor: sFactor,
     };
   });
 
@@ -162,6 +187,13 @@ export function runSimulation(
     projectedHeadcount: employeeCount,
     projectedInventoryRisk: parseFloat(projectedInventoryRisk.toFixed(2)),
     monthlyData,
+    explain: {
+      priceElasticityCoefficient,
+      marketingElasticityCoefficient,
+      priceMultiplier,
+      demandMultiplier,
+      marketingDeltaPercent,
+    },
   };
 }
 
