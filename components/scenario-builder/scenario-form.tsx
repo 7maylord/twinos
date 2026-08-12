@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Play, AlertTriangle } from 'lucide-react';
+import { Play, AlertTriangle, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { getScenarioTemplates, applyScenarioTemplate } from '@/lib/scenario-templates';
 
 export default function ScenarioForm() {
   const router = useRouter();
@@ -35,6 +36,19 @@ export default function ScenarioForm() {
     }
     fetchBusiness();
   }, []);
+
+  const handleApplyTemplate = (template: ReturnType<typeof getScenarioTemplates>[number]) => {
+    if (!business) return;
+    const applied = applyScenarioTemplate(template, {
+      currentHeadcount: business.employees?.length || 0,
+      baselineMarketing: business.baselineMarketing || 0,
+    });
+    setScenarioName(template.name);
+    setPriceIncrease(applied.priceIncrease);
+    setEmployeeCount(applied.employeeCount);
+    setMarketingBudget(applied.marketingBudget);
+    setSupplierDelay(applied.supplierDelay);
+  };
 
   const handleRunSimulation = async () => {
     if (!business || !scenarioName.trim()) return;
@@ -103,6 +117,30 @@ export default function ScenarioForm() {
           <a href="/onboarding" className="py-2.5 px-5 bg-amber-950 text-white text-xs font-semibold rounded-full hover:bg-amber-900 transition-colors shadow-sm self-start sm:self-auto shrink-0 text-center">
             Create Twin
           </a>
+        </div>
+      )}
+
+      {/* Starter Templates */}
+      {business && (
+        <div className="mb-8">
+          <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-3">
+            <Sparkles className="w-4 h-4" />
+            Starter Templates for {business.industry || 'Your Business'}
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {getScenarioTemplates(business.industry).map((template) => (
+              <button
+                key={template.name}
+                type="button"
+                disabled={submitting}
+                onClick={() => handleApplyTemplate(template)}
+                title={template.description}
+                className="px-4 py-2 bg-[#F5F5F5] hover:bg-gray-200 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 transition-colors disabled:opacity-60"
+              >
+                {template.name}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
