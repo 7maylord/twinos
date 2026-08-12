@@ -8,6 +8,11 @@ export interface BaselineMetrics {
   baselineHeadcount: number;
   averageEmployeeSalary: number;
   industry?: string | null;
+  // Explicit elasticity overrides take precedence over the industry-derived
+  // defaults. Used both for user-editable assumptions and internally by
+  // runSimulationWithConfidenceBand() to perturb the assumption.
+  priceElasticityOverride?: number | null;
+  marketingElasticityOverride?: number | null;
 }
 
 export interface ScenarioAdjustments {
@@ -46,6 +51,8 @@ export function runSimulation(
     baselineHeadcount,
     averageEmployeeSalary,
     industry,
+    priceElasticityOverride,
+    marketingElasticityOverride,
   } = baseline;
 
   const {
@@ -61,7 +68,11 @@ export function runSimulation(
 
   // Demand elasticity varies by industry (see lib/industry-profiles.ts); falls
   // back to the universal 0.45 / 0.1 constants when industry is unset/unknown.
-  const { priceElasticityCoefficient, marketingElasticityCoefficient } = getIndustryProfile(industry);
+  // An explicit override (user-edited assumption, or a confidence-band probe)
+  // always wins over the industry default.
+  const industryProfile = getIndustryProfile(industry);
+  const priceElasticityCoefficient = priceElasticityOverride ?? industryProfile.priceElasticityCoefficient;
+  const marketingElasticityCoefficient = marketingElasticityOverride ?? industryProfile.marketingElasticityCoefficient;
 
   // But marketing budget increases demand! Let's say +10% marketing spend over baseline increases demand by 1%
   const marketingDeltaPercent = (marketingBudget - baselineMarketing) / (baselineMarketing || 1);
@@ -151,6 +162,79 @@ export function runSimulation(
     projectedHeadcount: employeeCount,
     projectedInventoryRisk: parseFloat(projectedInventoryRisk.toFixed(2)),
     monthlyData,
+  };
+}
+
+export interface MonthlyProjectionBand extends MonthlyProjection {
+  projectedRevenueLow: number;
+  projectedRevenueHigh: number;
+  projectedProfitLow: number;
+  projectedProfitHigh: number;
+}
+
+export interface ConfidenceBandOutput {
+  expected: SimulationOutput;
+  monthlyDataBand: MonthlyProjectionBand[];
+  projectedRevenueLow: number;
+  projectedRevenueHigh: number;
+  projectedProfitLow: number;
+  projectedProfitHigh: number;
+}
+
+// Runs the simulation three times: once at the nominal elasticity assumption,
+// and twice more with the price/marketing elasticity coefficients perturbed by
+// +/- `uncertainty` in opposite directions. Per period (and for the headline
+// figures), the two perturbed runs are compared and the lower/higher revenue
+// and profit values are reported as the band — rather than assuming a fixed
+// "pessimistic" direction, since whether higher or lower elasticity is worse
+// depends on the sign of the scenario's price/marketing deltas.
+export function runSimulationWithConfidenceBand(
+  baseline: BaselineMetrics,
+  adjustments: ScenarioAdjustments,
+  uncertainty: number = 0.25
+): ConfidenceBandOutput {
+  const expected = runSimulation(baseline, adjustments);
+
+  const industryProfile = getIndustryProfile(baseline.industry);
+  const basePriceElasticity = baseline.priceElasticityOverride ?? industryProfile.priceElasticityCoefficient;
+  const baseMarketingElasticity = baseline.marketingElasticityOverride ?? industryProfile.marketingElasticityCoefficient;
+
+  const variantA = runSimulation(
+    {
+      ...baseline,
+      priceElasticityOverride: basePriceElasticity * (1 + uncertainty),
+      marketingElasticityOverride: baseMarketingElasticity * (1 - uncertainty),
+    },
+    adjustments
+  );
+  const variantB = runSimulation(
+    {
+      ...baseline,
+      priceElasticityOverride: basePriceElasticity * (1 - uncertainty),
+      marketingElasticityOverride: baseMarketingElasticity * (1 + uncertainty),
+    },
+    adjustments
+  );
+
+  const monthlyDataBand: MonthlyProjectionBand[] = expected.monthlyData.map((month, i) => {
+    const a = variantA.monthlyData[i];
+    const b = variantB.monthlyData[i];
+    return {
+      ...month,
+      projectedRevenueLow: Math.min(a.projectedRevenue, b.projectedRevenue),
+      projectedRevenueHigh: Math.max(a.projectedRevenue, b.projectedRevenue),
+      projectedProfitLow: Math.min(a.projectedProfit, b.projectedProfit),
+      projectedProfitHigh: Math.max(a.projectedProfit, b.projectedProfit),
+    };
+  });
+
+  return {
+    expected,
+    monthlyDataBand,
+    projectedRevenueLow: Math.min(variantA.projectedRevenue, variantB.projectedRevenue),
+    projectedRevenueHigh: Math.max(variantA.projectedRevenue, variantB.projectedRevenue),
+    projectedProfitLow: Math.min(variantA.projectedProfit, variantB.projectedProfit),
+    projectedProfitHigh: Math.max(variantA.projectedProfit, variantB.projectedProfit),
   };
 }
 

@@ -1,8 +1,9 @@
 'use client';
 
 import {
-  BarChart,
+  ComposedChart,
   Bar,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -15,6 +16,8 @@ interface MonthlyProfitData {
   month: string;
   baselineProfit: number;
   projectedProfit: number;
+  projectedProfitLow?: number;
+  projectedProfitHigh?: number;
 }
 
 export function ProfitComparisonChart({ data }: { data: MonthlyProfitData[] }) {
@@ -26,11 +29,13 @@ export function ProfitComparisonChart({ data }: { data: MonthlyProfitData[] }) {
     return `$${value}`;
   };
 
+  const hasBand = data.some((d) => d.projectedProfitLow !== undefined && d.projectedProfitHigh !== undefined);
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
       <h3 className="text-black font-medium tracking-tight text-lg mb-6">Profit Analysis</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
+        <ComposedChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
           <XAxis dataKey="month" stroke="#999999" style={{ fontSize: '12px' }} />
           <YAxis stroke="#999999" style={{ fontSize: '12px' }} tickFormatter={formatYAxis} />
@@ -47,7 +52,33 @@ export function ProfitComparisonChart({ data }: { data: MonthlyProfitData[] }) {
           <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
           <Bar dataKey="baselineProfit" fill="#CCCCCC" name="Baseline Profit" radius={[4, 4, 0, 0]} />
           <Bar dataKey="projectedProfit" fill="#2B2644" name="Projected Profit" radius={[4, 4, 0, 0]} />
-        </BarChart>
+          {hasBand && (
+            <>
+              <Line
+                type="monotone"
+                dataKey="projectedProfitHigh"
+                stroke="#2B2644"
+                strokeWidth={1}
+                strokeOpacity={0.4}
+                dot={false}
+                name="High Estimate"
+                strokeDasharray="2 3"
+                isAnimationActive={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="projectedProfitLow"
+                stroke="#2B2644"
+                strokeWidth={1}
+                strokeOpacity={0.4}
+                dot={false}
+                name="Low Estimate"
+                strokeDasharray="2 3"
+                isAnimationActive={false}
+              />
+            </>
+          )}
+        </ComposedChart>
       </ResponsiveContainer>
     </div>
   );

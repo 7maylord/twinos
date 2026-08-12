@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { runSimulationWithConfidenceBand } from '@/lib/simulation-engine';
 
 export async function GET(
   request: Request,
@@ -53,16 +54,50 @@ export async function GET(
     }
 
     const { employees, ...businessRest } = scenario.business;
-    const business = {
-      ...businessRest,
-      employeeCount: employees.length,
-      totalPayroll: employees.reduce((sum, e) => sum + e.salary, 0),
-    };
+    const employeeCount = employees.length;
+    const totalPayroll = employees.reduce((sum, e) => sum + e.salary, 0);
+    const business = { ...businessRest, employeeCount, totalPayroll };
+
+    // Confidence band: reruns the deterministic engine with the elasticity
+    // assumption perturbed +/-25% to show a low/high range alongside the
+    // point-estimate projection, rather than false precision on a single number.
+    const averageEmployeeSalary = employeeCount > 0 ? totalPayroll / employeeCount : 4000;
+    const confidenceBand = runSimulationWithConfidenceBand(
+      {
+        baselineRevenue: business.baselineRevenue,
+        baselineMarketing: business.baselineMarketing,
+        baselineInventory: business.baselineInventory,
+        baselineFixedCosts: business.baselineFixedCosts,
+        baselineHeadcount: employeeCount || 24,
+        averageEmployeeSalary,
+        industry: business.industry,
+      },
+      {
+        priceIncrease: scenario.priceIncrease,
+        employeeCount: scenario.employeeCount,
+        marketingBudget: scenario.marketingBudget,
+        supplierDelay: scenario.supplierDelay,
+      }
+    );
+
+    const monthlyDataWithBand = monthlyData.map((month: any, i: number) => ({
+      ...month,
+      projectedRevenueLow: confidenceBand.monthlyDataBand[i]?.projectedRevenueLow,
+      projectedRevenueHigh: confidenceBand.monthlyDataBand[i]?.projectedRevenueHigh,
+      projectedProfitLow: confidenceBand.monthlyDataBand[i]?.projectedProfitLow,
+      projectedProfitHigh: confidenceBand.monthlyDataBand[i]?.projectedProfitHigh,
+    }));
 
     return NextResponse.json({
       scenario: { ...scenario, business },
       result: latestResult,
-      monthlyData,
+      monthlyData: monthlyDataWithBand,
+      confidenceBand: {
+        projectedRevenueLow: confidenceBand.projectedRevenueLow,
+        projectedRevenueHigh: confidenceBand.projectedRevenueHigh,
+        projectedProfitLow: confidenceBand.projectedProfitLow,
+        projectedProfitHigh: confidenceBand.projectedProfitHigh,
+      },
     });
   } catch (error: any) {
     console.error('Error fetching scenario results:', error);

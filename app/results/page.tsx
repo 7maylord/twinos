@@ -8,7 +8,7 @@ import { RevenueComparisonChart } from '@/components/results/revenue-comparison-
 import { ProfitComparisonChart } from '@/components/results/profit-comparison-chart';
 import { ImpactMetrics } from '@/components/results/impact-metrics';
 import { AIRecommendationCard } from '@/components/results/ai-recommendation-card';
-import { runSimulation } from '@/lib/simulation-engine';
+import { runSimulationWithConfidenceBand } from '@/lib/simulation-engine';
 
 interface Business {
   id: string;
@@ -293,7 +293,7 @@ function ResultsContent() {
 
             const averageEmployeeSalary = business.employeeCount > 0 ? business.totalPayroll / business.employeeCount : 4000;
 
-            const output = runSimulation(
+            const output = runSimulationWithConfidenceBand(
               {
                 baselineRevenue: business.baselineRevenue,
                 baselineMarketing: business.baselineMarketing,
@@ -311,7 +311,7 @@ function ResultsContent() {
                 horizon,
               }
             );
-            return output.monthlyData;
+            return output.monthlyDataBand;
           };
 
           const chartData = getChartData();

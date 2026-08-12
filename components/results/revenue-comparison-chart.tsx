@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  LineChart,
+  ComposedChart,
   Line,
   XAxis,
   YAxis,
@@ -15,6 +15,8 @@ interface MonthlyRevenueData {
   month: string;
   baselineRevenue: number;
   projectedRevenue: number;
+  projectedRevenueLow?: number;
+  projectedRevenueHigh?: number;
 }
 
 export function RevenueComparisonChart({ data }: { data: MonthlyRevenueData[] }) {
@@ -26,11 +28,13 @@ export function RevenueComparisonChart({ data }: { data: MonthlyRevenueData[] })
     return `$${value}`;
   };
 
+  const hasBand = data.some((d) => d.projectedRevenueLow !== undefined && d.projectedRevenueHigh !== undefined);
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
       <h3 className="text-black font-medium tracking-tight text-lg mb-6">Revenue Comparison</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
+        <ComposedChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E5E5" vertical={false} />
           <XAxis dataKey="month" stroke="#999999" style={{ fontSize: '12px' }} />
           <YAxis stroke="#999999" style={{ fontSize: '12px' }} tickFormatter={formatYAxis} />
@@ -55,6 +59,32 @@ export function RevenueComparisonChart({ data }: { data: MonthlyRevenueData[] })
             isAnimationActive={true}
             strokeDasharray="4 4"
           />
+          {hasBand && (
+            <>
+              <Line
+                type="monotone"
+                dataKey="projectedRevenueHigh"
+                stroke="#2B2644"
+                strokeWidth={1}
+                strokeOpacity={0.4}
+                dot={false}
+                name="High Estimate"
+                strokeDasharray="2 3"
+                isAnimationActive={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="projectedRevenueLow"
+                stroke="#2B2644"
+                strokeWidth={1}
+                strokeOpacity={0.4}
+                dot={false}
+                name="Low Estimate"
+                strokeDasharray="2 3"
+                isAnimationActive={false}
+              />
+            </>
+          )}
           <Line
             type="monotone"
             dataKey="projectedRevenue"
@@ -64,7 +94,7 @@ export function RevenueComparisonChart({ data }: { data: MonthlyRevenueData[] })
             name="Projected Revenue"
             isAnimationActive={true}
           />
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </div>
   );

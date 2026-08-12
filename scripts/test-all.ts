@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { runSimulation, getChangeCost, optimizeScenario, generateRuleBasedRecommendation } from '../lib/simulation-engine';
+import { runSimulation, runSimulationWithConfidenceBand, getChangeCost, optimizeScenario, generateRuleBasedRecommendation } from '../lib/simulation-engine';
 import { logOptimizationRun, cacheForecast } from '../lib/dynamodb';
 import fs from 'fs';
 import path from 'path';
@@ -176,6 +176,73 @@ async function main() {
     // Unrecognized industry string falls back to the same default as no industry at all.
     const outputUnknown = runSimulation({ ...baseline, industry: 'Nonexistent Sector' }, adjustments);
     assert.strictEqual(outputUnknown.projectedRevenue, outputDefault.projectedRevenue);
+  });
+
+  await test('Simulation Engine - Confidence band brackets the point estimate', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000,
+      industry: 'E-commerce',
+    };
+
+    const adjustments = {
+      priceIncrease: 15,
+      employeeCount: 10,
+      marketingBudget: 15000,
+      supplierDelay: 'none',
+    };
+
+    const band = runSimulationWithConfidenceBand(baseline, adjustments);
+
+    // Low <= expected <= High for the headline figures.
+    assert.ok(band.projectedRevenueLow <= band.expected.projectedRevenue);
+    assert.ok(band.expected.projectedRevenue <= band.projectedRevenueHigh);
+    assert.ok(band.projectedProfitLow <= band.expected.projectedProfit);
+    assert.ok(band.expected.projectedProfit <= band.projectedProfitHigh);
+
+    // Same per-period guarantee across the whole monthly series.
+    for (let i = 0; i < band.expected.monthlyData.length; i++) {
+      const expectedMonth = band.expected.monthlyData[i];
+      const bandMonth = band.monthlyDataBand[i];
+      assert.ok(bandMonth.projectedRevenueLow <= expectedMonth.projectedRevenue);
+      assert.ok(expectedMonth.projectedRevenue <= bandMonth.projectedRevenueHigh);
+    }
+
+    // A wider uncertainty parameter should never produce a narrower band.
+    const widerBand = runSimulationWithConfidenceBand(baseline, adjustments, 0.5);
+    const defaultSpread = band.projectedRevenueHigh - band.projectedRevenueLow;
+    const widerSpread = widerBand.projectedRevenueHigh - widerBand.projectedRevenueLow;
+    assert.ok(widerSpread >= defaultSpread);
+  });
+
+  await test('Simulation Engine - Explicit elasticity override wins over industry default', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000,
+      industry: 'Software / SaaS', // default price elasticity 0.20
+    };
+
+    const adjustments = {
+      priceIncrease: 20,
+      employeeCount: 10,
+      marketingBudget: 10000,
+      supplierDelay: 'none',
+    };
+
+    const withIndustryDefault = runSimulation(baseline, adjustments);
+    // Override to a much higher elasticity (0.65, like E-commerce) — should
+    // reduce projected revenue relative to the SaaS default despite the same industry.
+    const withOverride = runSimulation({ ...baseline, priceElasticityOverride: 0.65 }, adjustments);
+
+    assert.ok(withOverride.projectedRevenue < withIndustryDefault.projectedRevenue);
   });
 
   // 2. Hill Climbing & Optimization Engine Tests
