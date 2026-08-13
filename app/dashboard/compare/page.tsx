@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
-import { ArrowUpRight, ArrowDownLeft, TrendingUp, RefreshCw, BarChart2 } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, TrendingUp, RefreshCw, BarChart2, GitCompare } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -14,6 +14,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { diffScenarioInputs } from '@/lib/scenario-diff';
 
 interface Scenario {
   id: string;
@@ -22,6 +23,8 @@ interface Scenario {
   employeeCount: number;
   marketingBudget: number;
   supplierDelay: string;
+  priceElasticityOverride?: number | null;
+  marketingElasticityOverride?: number | null;
 }
 
 interface MonthlyData {
@@ -333,6 +336,36 @@ export default function ComparePage() {
                   </div>
                 </div>
               </div>
+
+              {/* What Changed: input-level diff between the two scenarios */}
+              {detailsB && (
+                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center gap-2 mb-6">
+                    <GitCompare className="w-5 h-5 text-black" />
+                    <h3 className="text-black font-medium tracking-tight text-lg">What Changed</h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="py-2 pr-4 font-semibold text-gray-500 text-xs uppercase tracking-wider">Lever</th>
+                          <th className="py-2 pr-4 font-semibold text-gray-500 text-xs uppercase tracking-wider">A: {detailsA.scenario.name}</th>
+                          <th className="py-2 font-semibold text-gray-500 text-xs uppercase tracking-wider">B: {detailsB.scenario.name}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {diffScenarioInputs(detailsA.scenario, detailsB.scenario).map((row) => (
+                          <tr key={row.label} className={row.changed ? 'bg-amber-50/60' : ''}>
+                            <td className="py-2.5 pr-4 text-gray-600">{row.label}</td>
+                            <td className={`py-2.5 pr-4 ${row.changed ? 'font-semibold text-black' : 'text-gray-700'}`}>{row.valueA}</td>
+                            <td className={`py-2.5 ${row.changed ? 'font-semibold text-black' : 'text-gray-700'}`}>{row.valueB}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
 
               {/* Combined Chart */}
               <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
