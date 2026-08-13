@@ -9,6 +9,7 @@ import { ProfitComparisonChart } from '@/components/results/profit-comparison-ch
 import { ImpactMetrics } from '@/components/results/impact-metrics';
 import { AIRecommendationCard } from '@/components/results/ai-recommendation-card';
 import { ExplainPopover } from '@/components/results/explain-popover';
+import { ScenarioComments } from '@/components/results/scenario-comments';
 import { runSimulationWithConfidenceBand } from '@/lib/simulation-engine';
 
 interface Business {
@@ -251,7 +252,7 @@ function ResultsContent() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
+            <div className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
               Revenue Impact
               {data.explain && (
                 <ExplainPopover
@@ -270,7 +271,7 @@ function ResultsContent() {
                   ]}
                 />
               )}
-            </p>
+            </div>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-3xl font-medium tracking-tight text-black">
                 {revDelta >= 0 ? '+' : ''}${(revDelta / 1000).toFixed(0)}K
@@ -283,7 +284,7 @@ function ResultsContent() {
           </div>
           
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
+            <div className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
               Projected Profit
               {finalMonthData.projectedPayroll !== undefined && (
                 <ExplainPopover
@@ -299,7 +300,7 @@ function ResultsContent() {
                   ]}
                 />
               )}
-            </p>
+            </div>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-3xl font-medium tracking-tight text-black">
                 {projectedProfit >= 0 ? '' : '-'}${(Math.abs(projectedProfit) / 1000).toFixed(1)}K
@@ -488,6 +489,9 @@ function ResultsContent() {
             </ul>
           </div>
         </div>
+
+        {/* Notes & Comments */}
+        <ScenarioComments scenarioId={scenario.id} />
 
         {/* Print-Only Detailed Report Section */}
         <div className="hidden print:block mt-12 break-before-page">

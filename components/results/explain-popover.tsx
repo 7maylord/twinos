@@ -20,6 +20,8 @@ export function ExplainPopover({ title, formula, rows }: { title: string; formul
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // This renders block content (divs, p tags) in its popover panel, so the
+  // caller must not place it inside a <p> — use a <div> label wrapper instead.
   return (
     <div className="relative inline-block no-print" ref={ref}>
       <button

@@ -211,7 +211,7 @@ function ShareContent() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
+            <div className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
               Revenue Impact
               {data.explain && (
                 <ExplainPopover
@@ -230,7 +230,7 @@ function ShareContent() {
                   ]}
                 />
               )}
-            </p>
+            </div>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-3xl font-medium tracking-tight text-black">
                 {revDelta >= 0 ? '+' : ''}${(revDelta / 1000).toFixed(0)}K
@@ -243,7 +243,7 @@ function ShareContent() {
           </div>
           
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
-            <p className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
+            <div className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
               Projected Profit
               {finalMonthData.projectedPayroll !== undefined && (
                 <ExplainPopover
@@ -259,7 +259,7 @@ function ShareContent() {
                   ]}
                 />
               )}
-            </p>
+            </div>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-3xl font-medium tracking-tight text-black">
                 {projectedProfit >= 0 ? '' : '-'}${(Math.abs(projectedProfit) / 1000).toFixed(1)}K
