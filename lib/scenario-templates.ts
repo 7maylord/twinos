@@ -18,6 +18,21 @@ export const DEFAULT_TEMPLATES: ScenarioTemplate[] = [
   { name: 'Growth Push', description: 'Hire and spend more on marketing', priceIncrease: 0, headcountDelta: 2, marketingBudgetMultiplier: 1.5, supplierDelay: 'none' },
 ];
 
+// Crisis playbooks: universal shock types rather than industry-specific
+// growth plays. Unlike DEFAULT_TEMPLATES/SCENARIO_TEMPLATES these aren't
+// keyed by industry, since an acute shock (lost a key supplier, demand
+// cratered) isn't industry-dependent the way pricing strategy is. Note the
+// scenario engine only models price *increases* (0-50%), never cuts, so a
+// demand-drop crisis is modeled through marketing/headcount response instead
+// of a price cut it has no way to represent.
+export const CRISIS_TEMPLATES: ScenarioTemplate[] = [
+  { name: 'Key Supplier Collapsed', description: 'A critical supplier has gone under or cut you off', priceIncrease: 0, headcountDelta: 0, marketingBudgetMultiplier: 1.0, supplierDelay: 'severe' },
+  { name: 'Demand Suddenly Dropped', description: 'Sales have cratered and you need to react fast', priceIncrease: 0, headcountDelta: -2, marketingBudgetMultiplier: 1.8, supplierDelay: 'none' },
+  { name: 'Major Client Lost', description: 'A large client or contract just walked away', priceIncrease: 0, headcountDelta: -3, marketingBudgetMultiplier: 1.5, supplierDelay: 'none' },
+  { name: 'Sudden Cost Spike', description: 'Rent, input costs, or supplier prices jumped overnight', priceIncrease: 15, headcountDelta: 0, marketingBudgetMultiplier: 0.8, supplierDelay: 'moderate' },
+  { name: 'Cash Crunch', description: 'Need immediate savings to protect runway', priceIncrease: 8, headcountDelta: -4, marketingBudgetMultiplier: 0.5, supplierDelay: 'none' },
+];
+
 export const SCENARIO_TEMPLATES: Record<string, ScenarioTemplate[]> = {
   'Software / SaaS': [
     { name: 'Annual Price Increase', description: 'Typical yearly subscription price bump', priceIncrease: 8, headcountDelta: 0, marketingBudgetMultiplier: 1.0, supplierDelay: 'none' },

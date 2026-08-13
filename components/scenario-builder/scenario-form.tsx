@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Play, AlertTriangle, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, AlertTriangle, Sparkles, ChevronDown, ChevronUp, Siren, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { getScenarioTemplates, applyScenarioTemplate } from '@/lib/scenario-templates';
+import Link from 'next/link';
+import { getScenarioTemplates, applyScenarioTemplate, CRISIS_TEMPLATES } from '@/lib/scenario-templates';
 import { getIndustryProfile } from '@/lib/industry-profiles';
 
 export default function ScenarioForm() {
@@ -19,6 +20,7 @@ export default function ScenarioForm() {
   const [supplierDelay, setSupplierDelay] = useState('none');
   const [submitting, setSubmitting] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [templateMode, setTemplateMode] = useState<'growth' | 'crisis'>('growth');
   // Empty string = "use the industry default" (see lib/industry-profiles.ts).
   const [priceElasticityInput, setPriceElasticityInput] = useState('');
   const [marketingElasticityInput, setMarketingElasticityInput] = useState('');
@@ -129,27 +131,64 @@ export default function ScenarioForm() {
         </div>
       )}
 
-      {/* Starter Templates */}
+      {/* Starter Templates / Crisis Playbooks */}
       {business && (
         <div className="mb-8">
-          <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-3">
-            <Sparkles className="w-4 h-4" />
-            Starter Templates for {business.industry || 'Your Business'}
-          </label>
+          <div className="flex items-center justify-between mb-3">
+            <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+              {templateMode === 'crisis' ? <Siren className="w-4 h-4 text-red-600" /> : <Sparkles className="w-4 h-4" />}
+              {templateMode === 'crisis' ? 'Crisis Playbooks' : `Starter Templates for ${business.industry || 'Your Business'}`}
+            </label>
+            <div className="flex bg-[#F5F5F5] p-1 rounded-full border border-gray-200 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setTemplateMode('growth')}
+                className={`px-3 py-1 rounded-full transition-colors ${templateMode === 'growth' ? 'bg-black text-white' : 'text-gray-600 hover:text-black'}`}
+              >
+                Growth
+              </button>
+              <button
+                type="button"
+                onClick={() => setTemplateMode('crisis')}
+                className={`px-3 py-1 rounded-full transition-colors ${templateMode === 'crisis' ? 'bg-red-600 text-white' : 'text-gray-600 hover:text-black'}`}
+              >
+                Crisis
+              </button>
+            </div>
+          </div>
+
           <div className="flex flex-wrap gap-2">
-            {getScenarioTemplates(business.industry).map((template) => (
+            {(templateMode === 'crisis' ? CRISIS_TEMPLATES : getScenarioTemplates(business.industry)).map((template) => (
               <button
                 key={template.name}
                 type="button"
                 disabled={submitting}
                 onClick={() => handleApplyTemplate(template)}
                 title={template.description}
-                className="px-4 py-2 bg-[#F5F5F5] hover:bg-gray-200 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 transition-colors disabled:opacity-60"
+                className={`px-4 py-2 rounded-full text-xs font-semibold transition-colors disabled:opacity-60 border ${
+                  templateMode === 'crisis'
+                    ? 'bg-red-50 hover:bg-red-100 border-red-200 text-red-800'
+                    : 'bg-[#F5F5F5] hover:bg-gray-200 border-gray-200 text-gray-700'
+                }`}
               >
                 {template.name}
               </button>
             ))}
           </div>
+
+          {templateMode === 'crisis' && (
+            <div className="mt-4 flex items-center justify-between gap-4 p-4 bg-red-50/60 border border-red-200 rounded-xl">
+              <p className="text-xs text-red-900">
+                Picked a playbook? For a full recovery plan, tell the Counterfactual Optimizer your target and let it reverse-engineer the smallest set of changes needed.
+              </p>
+              <Link
+                href="/dashboard/optimize"
+                className="flex items-center gap-1 text-xs font-semibold text-red-700 hover:text-red-900 shrink-0"
+              >
+                Open Optimizer <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          )}
         </div>
       )}
 

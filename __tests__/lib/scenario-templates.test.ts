@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getScenarioTemplates, applyScenarioTemplate, DEFAULT_TEMPLATES } from '@/lib/scenario-templates';
+import { getScenarioTemplates, applyScenarioTemplate, DEFAULT_TEMPLATES, CRISIS_TEMPLATES } from '@/lib/scenario-templates';
 
 describe('getScenarioTemplates', () => {
   it('returns industry-specific templates for a known industry', () => {
@@ -48,5 +48,25 @@ describe('applyScenarioTemplate', () => {
   it('clamps price increase to the 0-50 range enforced by the manual slider', () => {
     const overshoot = { name: 'Overshoot', description: '', priceIncrease: 75, headcountDelta: 0, marketingBudgetMultiplier: 1, supplierDelay: 'none' as const };
     expect(applyScenarioTemplate(overshoot, { currentHeadcount: 10, baselineMarketing: 10000 }).priceIncrease).toBe(50);
+  });
+});
+
+describe('CRISIS_TEMPLATES', () => {
+  it('are universal (not industry-specific) and each resolve to valid clamped values', () => {
+    expect(CRISIS_TEMPLATES.length).toBeGreaterThan(0);
+    for (const template of CRISIS_TEMPLATES) {
+      const applied = applyScenarioTemplate(template, { currentHeadcount: 10, baselineMarketing: 20000 });
+      expect(applied.priceIncrease).toBeGreaterThanOrEqual(0);
+      expect(applied.priceIncrease).toBeLessThanOrEqual(50);
+      expect(applied.employeeCount).toBeGreaterThanOrEqual(5);
+      expect(applied.employeeCount).toBeLessThanOrEqual(50);
+      expect(applied.marketingBudget).toBeGreaterThanOrEqual(0);
+      expect(applied.marketingBudget).toBeLessThanOrEqual(100000);
+    }
+  });
+
+  it('includes a severe supplier-delay playbook for a supplier-collapse crisis', () => {
+    const supplierCrisis = CRISIS_TEMPLATES.find((t) => t.name === 'Key Supplier Collapsed');
+    expect(supplierCrisis?.supplierDelay).toBe('severe');
   });
 });
