@@ -5,6 +5,7 @@ export interface ScenarioInputs {
   supplierDelay: string;
   priceElasticityOverride?: number | null;
   marketingElasticityOverride?: number | null;
+  roleTargetsJson?: string | null;
 }
 
 export interface ScenarioDiffRow {
@@ -16,6 +17,16 @@ export interface ScenarioDiffRow {
 
 function formatElasticity(value: number | null | undefined): string {
   return value != null ? value.toFixed(2) : 'Industry default';
+}
+
+function formatRoleTargets(json: string | null | undefined): string {
+  if (!json) return 'Blended';
+  try {
+    const targets: { role: string; count: number }[] = JSON.parse(json);
+    return targets.map((t) => `${t.count} ${t.role}`).join(', ') || 'Blended';
+  } catch {
+    return 'Blended';
+  }
 }
 
 // Row-by-row diff of two scenarios' input levers, for the compare page's
@@ -59,6 +70,12 @@ export function diffScenarioInputs(a: ScenarioInputs, b: ScenarioInputs): Scenar
       valueA: formatElasticity(a.marketingElasticityOverride),
       valueB: formatElasticity(b.marketingElasticityOverride),
       changed: (a.marketingElasticityOverride ?? null) !== (b.marketingElasticityOverride ?? null),
+    },
+    {
+      label: 'Headcount by Role',
+      valueA: formatRoleTargets(a.roleTargetsJson),
+      valueB: formatRoleTargets(b.roleTargetsJson),
+      changed: (a.roleTargetsJson ?? null) !== (b.roleTargetsJson ?? null),
     },
   ];
 }

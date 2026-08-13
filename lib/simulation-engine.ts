@@ -13,14 +13,29 @@ export interface BaselineMetrics {
   // runSimulationWithConfidenceBand() to perturb the assumption.
   priceElasticityOverride?: number | null;
   marketingElasticityOverride?: number | null;
+  // Average salary per role, e.g. { Barista: 3500, Manager: 6500 }. Used to
+  // cost roleTargets accurately; a role missing here falls back to
+  // averageEmployeeSalary. Computed server-side from real employee records —
+  // never sent to the client (see app/api/scenarios/[id]/results/route.ts).
+  roleSalaries?: Record<string, number>;
+}
+
+export interface RoleTarget {
+  role: string;
+  count: number;
 }
 
 export interface ScenarioAdjustments {
   priceIncrease: number;     // 0 - 100%
-  employeeCount: number;     // Target employee count
+  employeeCount: number;     // Target employee count (ignored for payroll when roleTargets is set)
   marketingBudget: number;   // Monthly marketing budget
   supplierDelay: string;     // 'none' | 'minor' | 'moderate' | 'severe'
   horizon?: '30d' | '90d' | '6m' | '12m';
+  // Optional per-role headcount targets. When present and non-empty, payroll
+  // is costed per-role (each at its own average salary) instead of
+  // employeeCount x one blended averageEmployeeSalary, and projectedHeadcount
+  // becomes the sum of these counts.
+  roleTargets?: RoleTarget[];
 }
 
 export interface MonthlyProjection {
@@ -73,6 +88,7 @@ export function runSimulation(
     industry,
     priceElasticityOverride,
     marketingElasticityOverride,
+    roleSalaries,
   } = baseline;
 
   const {
@@ -80,7 +96,18 @@ export function runSimulation(
     employeeCount,
     marketingBudget,
     supplierDelay,
+    roleTargets,
   } = adjustments;
+
+  // Role-costed payroll: each role's target headcount x that role's own
+  // average salary, instead of one blended average across every employee.
+  const hasRoleTargets = !!roleTargets && roleTargets.length > 0;
+  const effectiveEmployeeCount = hasRoleTargets
+    ? roleTargets!.reduce((sum, rt) => sum + rt.count, 0)
+    : employeeCount;
+  const monthlyRolePayroll = hasRoleTargets
+    ? roleTargets!.reduce((sum, rt) => sum + rt.count * (roleSalaries?.[rt.role] ?? averageEmployeeSalary), 0)
+    : effectiveEmployeeCount * averageEmployeeSalary;
 
   // 1. Calculate multipliers
   // Price Multiplier: 1 + (priceIncrease / 100)
@@ -143,7 +170,7 @@ export function runSimulation(
 
     // Projected calculation for this period
     const monthProjectedRevenue = (baselineRevenue / divisor) * priceMultiplier * demandMultiplier * sFactor;
-    const projectedPayroll = (employeeCount * averageEmployeeSalary) / divisor;
+    const projectedPayroll = monthlyRolePayroll / divisor;
     
     // Inventory costs scale with demand
     const projectedInventoryCost = (baselineInventory / divisor) * demandMultiplier;
@@ -184,7 +211,7 @@ export function runSimulation(
   return {
     projectedRevenue: divisor > 1 ? Math.round(finalMonth.projectedRevenue * divisor) : finalMonth.projectedRevenue,
     projectedProfit: divisor > 1 ? Math.round(finalMonth.projectedProfit * divisor) : finalMonth.projectedProfit,
-    projectedHeadcount: employeeCount,
+    projectedHeadcount: effectiveEmployeeCount,
     projectedInventoryRisk: parseFloat(projectedInventoryRisk.toFixed(2)),
     monthlyData,
     explain: {
@@ -195,6 +222,24 @@ export function runSimulation(
       marketingDeltaPercent,
     },
   };
+}
+
+// Average salary per role, from real employee records — feeds
+// BaselineMetrics.roleSalaries. Server-side only; never serialize the result
+// into a client-facing response (it's nearly as revealing as individual
+// salaries for a small business — see app/api/scenarios/[id]/results/route.ts).
+export function computeRoleSalaries(employees: { role: string; salary: number }[]): Record<string, number> {
+  const totals: Record<string, { sum: number; count: number }> = {};
+  for (const emp of employees) {
+    const bucket = (totals[emp.role] ??= { sum: 0, count: 0 });
+    bucket.sum += emp.salary;
+    bucket.count += 1;
+  }
+  const averages: Record<string, number> = {};
+  for (const role in totals) {
+    averages[role] = totals[role].sum / totals[role].count;
+  }
+  return averages;
 }
 
 export interface MonthlyProjectionBand extends MonthlyProjection {

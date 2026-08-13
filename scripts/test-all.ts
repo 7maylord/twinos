@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { runSimulation, runSimulationWithConfidenceBand, getChangeCost, optimizeScenario, generateRuleBasedRecommendation } from '../lib/simulation-engine';
+import { runSimulation, runSimulationWithConfidenceBand, getChangeCost, optimizeScenario, generateRuleBasedRecommendation, computeRoleSalaries } from '../lib/simulation-engine';
 import { logOptimizationRun, cacheForecast } from '../lib/dynamodb';
 import fs from 'fs';
 import path from 'path';
@@ -279,6 +279,75 @@ async function main() {
       // Allow rounding slack since each component is independently rounded.
       assert.ok(Math.abs(reconstructedProfit - month.projectedProfit) <= 4);
     }
+  });
+
+  await test('Simulation Engine - computeRoleSalaries averages salary per role', () => {
+    const employees = [
+      { role: 'Barista', salary: 3000 },
+      { role: 'Barista', salary: 4000 },
+      { role: 'Manager', salary: 8000 },
+    ];
+    const averages = computeRoleSalaries(employees);
+    assert.strictEqual(averages['Barista'], 3500);
+    assert.strictEqual(averages['Manager'], 8000);
+  });
+
+  await test('Simulation Engine - role-targeted headcount costs payroll per-role, not blended', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000, // blended average across all employees
+      roleSalaries: { Barista: 3000, Manager: 8000 },
+    };
+
+    // Same headcount (2), but roleTargets should cost this using the actual
+    // per-role salaries (3000 + 8000 = 11000), not 2 x the blended average (8000).
+    const withRoleTargets = runSimulation(baseline, {
+      priceIncrease: 0,
+      employeeCount: 2,
+      marketingBudget: 10000,
+      supplierDelay: 'none',
+      roleTargets: [{ role: 'Barista', count: 1 }, { role: 'Manager', count: 1 }],
+    });
+
+    const withBlended = runSimulation(baseline, {
+      priceIncrease: 0,
+      employeeCount: 2,
+      marketingBudget: 10000,
+      supplierDelay: 'none',
+    });
+
+    assert.strictEqual(withRoleTargets.projectedHeadcount, 2);
+    // Role-costed payroll (11000/mo) is higher than blended (2 x 4000 = 8000/mo),
+    // so profit should be correspondingly lower.
+    assert.ok(withRoleTargets.projectedProfit < withBlended.projectedProfit);
+  });
+
+  await test('Simulation Engine - unmapped role in roleTargets falls back to averageEmployeeSalary', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 5000,
+      roleSalaries: { Barista: 3000 },
+    };
+
+    const output = runSimulation(baseline, {
+      priceIncrease: 0,
+      employeeCount: 1,
+      marketingBudget: 10000,
+      supplierDelay: 'none',
+      roleTargets: [{ role: 'Unknown Role', count: 1 }],
+    });
+
+    // Payroll for the final period should equal exactly the fallback salary (5000).
+    const finalMonth = output.monthlyData[output.monthlyData.length - 1];
+    assert.strictEqual(finalMonth.projectedPayroll, 5000);
   });
 
   // 2. Hill Climbing & Optimization Engine Tests

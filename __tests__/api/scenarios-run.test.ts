@@ -31,6 +31,7 @@ vi.mock('@/lib/simulation-engine', () => ({
     projectedInventoryRisk: 0.1,
     monthlyData: [],
   }),
+  computeRoleSalaries: vi.fn().mockReturnValue({}),
 }));
 
 import { POST } from '@/app/api/scenarios/run/route';
@@ -150,6 +151,49 @@ describe('POST /api/scenarios/run — new scenario path', () => {
       })
     );
   });
+
+  it('sanitizes and stores role targets, passing them through to runSimulation', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
+    const expectedJson = JSON.stringify([{ role: 'Barista', count: 18 }, { role: 'Chef', count: 5 }]);
+    mockPrisma.scenario.create.mockResolvedValue({ ...BASE_SCENARIO, roleTargetsJson: expectedJson });
+    mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
+    mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
+
+    const req = makeRequest({
+      name: 'Role Breakdown Test',
+      businessId: BUSINESS_A.id,
+      roleTargets: [
+        { role: 'Barista', count: 18 },
+        { role: 'Chef', count: 5 },
+        { role: '   ', count: 3 }, // blank role — dropped
+        { role: 'Ghost', count: -1 }, // negative count — dropped
+      ],
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.scenario.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ roleTargetsJson: expectedJson }) })
+    );
+    expect(vi.mocked(runSimulation)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ roleTargets: [{ role: 'Barista', count: 18 }, { role: 'Chef', count: 5 }] })
+    );
+  });
+
+  it('omits roleTargetsJson entirely when no valid role targets are provided', async () => {
+    mockGetActiveBusiness.mockResolvedValue(BUSINESS_A);
+    mockPrisma.scenario.create.mockResolvedValue(BASE_SCENARIO);
+    mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
+    mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
+
+    const req = makeRequest({ name: 'No Roles Test', priceIncrease: 5, businessId: BUSINESS_A.id });
+    await POST(req);
+
+    expect(mockPrisma.scenario.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ roleTargetsJson: undefined }) })
+    );
+  });
 });
 
 describe('POST /api/scenarios/run — existing scenario path', () => {
@@ -205,6 +249,24 @@ describe('POST /api/scenarios/run — existing scenario path', () => {
     expect(vi.mocked(runSimulation)).toHaveBeenCalledWith(
       expect.objectContaining({ priceElasticityOverride: 0.55, marketingElasticityOverride: null }),
       expect.anything()
+    );
+  });
+
+  it('passes previously-stored role targets through to runSimulation on re-run', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
+    mockPrisma.scenario.findUnique.mockResolvedValue({
+      ...BASE_SCENARIO,
+      roleTargetsJson: JSON.stringify([{ role: 'Barista', count: 18 }]),
+    });
+    mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
+    mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
+
+    const req = makeRequest({ scenarioId: 'sc-1' });
+    await POST(req);
+
+    expect(vi.mocked(runSimulation)).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ roleTargets: [{ role: 'Barista', count: 18 }] })
     );
   });
 });

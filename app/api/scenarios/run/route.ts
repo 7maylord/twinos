@@ -1,13 +1,23 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
-import { runSimulation } from '@/lib/simulation-engine';
+import { runSimulation, computeRoleSalaries, RoleTarget } from '@/lib/simulation-engine';
 import { cacheForecast } from '@/lib/dynamodb';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    let { scenarioId, name, priceIncrease, employeeCount, marketingBudget, supplierDelay, businessId, priceElasticityOverride, marketingElasticityOverride } = body;
+    let { scenarioId, name, priceIncrease, employeeCount, marketingBudget, supplierDelay, businessId, priceElasticityOverride, marketingElasticityOverride, roleTargets } = body;
+
+    // Sanitize role targets: drop malformed entries rather than reject the
+    // whole request, and cap the list length as a defensive bound.
+    const sanitizedRoleTargets: RoleTarget[] | undefined = Array.isArray(roleTargets)
+      ? roleTargets
+          .filter((rt: any) => typeof rt?.role === 'string' && rt.role.trim() && Number.isFinite(Number(rt.count)) && Number(rt.count) >= 0)
+          .slice(0, 20)
+          .map((rt: any) => ({ role: rt.role.trim(), count: Math.round(Number(rt.count)) }))
+      : undefined;
+    const roleTargetsJson = sanitizedRoleTargets && sanitizedRoleTargets.length > 0 ? JSON.stringify(sanitizedRoleTargets) : undefined;
 
     // Elasticity coefficients are conceptually 0 (fully inelastic) to ~2 (highly
     // elastic); clamp so a bad/adversarial input can't push economically
@@ -56,6 +66,7 @@ export async function POST(request: Request) {
           supplierDelay: supplierDelay || 'none',
           priceElasticityOverride,
           marketingElasticityOverride,
+          roleTargetsJson,
           status: 'PENDING',
         },
         include: { business: { include: { employees: true } } },
@@ -67,6 +78,15 @@ export async function POST(request: Request) {
     const employees = business.employees;
     const totalSalary = employees.reduce((sum, emp) => sum + emp.salary, 0);
     const averageEmployeeSalary = employees.length > 0 ? (totalSalary / employees.length) : 4000.0;
+
+    let storedRoleTargets: RoleTarget[] | undefined;
+    if (scenario.roleTargetsJson) {
+      try {
+        storedRoleTargets = JSON.parse(scenario.roleTargetsJson);
+      } catch {
+        storedRoleTargets = undefined;
+      }
+    }
 
     // Run the simulation calculations
     const simulationOutput = runSimulation(
@@ -80,12 +100,14 @@ export async function POST(request: Request) {
         industry: business.industry,
         priceElasticityOverride: scenario.priceElasticityOverride,
         marketingElasticityOverride: scenario.marketingElasticityOverride,
+        roleSalaries: computeRoleSalaries(employees),
       },
       {
         priceIncrease: scenario.priceIncrease,
         employeeCount: scenario.employeeCount,
         marketingBudget: scenario.marketingBudget,
         supplierDelay: scenario.supplierDelay,
+        roleTargets: storedRoleTargets,
       }
     );
 

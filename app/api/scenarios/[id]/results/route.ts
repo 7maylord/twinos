@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { runSimulationWithConfidenceBand } from '@/lib/simulation-engine';
+import { runSimulationWithConfidenceBand, computeRoleSalaries, RoleTarget } from '@/lib/simulation-engine';
 
 export async function GET(
   request: Request,
@@ -24,7 +24,10 @@ export async function GET(
             baselineMarketing: true,
             baselineInventory: true,
             baselineFixedCosts: true,
-            employees: { select: { salary: true } },
+            // role is only used server-side to cost role-targeted headcount
+            // scenarios (computeRoleSalaries below) — employees is destructured
+            // out below and never reaches the response.
+            employees: { select: { salary: true, role: true } },
           },
         },
         simulationResults: {
@@ -62,6 +65,16 @@ export async function GET(
     // assumption perturbed +/-25% to show a low/high range alongside the
     // point-estimate projection, rather than false precision on a single number.
     const averageEmployeeSalary = employeeCount > 0 ? totalPayroll / employeeCount : 4000;
+
+    let storedRoleTargets: RoleTarget[] | undefined;
+    if (scenario.roleTargetsJson) {
+      try {
+        storedRoleTargets = JSON.parse(scenario.roleTargetsJson);
+      } catch {
+        storedRoleTargets = undefined;
+      }
+    }
+
     const confidenceBand = runSimulationWithConfidenceBand(
       {
         baselineRevenue: business.baselineRevenue,
@@ -73,12 +86,14 @@ export async function GET(
         industry: business.industry,
         priceElasticityOverride: scenario.priceElasticityOverride,
         marketingElasticityOverride: scenario.marketingElasticityOverride,
+        roleSalaries: computeRoleSalaries(employees),
       },
       {
         priceIncrease: scenario.priceIncrease,
         employeeCount: scenario.employeeCount,
         marketingBudget: scenario.marketingBudget,
         supplierDelay: scenario.supplierDelay,
+        roleTargets: storedRoleTargets,
       }
     );
 

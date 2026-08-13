@@ -89,6 +89,13 @@ model Scenario {
   priceElasticityOverride     Float?
   marketingElasticityOverride Float?
 
+  // Optional per-role headcount targets, e.g. [{"role":"Barista","count":18}].
+  // When set, overrides employeeCount for payroll purposes — each role is
+  // costed at its own average salary instead of one blended average across
+  // all employees. Free-text JSON (not a join table) because Employee.role is
+  // a free-text field, not a FK'd entity.
+  roleTargetsJson String?
+
   simulationResults SimulationResult[]
   comments          ScenarioComment[]
 }

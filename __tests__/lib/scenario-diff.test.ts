@@ -37,4 +37,21 @@ describe('diffScenarioInputs', () => {
     const row = rows.find((r) => r.label === 'Price Elasticity Override');
     expect(row?.changed).toBe(false);
   });
+
+  it('shows "Blended" for role targets when unset, and a readable summary when set', () => {
+    const rows = diffScenarioInputs(BASE, {
+      ...BASE,
+      roleTargetsJson: JSON.stringify([{ role: 'Barista', count: 18 }, { role: 'Chef', count: 5 }]),
+    });
+    const row = rows.find((r) => r.label === 'Headcount by Role');
+    expect(row?.changed).toBe(true);
+    expect(row?.valueA).toBe('Blended');
+    expect(row?.valueB).toBe('18 Barista, 5 Chef');
+  });
+
+  it('does not flag a role-target change when both sides are blended', () => {
+    const rows = diffScenarioInputs(BASE, { ...BASE });
+    const row = rows.find((r) => r.label === 'Headcount by Role');
+    expect(row?.changed).toBe(false);
+  });
 });

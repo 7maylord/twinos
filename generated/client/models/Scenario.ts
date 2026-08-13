@@ -55,6 +55,7 @@ export type ScenarioMinAggregateOutputType = {
   supplierDelay: string | null
   priceElasticityOverride: number | null
   marketingElasticityOverride: number | null
+  roleTargetsJson: string | null
 }
 
 export type ScenarioMaxAggregateOutputType = {
@@ -70,6 +71,7 @@ export type ScenarioMaxAggregateOutputType = {
   supplierDelay: string | null
   priceElasticityOverride: number | null
   marketingElasticityOverride: number | null
+  roleTargetsJson: string | null
 }
 
 export type ScenarioCountAggregateOutputType = {
@@ -85,6 +87,7 @@ export type ScenarioCountAggregateOutputType = {
   supplierDelay: number
   priceElasticityOverride: number
   marketingElasticityOverride: number
+  roleTargetsJson: number
   _all: number
 }
 
@@ -118,6 +121,7 @@ export type ScenarioMinAggregateInputType = {
   supplierDelay?: true
   priceElasticityOverride?: true
   marketingElasticityOverride?: true
+  roleTargetsJson?: true
 }
 
 export type ScenarioMaxAggregateInputType = {
@@ -133,6 +137,7 @@ export type ScenarioMaxAggregateInputType = {
   supplierDelay?: true
   priceElasticityOverride?: true
   marketingElasticityOverride?: true
+  roleTargetsJson?: true
 }
 
 export type ScenarioCountAggregateInputType = {
@@ -148,6 +153,7 @@ export type ScenarioCountAggregateInputType = {
   supplierDelay?: true
   priceElasticityOverride?: true
   marketingElasticityOverride?: true
+  roleTargetsJson?: true
   _all?: true
 }
 
@@ -250,6 +256,7 @@ export type ScenarioGroupByOutputType = {
   supplierDelay: string
   priceElasticityOverride: number | null
   marketingElasticityOverride: number | null
+  roleTargetsJson: string | null
   _count: ScenarioCountAggregateOutputType | null
   _avg: ScenarioAvgAggregateOutputType | null
   _sum: ScenarioSumAggregateOutputType | null
@@ -288,6 +295,7 @@ export type ScenarioWhereInput = {
   supplierDelay?: Prisma.StringFilter<"Scenario"> | string
   priceElasticityOverride?: Prisma.FloatNullableFilter<"Scenario"> | number | null
   marketingElasticityOverride?: Prisma.FloatNullableFilter<"Scenario"> | number | null
+  roleTargetsJson?: Prisma.StringNullableFilter<"Scenario"> | string | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
   simulationResults?: Prisma.SimulationResultListRelationFilter
   comments?: Prisma.ScenarioCommentListRelationFilter
@@ -306,6 +314,7 @@ export type ScenarioOrderByWithRelationInput = {
   supplierDelay?: Prisma.SortOrder
   priceElasticityOverride?: Prisma.SortOrderInput | Prisma.SortOrder
   marketingElasticityOverride?: Prisma.SortOrderInput | Prisma.SortOrder
+  roleTargetsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   business?: Prisma.BusinessOrderByWithRelationInput
   simulationResults?: Prisma.SimulationResultOrderByRelationAggregateInput
   comments?: Prisma.ScenarioCommentOrderByRelationAggregateInput
@@ -327,6 +336,7 @@ export type ScenarioWhereUniqueInput = Prisma.AtLeast<{
   supplierDelay?: Prisma.StringFilter<"Scenario"> | string
   priceElasticityOverride?: Prisma.FloatNullableFilter<"Scenario"> | number | null
   marketingElasticityOverride?: Prisma.FloatNullableFilter<"Scenario"> | number | null
+  roleTargetsJson?: Prisma.StringNullableFilter<"Scenario"> | string | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
   simulationResults?: Prisma.SimulationResultListRelationFilter
   comments?: Prisma.ScenarioCommentListRelationFilter
@@ -345,6 +355,7 @@ export type ScenarioOrderByWithAggregationInput = {
   supplierDelay?: Prisma.SortOrder
   priceElasticityOverride?: Prisma.SortOrderInput | Prisma.SortOrder
   marketingElasticityOverride?: Prisma.SortOrderInput | Prisma.SortOrder
+  roleTargetsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ScenarioCountOrderByAggregateInput
   _avg?: Prisma.ScenarioAvgOrderByAggregateInput
   _max?: Prisma.ScenarioMaxOrderByAggregateInput
@@ -368,6 +379,7 @@ export type ScenarioScalarWhereWithAggregatesInput = {
   supplierDelay?: Prisma.StringWithAggregatesFilter<"Scenario"> | string
   priceElasticityOverride?: Prisma.FloatNullableWithAggregatesFilter<"Scenario"> | number | null
   marketingElasticityOverride?: Prisma.FloatNullableWithAggregatesFilter<"Scenario"> | number | null
+  roleTargetsJson?: Prisma.StringNullableWithAggregatesFilter<"Scenario"> | string | null
 }
 
 export type ScenarioCreateInput = {
@@ -382,6 +394,7 @@ export type ScenarioCreateInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
   business: Prisma.BusinessCreateNestedOneWithoutScenariosInput
   simulationResults?: Prisma.SimulationResultCreateNestedManyWithoutScenarioInput
   comments?: Prisma.ScenarioCommentCreateNestedManyWithoutScenarioInput
@@ -400,6 +413,7 @@ export type ScenarioUncheckedCreateInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
   simulationResults?: Prisma.SimulationResultUncheckedCreateNestedManyWithoutScenarioInput
   comments?: Prisma.ScenarioCommentUncheckedCreateNestedManyWithoutScenarioInput
 }
@@ -416,6 +430,7 @@ export type ScenarioUpdateInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   business?: Prisma.BusinessUpdateOneRequiredWithoutScenariosNestedInput
   simulationResults?: Prisma.SimulationResultUpdateManyWithoutScenarioNestedInput
   comments?: Prisma.ScenarioCommentUpdateManyWithoutScenarioNestedInput
@@ -434,6 +449,7 @@ export type ScenarioUncheckedUpdateInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   simulationResults?: Prisma.SimulationResultUncheckedUpdateManyWithoutScenarioNestedInput
   comments?: Prisma.ScenarioCommentUncheckedUpdateManyWithoutScenarioNestedInput
 }
@@ -451,6 +467,7 @@ export type ScenarioCreateManyInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
 }
 
 export type ScenarioUpdateManyMutationInput = {
@@ -465,6 +482,7 @@ export type ScenarioUpdateManyMutationInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ScenarioUncheckedUpdateManyInput = {
@@ -480,6 +498,7 @@ export type ScenarioUncheckedUpdateManyInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ScenarioListRelationFilter = {
@@ -505,6 +524,7 @@ export type ScenarioCountOrderByAggregateInput = {
   supplierDelay?: Prisma.SortOrder
   priceElasticityOverride?: Prisma.SortOrder
   marketingElasticityOverride?: Prisma.SortOrder
+  roleTargetsJson?: Prisma.SortOrder
 }
 
 export type ScenarioAvgOrderByAggregateInput = {
@@ -528,6 +548,7 @@ export type ScenarioMaxOrderByAggregateInput = {
   supplierDelay?: Prisma.SortOrder
   priceElasticityOverride?: Prisma.SortOrder
   marketingElasticityOverride?: Prisma.SortOrder
+  roleTargetsJson?: Prisma.SortOrder
 }
 
 export type ScenarioMinOrderByAggregateInput = {
@@ -543,6 +564,7 @@ export type ScenarioMinOrderByAggregateInput = {
   supplierDelay?: Prisma.SortOrder
   priceElasticityOverride?: Prisma.SortOrder
   marketingElasticityOverride?: Prisma.SortOrder
+  roleTargetsJson?: Prisma.SortOrder
 }
 
 export type ScenarioSumOrderByAggregateInput = {
@@ -656,6 +678,7 @@ export type ScenarioCreateWithoutBusinessInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
   simulationResults?: Prisma.SimulationResultCreateNestedManyWithoutScenarioInput
   comments?: Prisma.ScenarioCommentCreateNestedManyWithoutScenarioInput
 }
@@ -672,6 +695,7 @@ export type ScenarioUncheckedCreateWithoutBusinessInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
   simulationResults?: Prisma.SimulationResultUncheckedCreateNestedManyWithoutScenarioInput
   comments?: Prisma.ScenarioCommentUncheckedCreateNestedManyWithoutScenarioInput
 }
@@ -718,6 +742,7 @@ export type ScenarioScalarWhereInput = {
   supplierDelay?: Prisma.StringFilter<"Scenario"> | string
   priceElasticityOverride?: Prisma.FloatNullableFilter<"Scenario"> | number | null
   marketingElasticityOverride?: Prisma.FloatNullableFilter<"Scenario"> | number | null
+  roleTargetsJson?: Prisma.StringNullableFilter<"Scenario"> | string | null
 }
 
 export type ScenarioCreateWithoutCommentsInput = {
@@ -732,6 +757,7 @@ export type ScenarioCreateWithoutCommentsInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
   business: Prisma.BusinessCreateNestedOneWithoutScenariosInput
   simulationResults?: Prisma.SimulationResultCreateNestedManyWithoutScenarioInput
 }
@@ -749,6 +775,7 @@ export type ScenarioUncheckedCreateWithoutCommentsInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
   simulationResults?: Prisma.SimulationResultUncheckedCreateNestedManyWithoutScenarioInput
 }
 
@@ -780,6 +807,7 @@ export type ScenarioUpdateWithoutCommentsInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   business?: Prisma.BusinessUpdateOneRequiredWithoutScenariosNestedInput
   simulationResults?: Prisma.SimulationResultUpdateManyWithoutScenarioNestedInput
 }
@@ -797,6 +825,7 @@ export type ScenarioUncheckedUpdateWithoutCommentsInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   simulationResults?: Prisma.SimulationResultUncheckedUpdateManyWithoutScenarioNestedInput
 }
 
@@ -812,6 +841,7 @@ export type ScenarioCreateWithoutSimulationResultsInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
   business: Prisma.BusinessCreateNestedOneWithoutScenariosInput
   comments?: Prisma.ScenarioCommentCreateNestedManyWithoutScenarioInput
 }
@@ -829,6 +859,7 @@ export type ScenarioUncheckedCreateWithoutSimulationResultsInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
   comments?: Prisma.ScenarioCommentUncheckedCreateNestedManyWithoutScenarioInput
 }
 
@@ -860,6 +891,7 @@ export type ScenarioUpdateWithoutSimulationResultsInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   business?: Prisma.BusinessUpdateOneRequiredWithoutScenariosNestedInput
   comments?: Prisma.ScenarioCommentUpdateManyWithoutScenarioNestedInput
 }
@@ -877,6 +909,7 @@ export type ScenarioUncheckedUpdateWithoutSimulationResultsInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   comments?: Prisma.ScenarioCommentUncheckedUpdateManyWithoutScenarioNestedInput
 }
 
@@ -892,6 +925,7 @@ export type ScenarioCreateManyBusinessInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  roleTargetsJson?: string | null
 }
 
 export type ScenarioUpdateWithoutBusinessInput = {
@@ -906,6 +940,7 @@ export type ScenarioUpdateWithoutBusinessInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   simulationResults?: Prisma.SimulationResultUpdateManyWithoutScenarioNestedInput
   comments?: Prisma.ScenarioCommentUpdateManyWithoutScenarioNestedInput
 }
@@ -922,6 +957,7 @@ export type ScenarioUncheckedUpdateWithoutBusinessInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   simulationResults?: Prisma.SimulationResultUncheckedUpdateManyWithoutScenarioNestedInput
   comments?: Prisma.ScenarioCommentUncheckedUpdateManyWithoutScenarioNestedInput
 }
@@ -938,6 +974,7 @@ export type ScenarioUncheckedUpdateManyWithoutBusinessInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  roleTargetsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -993,6 +1030,7 @@ export type ScenarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   supplierDelay?: boolean
   priceElasticityOverride?: boolean
   marketingElasticityOverride?: boolean
+  roleTargetsJson?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
   simulationResults?: boolean | Prisma.Scenario$simulationResultsArgs<ExtArgs>
   comments?: boolean | Prisma.Scenario$commentsArgs<ExtArgs>
@@ -1012,6 +1050,7 @@ export type ScenarioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   supplierDelay?: boolean
   priceElasticityOverride?: boolean
   marketingElasticityOverride?: boolean
+  roleTargetsJson?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scenario"]>
 
@@ -1028,6 +1067,7 @@ export type ScenarioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   supplierDelay?: boolean
   priceElasticityOverride?: boolean
   marketingElasticityOverride?: boolean
+  roleTargetsJson?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scenario"]>
 
@@ -1044,9 +1084,10 @@ export type ScenarioSelectScalar = {
   supplierDelay?: boolean
   priceElasticityOverride?: boolean
   marketingElasticityOverride?: boolean
+  roleTargetsJson?: boolean
 }
 
-export type ScenarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "name" | "status" | "tenantId" | "createdAt" | "priceIncrease" | "employeeCount" | "marketingBudget" | "supplierDelay" | "priceElasticityOverride" | "marketingElasticityOverride", ExtArgs["result"]["scenario"]>
+export type ScenarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "name" | "status" | "tenantId" | "createdAt" | "priceIncrease" | "employeeCount" | "marketingBudget" | "supplierDelay" | "priceElasticityOverride" | "marketingElasticityOverride" | "roleTargetsJson", ExtArgs["result"]["scenario"]>
 export type ScenarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
   simulationResults?: boolean | Prisma.Scenario$simulationResultsArgs<ExtArgs>
@@ -1080,6 +1121,7 @@ export type $ScenarioPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     supplierDelay: string
     priceElasticityOverride: number | null
     marketingElasticityOverride: number | null
+    roleTargetsJson: string | null
   }, ExtArgs["result"]["scenario"]>
   composites: {}
 }
@@ -1518,6 +1560,7 @@ export interface ScenarioFieldRefs {
   readonly supplierDelay: Prisma.FieldRef<"Scenario", 'String'>
   readonly priceElasticityOverride: Prisma.FieldRef<"Scenario", 'Float'>
   readonly marketingElasticityOverride: Prisma.FieldRef<"Scenario", 'Float'>
+  readonly roleTargetsJson: Prisma.FieldRef<"Scenario", 'String'>
 }
     
 

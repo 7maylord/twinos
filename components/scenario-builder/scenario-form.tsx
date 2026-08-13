@@ -24,6 +24,8 @@ export default function ScenarioForm() {
   // Empty string = "use the industry default" (see lib/industry-profiles.ts).
   const [priceElasticityInput, setPriceElasticityInput] = useState('');
   const [marketingElasticityInput, setMarketingElasticityInput] = useState('');
+  const [roleBreakdown, setRoleBreakdown] = useState(false);
+  const [roleTargetCounts, setRoleTargetCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     async function fetchBusiness() {
@@ -34,6 +36,11 @@ export default function ScenarioForm() {
           setBusiness(data);
           setEmployeeCount(data.employees?.length || 0);
           setMarketingBudget(data.baselineMarketing || 0);
+          const counts: Record<string, number> = {};
+          for (const emp of data.employees || []) {
+            counts[emp.role] = (counts[emp.role] || 0) + 1;
+          }
+          setRoleTargetCounts(counts);
         }
       } catch (err) {
         console.error('Error fetching business for scenario form:', err);
@@ -57,7 +64,10 @@ export default function ScenarioForm() {
     setSupplierDelay(applied.supplierDelay);
     setPriceElasticityInput('');
     setMarketingElasticityInput('');
+    setRoleBreakdown(false);
   };
+
+  const roleTargetTotal = Object.values(roleTargetCounts).reduce((sum, c) => sum + c, 0);
 
   const handleRunSimulation = async () => {
     if (!business || !scenarioName.trim()) return;
@@ -71,12 +81,15 @@ export default function ScenarioForm() {
         body: JSON.stringify({
           name: scenarioName,
           priceIncrease,
-          employeeCount,
+          employeeCount: roleBreakdown ? roleTargetTotal : employeeCount,
           marketingBudget,
           supplierDelay,
           businessId: business.id,
           priceElasticityOverride: priceElasticityInput === '' ? undefined : Number(priceElasticityInput),
           marketingElasticityOverride: marketingElasticityInput === '' ? undefined : Number(marketingElasticityInput),
+          roleTargets: roleBreakdown
+            ? Object.entries(roleTargetCounts).map(([role, count]) => ({ role, count }))
+            : undefined,
         }),
       });
 
@@ -226,26 +239,66 @@ export default function ScenarioForm() {
         </div>
       </div>
 
-      {/* Employee Count Slider */}
+      {/* Employee Count Slider / Role Breakdown */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
           <label className="text-sm font-semibold text-gray-700">Simulated Headcount</label>
-          <span className="text-lg font-medium text-black">{employeeCount} employees</span>
+          {business && Object.keys(roleTargetCounts).length > 1 && (
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => setRoleBreakdown((v) => !v)}
+              className="text-xs font-semibold text-[#2B2644] hover:underline disabled:opacity-60"
+            >
+              {roleBreakdown ? 'Use single total instead' : 'Break down by role'}
+            </button>
+          )}
         </div>
-        <input
-          type="range"
-          min={business ? 5 : 0}
-          max="50"
-          disabled={submitting || !business}
-          value={employeeCount}
-          onChange={(e) => setEmployeeCount(Number(e.target.value))}
-          className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black disabled:opacity-60"
-        />
-        <div className="flex justify-between text-xs text-gray-400 mt-2">
-          <span>{business ? '5 employees (Min)' : '0 employees'}</span>
-          <span>{business ? `${business.employees?.length} (Baseline)` : '0 (Baseline)'}</span>
-          <span>50 employees (Max)</span>
-        </div>
+
+        {roleBreakdown ? (
+          <div className="space-y-3">
+            {Object.keys(roleTargetCounts).sort().map((role) => (
+              <div key={role} className="flex items-center justify-between gap-3">
+                <span className="text-sm text-gray-700">{role}</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="50"
+                  disabled={submitting}
+                  value={roleTargetCounts[role]}
+                  onChange={(e) =>
+                    setRoleTargetCounts((prev) => ({ ...prev, [role]: Math.max(0, Number(e.target.value)) }))
+                  }
+                  className="w-20 px-3 py-1.5 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm text-right focus:outline-none focus:border-black transition-colors disabled:opacity-60"
+                />
+              </div>
+            ))}
+            <div className="flex justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+              <span>Total simulated headcount</span>
+              <span className="font-semibold text-black">{roleTargetTotal} employees</span>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-end mb-1">
+              <span className="text-lg font-medium text-black">{employeeCount} employees</span>
+            </div>
+            <input
+              type="range"
+              min={business ? 5 : 0}
+              max="50"
+              disabled={submitting || !business}
+              value={employeeCount}
+              onChange={(e) => setEmployeeCount(Number(e.target.value))}
+              className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black disabled:opacity-60"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <span>{business ? '5 employees (Min)' : '0 employees'}</span>
+              <span>{business ? `${business.employees?.length} (Baseline)` : '0 (Baseline)'}</span>
+              <span>50 employees (Max)</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Marketing Budget Slider */}

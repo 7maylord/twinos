@@ -149,7 +149,8 @@ export const ScenarioScalarFieldEnum = {
   marketingBudget: 'marketingBudget',
   supplierDelay: 'supplierDelay',
   priceElasticityOverride: 'priceElasticityOverride',
-  marketingElasticityOverride: 'marketingElasticityOverride'
+  marketingElasticityOverride: 'marketingElasticityOverride',
+  roleTargetsJson: 'roleTargetsJson'
 } as const
 
 export type ScenarioScalarFieldEnum = (typeof ScenarioScalarFieldEnum)[keyof typeof ScenarioScalarFieldEnum]

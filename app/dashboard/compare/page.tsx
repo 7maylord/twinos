@@ -25,6 +25,7 @@ interface Scenario {
   supplierDelay: string;
   priceElasticityOverride?: number | null;
   marketingElasticityOverride?: number | null;
+  roleTargetsJson?: string | null;
 }
 
 interface MonthlyData {
