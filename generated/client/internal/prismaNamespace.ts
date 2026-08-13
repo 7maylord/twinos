@@ -389,6 +389,7 @@ export const ModelName = {
   Product: 'Product',
   Employee: 'Employee',
   Scenario: 'Scenario',
+  ScenarioComment: 'ScenarioComment',
   SimulationResult: 'SimulationResult'
 } as const
 
@@ -405,7 +406,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "business" | "product" | "employee" | "scenario" | "simulationResult"
+    modelProps: "user" | "business" | "product" | "employee" | "scenario" | "scenarioComment" | "simulationResult"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -779,6 +780,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ScenarioComment: {
+      payload: Prisma.$ScenarioCommentPayload<ExtArgs>
+      fields: Prisma.ScenarioCommentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ScenarioCommentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ScenarioCommentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload>
+        }
+        findFirst: {
+          args: Prisma.ScenarioCommentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ScenarioCommentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload>
+        }
+        findMany: {
+          args: Prisma.ScenarioCommentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload>[]
+        }
+        create: {
+          args: Prisma.ScenarioCommentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload>
+        }
+        createMany: {
+          args: Prisma.ScenarioCommentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ScenarioCommentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload>[]
+        }
+        delete: {
+          args: Prisma.ScenarioCommentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload>
+        }
+        update: {
+          args: Prisma.ScenarioCommentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload>
+        }
+        deleteMany: {
+          args: Prisma.ScenarioCommentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ScenarioCommentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ScenarioCommentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload>[]
+        }
+        upsert: {
+          args: Prisma.ScenarioCommentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioCommentPayload>
+        }
+        aggregate: {
+          args: Prisma.ScenarioCommentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateScenarioComment>
+        }
+        groupBy: {
+          args: Prisma.ScenarioCommentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScenarioCommentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ScenarioCommentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScenarioCommentCountAggregateOutputType> | number
+        }
+      }
+    }
     SimulationResult: {
       payload: Prisma.$SimulationResultPayload<ExtArgs>
       fields: Prisma.SimulationResultFieldRefs
@@ -969,6 +1044,17 @@ export const ScenarioScalarFieldEnum = {
 } as const
 
 export type ScenarioScalarFieldEnum = (typeof ScenarioScalarFieldEnum)[keyof typeof ScenarioScalarFieldEnum]
+
+
+export const ScenarioCommentScalarFieldEnum = {
+  id: 'id',
+  scenarioId: 'scenarioId',
+  authorEmail: 'authorEmail',
+  body: 'body',
+  createdAt: 'createdAt'
+} as const
+
+export type ScenarioCommentScalarFieldEnum = (typeof ScenarioCommentScalarFieldEnum)[keyof typeof ScenarioCommentScalarFieldEnum]
 
 
 export const SimulationResultScalarFieldEnum = {
@@ -1186,6 +1272,7 @@ export type GlobalOmitConfig = {
   product?: Prisma.ProductOmit
   employee?: Prisma.EmployeeOmit
   scenario?: Prisma.ScenarioOmit
+  scenarioComment?: Prisma.ScenarioCommentOmit
   simulationResult?: Prisma.SimulationResultOmit
 }
 

@@ -90,6 +90,16 @@ model Scenario {
   marketingElasticityOverride Float?
 
   simulationResults SimulationResult[]
+  comments          ScenarioComment[]
+}
+
+model ScenarioComment {
+  id         String   @id @default(uuid())
+  scenarioId String
+  scenario   Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  authorEmail String
+  body        String
+  createdAt   DateTime @default(now())
 }
 
 model SimulationResult {

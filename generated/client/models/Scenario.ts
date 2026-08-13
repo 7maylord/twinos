@@ -290,6 +290,7 @@ export type ScenarioWhereInput = {
   marketingElasticityOverride?: Prisma.FloatNullableFilter<"Scenario"> | number | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
   simulationResults?: Prisma.SimulationResultListRelationFilter
+  comments?: Prisma.ScenarioCommentListRelationFilter
 }
 
 export type ScenarioOrderByWithRelationInput = {
@@ -307,6 +308,7 @@ export type ScenarioOrderByWithRelationInput = {
   marketingElasticityOverride?: Prisma.SortOrderInput | Prisma.SortOrder
   business?: Prisma.BusinessOrderByWithRelationInput
   simulationResults?: Prisma.SimulationResultOrderByRelationAggregateInput
+  comments?: Prisma.ScenarioCommentOrderByRelationAggregateInput
 }
 
 export type ScenarioWhereUniqueInput = Prisma.AtLeast<{
@@ -327,6 +329,7 @@ export type ScenarioWhereUniqueInput = Prisma.AtLeast<{
   marketingElasticityOverride?: Prisma.FloatNullableFilter<"Scenario"> | number | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
   simulationResults?: Prisma.SimulationResultListRelationFilter
+  comments?: Prisma.ScenarioCommentListRelationFilter
 }, "id">
 
 export type ScenarioOrderByWithAggregationInput = {
@@ -381,6 +384,7 @@ export type ScenarioCreateInput = {
   marketingElasticityOverride?: number | null
   business: Prisma.BusinessCreateNestedOneWithoutScenariosInput
   simulationResults?: Prisma.SimulationResultCreateNestedManyWithoutScenarioInput
+  comments?: Prisma.ScenarioCommentCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioUncheckedCreateInput = {
@@ -397,6 +401,7 @@ export type ScenarioUncheckedCreateInput = {
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
   simulationResults?: Prisma.SimulationResultUncheckedCreateNestedManyWithoutScenarioInput
+  comments?: Prisma.ScenarioCommentUncheckedCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioUpdateInput = {
@@ -413,6 +418,7 @@ export type ScenarioUpdateInput = {
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   business?: Prisma.BusinessUpdateOneRequiredWithoutScenariosNestedInput
   simulationResults?: Prisma.SimulationResultUpdateManyWithoutScenarioNestedInput
+  comments?: Prisma.ScenarioCommentUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioUncheckedUpdateInput = {
@@ -429,6 +435,7 @@ export type ScenarioUncheckedUpdateInput = {
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   simulationResults?: Prisma.SimulationResultUncheckedUpdateManyWithoutScenarioNestedInput
+  comments?: Prisma.ScenarioCommentUncheckedUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioCreateManyInput = {
@@ -609,6 +616,20 @@ export type NullableFloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type ScenarioCreateNestedOneWithoutCommentsInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutCommentsInput, Prisma.ScenarioUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutCommentsInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+}
+
+export type ScenarioUpdateOneRequiredWithoutCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.ScenarioCreateWithoutCommentsInput, Prisma.ScenarioUncheckedCreateWithoutCommentsInput>
+  connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutCommentsInput
+  upsert?: Prisma.ScenarioUpsertWithoutCommentsInput
+  connect?: Prisma.ScenarioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ScenarioUpdateToOneWithWhereWithoutCommentsInput, Prisma.ScenarioUpdateWithoutCommentsInput>, Prisma.ScenarioUncheckedUpdateWithoutCommentsInput>
+}
+
 export type ScenarioCreateNestedOneWithoutSimulationResultsInput = {
   create?: Prisma.XOR<Prisma.ScenarioCreateWithoutSimulationResultsInput, Prisma.ScenarioUncheckedCreateWithoutSimulationResultsInput>
   connectOrCreate?: Prisma.ScenarioCreateOrConnectWithoutSimulationResultsInput
@@ -636,6 +657,7 @@ export type ScenarioCreateWithoutBusinessInput = {
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
   simulationResults?: Prisma.SimulationResultCreateNestedManyWithoutScenarioInput
+  comments?: Prisma.ScenarioCommentCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioUncheckedCreateWithoutBusinessInput = {
@@ -651,6 +673,7 @@ export type ScenarioUncheckedCreateWithoutBusinessInput = {
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
   simulationResults?: Prisma.SimulationResultUncheckedCreateNestedManyWithoutScenarioInput
+  comments?: Prisma.ScenarioCommentUncheckedCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioCreateOrConnectWithoutBusinessInput = {
@@ -697,6 +720,86 @@ export type ScenarioScalarWhereInput = {
   marketingElasticityOverride?: Prisma.FloatNullableFilter<"Scenario"> | number | null
 }
 
+export type ScenarioCreateWithoutCommentsInput = {
+  id?: string
+  name: string
+  status?: string
+  tenantId?: string | null
+  createdAt?: Date | string
+  priceIncrease?: number
+  employeeCount?: number
+  marketingBudget?: number
+  supplierDelay?: string
+  priceElasticityOverride?: number | null
+  marketingElasticityOverride?: number | null
+  business: Prisma.BusinessCreateNestedOneWithoutScenariosInput
+  simulationResults?: Prisma.SimulationResultCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioUncheckedCreateWithoutCommentsInput = {
+  id?: string
+  businessId: string
+  name: string
+  status?: string
+  tenantId?: string | null
+  createdAt?: Date | string
+  priceIncrease?: number
+  employeeCount?: number
+  marketingBudget?: number
+  supplierDelay?: string
+  priceElasticityOverride?: number | null
+  marketingElasticityOverride?: number | null
+  simulationResults?: Prisma.SimulationResultUncheckedCreateNestedManyWithoutScenarioInput
+}
+
+export type ScenarioCreateOrConnectWithoutCommentsInput = {
+  where: Prisma.ScenarioWhereUniqueInput
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutCommentsInput, Prisma.ScenarioUncheckedCreateWithoutCommentsInput>
+}
+
+export type ScenarioUpsertWithoutCommentsInput = {
+  update: Prisma.XOR<Prisma.ScenarioUpdateWithoutCommentsInput, Prisma.ScenarioUncheckedUpdateWithoutCommentsInput>
+  create: Prisma.XOR<Prisma.ScenarioCreateWithoutCommentsInput, Prisma.ScenarioUncheckedCreateWithoutCommentsInput>
+  where?: Prisma.ScenarioWhereInput
+}
+
+export type ScenarioUpdateToOneWithWhereWithoutCommentsInput = {
+  where?: Prisma.ScenarioWhereInput
+  data: Prisma.XOR<Prisma.ScenarioUpdateWithoutCommentsInput, Prisma.ScenarioUncheckedUpdateWithoutCommentsInput>
+}
+
+export type ScenarioUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  priceIncrease?: Prisma.FloatFieldUpdateOperationsInput | number
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  marketingBudget?: Prisma.FloatFieldUpdateOperationsInput | number
+  supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
+  priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  business?: Prisma.BusinessUpdateOneRequiredWithoutScenariosNestedInput
+  simulationResults?: Prisma.SimulationResultUpdateManyWithoutScenarioNestedInput
+}
+
+export type ScenarioUncheckedUpdateWithoutCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  businessId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  priceIncrease?: Prisma.FloatFieldUpdateOperationsInput | number
+  employeeCount?: Prisma.IntFieldUpdateOperationsInput | number
+  marketingBudget?: Prisma.FloatFieldUpdateOperationsInput | number
+  supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
+  priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  simulationResults?: Prisma.SimulationResultUncheckedUpdateManyWithoutScenarioNestedInput
+}
+
 export type ScenarioCreateWithoutSimulationResultsInput = {
   id?: string
   name: string
@@ -710,6 +813,7 @@ export type ScenarioCreateWithoutSimulationResultsInput = {
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
   business: Prisma.BusinessCreateNestedOneWithoutScenariosInput
+  comments?: Prisma.ScenarioCommentCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioUncheckedCreateWithoutSimulationResultsInput = {
@@ -725,6 +829,7 @@ export type ScenarioUncheckedCreateWithoutSimulationResultsInput = {
   supplierDelay?: string
   priceElasticityOverride?: number | null
   marketingElasticityOverride?: number | null
+  comments?: Prisma.ScenarioCommentUncheckedCreateNestedManyWithoutScenarioInput
 }
 
 export type ScenarioCreateOrConnectWithoutSimulationResultsInput = {
@@ -756,6 +861,7 @@ export type ScenarioUpdateWithoutSimulationResultsInput = {
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   business?: Prisma.BusinessUpdateOneRequiredWithoutScenariosNestedInput
+  comments?: Prisma.ScenarioCommentUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioUncheckedUpdateWithoutSimulationResultsInput = {
@@ -771,6 +877,7 @@ export type ScenarioUncheckedUpdateWithoutSimulationResultsInput = {
   supplierDelay?: Prisma.StringFieldUpdateOperationsInput | string
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  comments?: Prisma.ScenarioCommentUncheckedUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioCreateManyBusinessInput = {
@@ -800,6 +907,7 @@ export type ScenarioUpdateWithoutBusinessInput = {
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   simulationResults?: Prisma.SimulationResultUpdateManyWithoutScenarioNestedInput
+  comments?: Prisma.ScenarioCommentUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioUncheckedUpdateWithoutBusinessInput = {
@@ -815,6 +923,7 @@ export type ScenarioUncheckedUpdateWithoutBusinessInput = {
   priceElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   marketingElasticityOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   simulationResults?: Prisma.SimulationResultUncheckedUpdateManyWithoutScenarioNestedInput
+  comments?: Prisma.ScenarioCommentUncheckedUpdateManyWithoutScenarioNestedInput
 }
 
 export type ScenarioUncheckedUpdateManyWithoutBusinessInput = {
@@ -838,10 +947,12 @@ export type ScenarioUncheckedUpdateManyWithoutBusinessInput = {
 
 export type ScenarioCountOutputType = {
   simulationResults: number
+  comments: number
 }
 
 export type ScenarioCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   simulationResults?: boolean | ScenarioCountOutputTypeCountSimulationResultsArgs
+  comments?: boolean | ScenarioCountOutputTypeCountCommentsArgs
 }
 
 /**
@@ -861,6 +972,13 @@ export type ScenarioCountOutputTypeCountSimulationResultsArgs<ExtArgs extends ru
   where?: Prisma.SimulationResultWhereInput
 }
 
+/**
+ * ScenarioCountOutputType without action
+ */
+export type ScenarioCountOutputTypeCountCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScenarioCommentWhereInput
+}
+
 
 export type ScenarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -877,6 +995,7 @@ export type ScenarioSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   marketingElasticityOverride?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
   simulationResults?: boolean | Prisma.Scenario$simulationResultsArgs<ExtArgs>
+  comments?: boolean | Prisma.Scenario$commentsArgs<ExtArgs>
   _count?: boolean | Prisma.ScenarioCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scenario"]>
 
@@ -931,6 +1050,7 @@ export type ScenarioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type ScenarioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
   simulationResults?: boolean | Prisma.Scenario$simulationResultsArgs<ExtArgs>
+  comments?: boolean | Prisma.Scenario$commentsArgs<ExtArgs>
   _count?: boolean | Prisma.ScenarioCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ScenarioIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -945,6 +1065,7 @@ export type $ScenarioPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     business: Prisma.$BusinessPayload<ExtArgs>
     simulationResults: Prisma.$SimulationResultPayload<ExtArgs>[]
+    comments: Prisma.$ScenarioCommentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1355,6 +1476,7 @@ export interface Prisma__ScenarioClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   business<T extends Prisma.BusinessDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BusinessDefaultArgs<ExtArgs>>): Prisma.Prisma__BusinessClient<runtime.Types.Result.GetResult<Prisma.$BusinessPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   simulationResults<T extends Prisma.Scenario$simulationResultsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scenario$simulationResultsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SimulationResultPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  comments<T extends Prisma.Scenario$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scenario$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScenarioCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1818,6 +1940,30 @@ export type Scenario$simulationResultsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.SimulationResultScalarFieldEnum | Prisma.SimulationResultScalarFieldEnum[]
+}
+
+/**
+ * Scenario.comments
+ */
+export type Scenario$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScenarioComment
+   */
+  select?: Prisma.ScenarioCommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScenarioComment
+   */
+  omit?: Prisma.ScenarioCommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScenarioCommentInclude<ExtArgs> | null
+  where?: Prisma.ScenarioCommentWhereInput
+  orderBy?: Prisma.ScenarioCommentOrderByWithRelationInput | Prisma.ScenarioCommentOrderByWithRelationInput[]
+  cursor?: Prisma.ScenarioCommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ScenarioCommentScalarFieldEnum | Prisma.ScenarioCommentScalarFieldEnum[]
 }
 
 /**
