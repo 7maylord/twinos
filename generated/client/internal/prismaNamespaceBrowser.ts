@@ -175,6 +175,9 @@ export const SimulationResultScalarFieldEnum = {
   projectedHeadcount: 'projectedHeadcount',
   projectedInventoryRisk: 'projectedInventoryRisk',
   monthlyDataJson: 'monthlyDataJson',
+  actualRevenue: 'actualRevenue',
+  actualProfit: 'actualProfit',
+  actualCapturedAt: 'actualCapturedAt',
   tenantId: 'tenantId',
   generatedAt: 'generatedAt'
 } as const

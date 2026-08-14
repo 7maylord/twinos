@@ -11,6 +11,7 @@ import { AIRecommendationCard } from '@/components/results/ai-recommendation-car
 import { ExplainPopover } from '@/components/results/explain-popover';
 import { ScenarioComments } from '@/components/results/scenario-comments';
 import { CashFlowChart } from '@/components/results/cashflow-chart';
+import { PredictedVsActualCard } from '@/components/results/predicted-vs-actual-card';
 import { runSimulationWithConfidenceBand } from '@/lib/simulation-engine';
 import { projectCashFlow, type CashFlowProjection } from '@/lib/cashflow-engine';
 
@@ -45,6 +46,9 @@ interface SimulationResultRecord {
   projectedProfit: number;
   projectedHeadcount: number;
   projectedInventoryRisk: number;
+  actualRevenue?: number | null;
+  actualProfit?: number | null;
+  actualCapturedAt?: string | null;
 }
 
 interface SimulationExplain {
@@ -429,6 +433,17 @@ function ResultsContent() {
             </>
           );
         })()}
+
+        {/* Predicted vs. Actual (only once enough time has passed and a sync has backfilled it) */}
+        {result.actualRevenue != null && result.actualProfit != null && result.actualCapturedAt && (
+          <PredictedVsActualCard
+            projectedRevenue={result.projectedRevenue}
+            projectedProfit={result.projectedProfit}
+            actualRevenue={result.actualRevenue}
+            actualProfit={result.actualProfit}
+            actualCapturedAt={result.actualCapturedAt}
+          />
+        )}
 
         {/* Impact Metrics */}
         <ImpactMetrics

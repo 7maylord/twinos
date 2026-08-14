@@ -16,6 +16,7 @@ const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.ho
     employee: {
       findFirst: vi.fn(),
       create: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
     },
   },
 }));
@@ -31,6 +32,9 @@ vi.mock('@/lib/integrations/quickbooks', () => ({
 vi.mock('@/lib/encryption', () => ({
   encrypt: vi.fn((v: string) => `enc:${v}`),
   decrypt: vi.fn((v: string) => v.replace('enc:', '')),
+}));
+vi.mock('@/lib/predicted-vs-actual', () => ({
+  backfillActuals: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { POST as qboPost } from '@/app/api/integrations/quickbooks/sync/route';

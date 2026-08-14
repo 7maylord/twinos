@@ -2,6 +2,25 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
 import { getValidQboToken } from '@/lib/integrations/quickbooks';
+import { backfillActuals } from '@/lib/predicted-vs-actual';
+
+// QuickBooks is the only sync that touches real financials (Shopify/Square
+// sync products/employees, not baselineRevenue) — so it's the only one that
+// can meaningfully backfill "what actually happened" against predictions.
+// Takes the already-updated business record (prisma.update() already returns
+// every field) rather than re-fetching it.
+async function backfillActualsForBusiness(business: {
+  id: string;
+  baselineRevenue: number;
+  baselineMarketing: number;
+  baselineInventory: number;
+  baselineFixedCosts: number;
+}) {
+  const employees = await prisma.employee.findMany({ where: { businessId: business.id }, select: { salary: true } });
+  const payroll = employees.reduce((sum, e) => sum + e.salary, 0);
+  const actualProfit = business.baselineRevenue - payroll - business.baselineMarketing - business.baselineInventory - business.baselineFixedCosts;
+  await backfillActuals(business.id, business.baselineRevenue, actualProfit);
+}
 
 export async function POST(request: Request) {
   try {
@@ -71,6 +90,11 @@ export async function POST(request: Request) {
         });
 
         console.log('[QBO Sync] Business twin baselines updated with live report stats.');
+        try {
+          await backfillActualsForBusiness(updated);
+        } catch (err) {
+          console.error('[QBO Sync] Failed backfilling predicted-vs-actual:', err);
+        }
         return NextResponse.json({
           success: true,
           message: 'QuickBooks live financial reports synced successfully.',
@@ -94,6 +118,11 @@ export async function POST(request: Request) {
     });
 
     console.log('[QBO Sync] Business twin updated with mock baseline values.');
+    try {
+      await backfillActualsForBusiness(updated);
+    } catch (err) {
+      console.error('[QBO Sync] Failed backfilling predicted-vs-actual:', err);
+    }
     return NextResponse.json({
       success: true,
       message: 'QuickBooks financial reports synced successfully.',

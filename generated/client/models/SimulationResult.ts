@@ -31,6 +31,8 @@ export type SimulationResultAvgAggregateOutputType = {
   projectedProfit: number | null
   projectedHeadcount: number | null
   projectedInventoryRisk: number | null
+  actualRevenue: number | null
+  actualProfit: number | null
 }
 
 export type SimulationResultSumAggregateOutputType = {
@@ -38,6 +40,8 @@ export type SimulationResultSumAggregateOutputType = {
   projectedProfit: number | null
   projectedHeadcount: number | null
   projectedInventoryRisk: number | null
+  actualRevenue: number | null
+  actualProfit: number | null
 }
 
 export type SimulationResultMinAggregateOutputType = {
@@ -48,6 +52,9 @@ export type SimulationResultMinAggregateOutputType = {
   projectedHeadcount: number | null
   projectedInventoryRisk: number | null
   monthlyDataJson: string | null
+  actualRevenue: number | null
+  actualProfit: number | null
+  actualCapturedAt: Date | null
   tenantId: string | null
   generatedAt: Date | null
 }
@@ -60,6 +67,9 @@ export type SimulationResultMaxAggregateOutputType = {
   projectedHeadcount: number | null
   projectedInventoryRisk: number | null
   monthlyDataJson: string | null
+  actualRevenue: number | null
+  actualProfit: number | null
+  actualCapturedAt: Date | null
   tenantId: string | null
   generatedAt: Date | null
 }
@@ -72,6 +82,9 @@ export type SimulationResultCountAggregateOutputType = {
   projectedHeadcount: number
   projectedInventoryRisk: number
   monthlyDataJson: number
+  actualRevenue: number
+  actualProfit: number
+  actualCapturedAt: number
   tenantId: number
   generatedAt: number
   _all: number
@@ -83,6 +96,8 @@ export type SimulationResultAvgAggregateInputType = {
   projectedProfit?: true
   projectedHeadcount?: true
   projectedInventoryRisk?: true
+  actualRevenue?: true
+  actualProfit?: true
 }
 
 export type SimulationResultSumAggregateInputType = {
@@ -90,6 +105,8 @@ export type SimulationResultSumAggregateInputType = {
   projectedProfit?: true
   projectedHeadcount?: true
   projectedInventoryRisk?: true
+  actualRevenue?: true
+  actualProfit?: true
 }
 
 export type SimulationResultMinAggregateInputType = {
@@ -100,6 +117,9 @@ export type SimulationResultMinAggregateInputType = {
   projectedHeadcount?: true
   projectedInventoryRisk?: true
   monthlyDataJson?: true
+  actualRevenue?: true
+  actualProfit?: true
+  actualCapturedAt?: true
   tenantId?: true
   generatedAt?: true
 }
@@ -112,6 +132,9 @@ export type SimulationResultMaxAggregateInputType = {
   projectedHeadcount?: true
   projectedInventoryRisk?: true
   monthlyDataJson?: true
+  actualRevenue?: true
+  actualProfit?: true
+  actualCapturedAt?: true
   tenantId?: true
   generatedAt?: true
 }
@@ -124,6 +147,9 @@ export type SimulationResultCountAggregateInputType = {
   projectedHeadcount?: true
   projectedInventoryRisk?: true
   monthlyDataJson?: true
+  actualRevenue?: true
+  actualProfit?: true
+  actualCapturedAt?: true
   tenantId?: true
   generatedAt?: true
   _all?: true
@@ -223,6 +249,9 @@ export type SimulationResultGroupByOutputType = {
   projectedHeadcount: number
   projectedInventoryRisk: number
   monthlyDataJson: string
+  actualRevenue: number | null
+  actualProfit: number | null
+  actualCapturedAt: Date | null
   tenantId: string | null
   generatedAt: Date
   _count: SimulationResultCountAggregateOutputType | null
@@ -258,6 +287,9 @@ export type SimulationResultWhereInput = {
   projectedHeadcount?: Prisma.IntFilter<"SimulationResult"> | number
   projectedInventoryRisk?: Prisma.FloatFilter<"SimulationResult"> | number
   monthlyDataJson?: Prisma.StringFilter<"SimulationResult"> | string
+  actualRevenue?: Prisma.FloatNullableFilter<"SimulationResult"> | number | null
+  actualProfit?: Prisma.FloatNullableFilter<"SimulationResult"> | number | null
+  actualCapturedAt?: Prisma.DateTimeNullableFilter<"SimulationResult"> | Date | string | null
   tenantId?: Prisma.StringNullableFilter<"SimulationResult"> | string | null
   generatedAt?: Prisma.DateTimeFilter<"SimulationResult"> | Date | string
   scenario?: Prisma.XOR<Prisma.ScenarioScalarRelationFilter, Prisma.ScenarioWhereInput>
@@ -271,6 +303,9 @@ export type SimulationResultOrderByWithRelationInput = {
   projectedHeadcount?: Prisma.SortOrder
   projectedInventoryRisk?: Prisma.SortOrder
   monthlyDataJson?: Prisma.SortOrder
+  actualRevenue?: Prisma.SortOrderInput | Prisma.SortOrder
+  actualProfit?: Prisma.SortOrderInput | Prisma.SortOrder
+  actualCapturedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   tenantId?: Prisma.SortOrderInput | Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   scenario?: Prisma.ScenarioOrderByWithRelationInput
@@ -287,6 +322,9 @@ export type SimulationResultWhereUniqueInput = Prisma.AtLeast<{
   projectedHeadcount?: Prisma.IntFilter<"SimulationResult"> | number
   projectedInventoryRisk?: Prisma.FloatFilter<"SimulationResult"> | number
   monthlyDataJson?: Prisma.StringFilter<"SimulationResult"> | string
+  actualRevenue?: Prisma.FloatNullableFilter<"SimulationResult"> | number | null
+  actualProfit?: Prisma.FloatNullableFilter<"SimulationResult"> | number | null
+  actualCapturedAt?: Prisma.DateTimeNullableFilter<"SimulationResult"> | Date | string | null
   tenantId?: Prisma.StringNullableFilter<"SimulationResult"> | string | null
   generatedAt?: Prisma.DateTimeFilter<"SimulationResult"> | Date | string
   scenario?: Prisma.XOR<Prisma.ScenarioScalarRelationFilter, Prisma.ScenarioWhereInput>
@@ -300,6 +338,9 @@ export type SimulationResultOrderByWithAggregationInput = {
   projectedHeadcount?: Prisma.SortOrder
   projectedInventoryRisk?: Prisma.SortOrder
   monthlyDataJson?: Prisma.SortOrder
+  actualRevenue?: Prisma.SortOrderInput | Prisma.SortOrder
+  actualProfit?: Prisma.SortOrderInput | Prisma.SortOrder
+  actualCapturedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   tenantId?: Prisma.SortOrderInput | Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
   _count?: Prisma.SimulationResultCountOrderByAggregateInput
@@ -320,6 +361,9 @@ export type SimulationResultScalarWhereWithAggregatesInput = {
   projectedHeadcount?: Prisma.IntWithAggregatesFilter<"SimulationResult"> | number
   projectedInventoryRisk?: Prisma.FloatWithAggregatesFilter<"SimulationResult"> | number
   monthlyDataJson?: Prisma.StringWithAggregatesFilter<"SimulationResult"> | string
+  actualRevenue?: Prisma.FloatNullableWithAggregatesFilter<"SimulationResult"> | number | null
+  actualProfit?: Prisma.FloatNullableWithAggregatesFilter<"SimulationResult"> | number | null
+  actualCapturedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SimulationResult"> | Date | string | null
   tenantId?: Prisma.StringNullableWithAggregatesFilter<"SimulationResult"> | string | null
   generatedAt?: Prisma.DateTimeWithAggregatesFilter<"SimulationResult"> | Date | string
 }
@@ -331,6 +375,9 @@ export type SimulationResultCreateInput = {
   projectedHeadcount: number
   projectedInventoryRisk: number
   monthlyDataJson: string
+  actualRevenue?: number | null
+  actualProfit?: number | null
+  actualCapturedAt?: Date | string | null
   tenantId?: string | null
   generatedAt?: Date | string
   scenario: Prisma.ScenarioCreateNestedOneWithoutSimulationResultsInput
@@ -344,6 +391,9 @@ export type SimulationResultUncheckedCreateInput = {
   projectedHeadcount: number
   projectedInventoryRisk: number
   monthlyDataJson: string
+  actualRevenue?: number | null
+  actualProfit?: number | null
+  actualCapturedAt?: Date | string | null
   tenantId?: string | null
   generatedAt?: Date | string
 }
@@ -355,6 +405,9 @@ export type SimulationResultUpdateInput = {
   projectedHeadcount?: Prisma.IntFieldUpdateOperationsInput | number
   projectedInventoryRisk?: Prisma.FloatFieldUpdateOperationsInput | number
   monthlyDataJson?: Prisma.StringFieldUpdateOperationsInput | string
+  actualRevenue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   scenario?: Prisma.ScenarioUpdateOneRequiredWithoutSimulationResultsNestedInput
@@ -368,6 +421,9 @@ export type SimulationResultUncheckedUpdateInput = {
   projectedHeadcount?: Prisma.IntFieldUpdateOperationsInput | number
   projectedInventoryRisk?: Prisma.FloatFieldUpdateOperationsInput | number
   monthlyDataJson?: Prisma.StringFieldUpdateOperationsInput | string
+  actualRevenue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -380,6 +436,9 @@ export type SimulationResultCreateManyInput = {
   projectedHeadcount: number
   projectedInventoryRisk: number
   monthlyDataJson: string
+  actualRevenue?: number | null
+  actualProfit?: number | null
+  actualCapturedAt?: Date | string | null
   tenantId?: string | null
   generatedAt?: Date | string
 }
@@ -391,6 +450,9 @@ export type SimulationResultUpdateManyMutationInput = {
   projectedHeadcount?: Prisma.IntFieldUpdateOperationsInput | number
   projectedInventoryRisk?: Prisma.FloatFieldUpdateOperationsInput | number
   monthlyDataJson?: Prisma.StringFieldUpdateOperationsInput | string
+  actualRevenue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -403,6 +465,9 @@ export type SimulationResultUncheckedUpdateManyInput = {
   projectedHeadcount?: Prisma.IntFieldUpdateOperationsInput | number
   projectedInventoryRisk?: Prisma.FloatFieldUpdateOperationsInput | number
   monthlyDataJson?: Prisma.StringFieldUpdateOperationsInput | string
+  actualRevenue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -425,6 +490,9 @@ export type SimulationResultCountOrderByAggregateInput = {
   projectedHeadcount?: Prisma.SortOrder
   projectedInventoryRisk?: Prisma.SortOrder
   monthlyDataJson?: Prisma.SortOrder
+  actualRevenue?: Prisma.SortOrder
+  actualProfit?: Prisma.SortOrder
+  actualCapturedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
 }
@@ -434,6 +502,8 @@ export type SimulationResultAvgOrderByAggregateInput = {
   projectedProfit?: Prisma.SortOrder
   projectedHeadcount?: Prisma.SortOrder
   projectedInventoryRisk?: Prisma.SortOrder
+  actualRevenue?: Prisma.SortOrder
+  actualProfit?: Prisma.SortOrder
 }
 
 export type SimulationResultMaxOrderByAggregateInput = {
@@ -444,6 +514,9 @@ export type SimulationResultMaxOrderByAggregateInput = {
   projectedHeadcount?: Prisma.SortOrder
   projectedInventoryRisk?: Prisma.SortOrder
   monthlyDataJson?: Prisma.SortOrder
+  actualRevenue?: Prisma.SortOrder
+  actualProfit?: Prisma.SortOrder
+  actualCapturedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
 }
@@ -456,6 +529,9 @@ export type SimulationResultMinOrderByAggregateInput = {
   projectedHeadcount?: Prisma.SortOrder
   projectedInventoryRisk?: Prisma.SortOrder
   monthlyDataJson?: Prisma.SortOrder
+  actualRevenue?: Prisma.SortOrder
+  actualProfit?: Prisma.SortOrder
+  actualCapturedAt?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   generatedAt?: Prisma.SortOrder
 }
@@ -465,6 +541,8 @@ export type SimulationResultSumOrderByAggregateInput = {
   projectedProfit?: Prisma.SortOrder
   projectedHeadcount?: Prisma.SortOrder
   projectedInventoryRisk?: Prisma.SortOrder
+  actualRevenue?: Prisma.SortOrder
+  actualProfit?: Prisma.SortOrder
 }
 
 export type SimulationResultCreateNestedManyWithoutScenarioInput = {
@@ -516,6 +594,9 @@ export type SimulationResultCreateWithoutScenarioInput = {
   projectedHeadcount: number
   projectedInventoryRisk: number
   monthlyDataJson: string
+  actualRevenue?: number | null
+  actualProfit?: number | null
+  actualCapturedAt?: Date | string | null
   tenantId?: string | null
   generatedAt?: Date | string
 }
@@ -527,6 +608,9 @@ export type SimulationResultUncheckedCreateWithoutScenarioInput = {
   projectedHeadcount: number
   projectedInventoryRisk: number
   monthlyDataJson: string
+  actualRevenue?: number | null
+  actualProfit?: number | null
+  actualCapturedAt?: Date | string | null
   tenantId?: string | null
   generatedAt?: Date | string
 }
@@ -568,6 +652,9 @@ export type SimulationResultScalarWhereInput = {
   projectedHeadcount?: Prisma.IntFilter<"SimulationResult"> | number
   projectedInventoryRisk?: Prisma.FloatFilter<"SimulationResult"> | number
   monthlyDataJson?: Prisma.StringFilter<"SimulationResult"> | string
+  actualRevenue?: Prisma.FloatNullableFilter<"SimulationResult"> | number | null
+  actualProfit?: Prisma.FloatNullableFilter<"SimulationResult"> | number | null
+  actualCapturedAt?: Prisma.DateTimeNullableFilter<"SimulationResult"> | Date | string | null
   tenantId?: Prisma.StringNullableFilter<"SimulationResult"> | string | null
   generatedAt?: Prisma.DateTimeFilter<"SimulationResult"> | Date | string
 }
@@ -579,6 +666,9 @@ export type SimulationResultCreateManyScenarioInput = {
   projectedHeadcount: number
   projectedInventoryRisk: number
   monthlyDataJson: string
+  actualRevenue?: number | null
+  actualProfit?: number | null
+  actualCapturedAt?: Date | string | null
   tenantId?: string | null
   generatedAt?: Date | string
 }
@@ -590,6 +680,9 @@ export type SimulationResultUpdateWithoutScenarioInput = {
   projectedHeadcount?: Prisma.IntFieldUpdateOperationsInput | number
   projectedInventoryRisk?: Prisma.FloatFieldUpdateOperationsInput | number
   monthlyDataJson?: Prisma.StringFieldUpdateOperationsInput | string
+  actualRevenue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -601,6 +694,9 @@ export type SimulationResultUncheckedUpdateWithoutScenarioInput = {
   projectedHeadcount?: Prisma.IntFieldUpdateOperationsInput | number
   projectedInventoryRisk?: Prisma.FloatFieldUpdateOperationsInput | number
   monthlyDataJson?: Prisma.StringFieldUpdateOperationsInput | string
+  actualRevenue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -612,6 +708,9 @@ export type SimulationResultUncheckedUpdateManyWithoutScenarioInput = {
   projectedHeadcount?: Prisma.IntFieldUpdateOperationsInput | number
   projectedInventoryRisk?: Prisma.FloatFieldUpdateOperationsInput | number
   monthlyDataJson?: Prisma.StringFieldUpdateOperationsInput | string
+  actualRevenue?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualProfit?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  actualCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   generatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -626,6 +725,9 @@ export type SimulationResultSelect<ExtArgs extends runtime.Types.Extensions.Inte
   projectedHeadcount?: boolean
   projectedInventoryRisk?: boolean
   monthlyDataJson?: boolean
+  actualRevenue?: boolean
+  actualProfit?: boolean
+  actualCapturedAt?: boolean
   tenantId?: boolean
   generatedAt?: boolean
   scenario?: boolean | Prisma.ScenarioDefaultArgs<ExtArgs>
@@ -639,6 +741,9 @@ export type SimulationResultSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   projectedHeadcount?: boolean
   projectedInventoryRisk?: boolean
   monthlyDataJson?: boolean
+  actualRevenue?: boolean
+  actualProfit?: boolean
+  actualCapturedAt?: boolean
   tenantId?: boolean
   generatedAt?: boolean
   scenario?: boolean | Prisma.ScenarioDefaultArgs<ExtArgs>
@@ -652,6 +757,9 @@ export type SimulationResultSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   projectedHeadcount?: boolean
   projectedInventoryRisk?: boolean
   monthlyDataJson?: boolean
+  actualRevenue?: boolean
+  actualProfit?: boolean
+  actualCapturedAt?: boolean
   tenantId?: boolean
   generatedAt?: boolean
   scenario?: boolean | Prisma.ScenarioDefaultArgs<ExtArgs>
@@ -665,11 +773,14 @@ export type SimulationResultSelectScalar = {
   projectedHeadcount?: boolean
   projectedInventoryRisk?: boolean
   monthlyDataJson?: boolean
+  actualRevenue?: boolean
+  actualProfit?: boolean
+  actualCapturedAt?: boolean
   tenantId?: boolean
   generatedAt?: boolean
 }
 
-export type SimulationResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scenarioId" | "projectedRevenue" | "projectedProfit" | "projectedHeadcount" | "projectedInventoryRisk" | "monthlyDataJson" | "tenantId" | "generatedAt", ExtArgs["result"]["simulationResult"]>
+export type SimulationResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "scenarioId" | "projectedRevenue" | "projectedProfit" | "projectedHeadcount" | "projectedInventoryRisk" | "monthlyDataJson" | "actualRevenue" | "actualProfit" | "actualCapturedAt" | "tenantId" | "generatedAt", ExtArgs["result"]["simulationResult"]>
 export type SimulationResultInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   scenario?: boolean | Prisma.ScenarioDefaultArgs<ExtArgs>
 }
@@ -693,6 +804,9 @@ export type $SimulationResultPayload<ExtArgs extends runtime.Types.Extensions.In
     projectedHeadcount: number
     projectedInventoryRisk: number
     monthlyDataJson: string
+    actualRevenue: number | null
+    actualProfit: number | null
+    actualCapturedAt: Date | null
     tenantId: string | null
     generatedAt: Date
   }, ExtArgs["result"]["simulationResult"]>
@@ -1126,6 +1240,9 @@ export interface SimulationResultFieldRefs {
   readonly projectedHeadcount: Prisma.FieldRef<"SimulationResult", 'Int'>
   readonly projectedInventoryRisk: Prisma.FieldRef<"SimulationResult", 'Float'>
   readonly monthlyDataJson: Prisma.FieldRef<"SimulationResult", 'String'>
+  readonly actualRevenue: Prisma.FieldRef<"SimulationResult", 'Float'>
+  readonly actualProfit: Prisma.FieldRef<"SimulationResult", 'Float'>
+  readonly actualCapturedAt: Prisma.FieldRef<"SimulationResult", 'DateTime'>
   readonly tenantId: Prisma.FieldRef<"SimulationResult", 'String'>
   readonly generatedAt: Prisma.FieldRef<"SimulationResult", 'DateTime'>
 }

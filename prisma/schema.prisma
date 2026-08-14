@@ -123,7 +123,14 @@ model SimulationResult {
   // Detailed projection metrics (stored as JSON string)
   // For rendering monthly charts: baseline vs projected
   monthlyDataJson   String   // Stores stringified JSON array
-  
+
+  // Backfilled once ~6 months have elapsed since generatedAt (every stored run
+  // uses the default 6-month horizon — see lib/predicted-vs-actual.ts) and the
+  // business's integrations sync fresh data. Null until then.
+  actualRevenue     Float?
+  actualProfit      Float?
+  actualCapturedAt  DateTime?
+
   tenantId          String?
   generatedAt       DateTime @default(now())
 }
