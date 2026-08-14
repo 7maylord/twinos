@@ -8,7 +8,9 @@ import { ProfitComparisonChart } from '@/components/results/profit-comparison-ch
 import { ImpactMetrics } from '@/components/results/impact-metrics';
 import { AIRecommendationCard } from '@/components/results/ai-recommendation-card';
 import { ExplainPopover } from '@/components/results/explain-popover';
+import { CashFlowChart } from '@/components/results/cashflow-chart';
 import { runSimulationWithConfidenceBand } from '@/lib/simulation-engine';
+import { projectCashFlow, type CashFlowProjection } from '@/lib/cashflow-engine';
 
 interface Business {
   id: string;
@@ -67,6 +69,7 @@ interface SimulationData {
     projectedFixedCosts?: number;
   }[];
   explain?: SimulationExplain;
+  cashFlow?: CashFlowProjection;
   recommendation?: {
     summary: string;
     headline: string;
@@ -328,6 +331,9 @@ function ShareContent() {
           };
 
           const chartData = getChartData();
+          const cashFlow = horizon === '6m' && data.cashFlow
+            ? data.cashFlow
+            : projectCashFlow({ baselineRevenue: business.baselineRevenue }, chartData);
 
           return (
             <>
@@ -375,6 +381,8 @@ function ShareContent() {
                 <RevenueComparisonChart data={chartData} />
                 <ProfitComparisonChart data={chartData} />
               </div>
+
+              <CashFlowChart cashFlow={cashFlow} />
             </>
           );
         })()}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { runSimulationWithConfidenceBand, computeRoleSalaries, RoleTarget } from '@/lib/simulation-engine';
+import { projectCashFlow } from '@/lib/cashflow-engine';
 
 export async function GET(
   request: Request,
@@ -118,6 +119,8 @@ export async function GET(
       };
     });
 
+    const cashFlow = projectCashFlow({ baselineRevenue: business.baselineRevenue }, monthlyData);
+
     return NextResponse.json({
       scenario: { ...scenario, business },
       result: latestResult,
@@ -129,6 +132,7 @@ export async function GET(
         projectedProfitHigh: confidenceBand.projectedProfitHigh,
       },
       explain: confidenceBand.expected.explain,
+      cashFlow,
     });
   } catch (error: any) {
     console.error('Error fetching scenario results:', error);
