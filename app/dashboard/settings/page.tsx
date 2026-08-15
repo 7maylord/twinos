@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
 import { Plus, Trash2, Tag, Users, ShieldAlert, Upload, Download, AlertCircle, FileSpreadsheet, Pencil, Check, X } from 'lucide-react';
@@ -11,6 +11,10 @@ interface Product {
   name: string;
   price: number;
   cost: number;
+  unitsSoldPerMonth?: number | null;
+  unitsInStock?: number | null;
+  reorderPoint?: number | null;
+  leadTimeDays?: number | null;
 }
 
 interface Employee {
@@ -56,6 +60,10 @@ export default function SettingsPage() {
   const [editProdName, setEditProdName] = useState('');
   const [editProdPrice, setEditProdPrice] = useState('');
   const [editProdCost, setEditProdCost] = useState('');
+  const [editProdUnitsSold, setEditProdUnitsSold] = useState('');
+  const [editProdUnitsInStock, setEditProdUnitsInStock] = useState('');
+  const [editProdReorderPoint, setEditProdReorderPoint] = useState('');
+  const [editProdLeadTime, setEditProdLeadTime] = useState('');
   const [savingProduct, setSavingProduct] = useState(false);
 
   const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null);
@@ -482,6 +490,10 @@ export default function SettingsPage() {
     setEditProdName(product.name);
     setEditProdPrice(String(product.price));
     setEditProdCost(String(product.cost));
+    setEditProdUnitsSold(product.unitsSoldPerMonth != null ? String(product.unitsSoldPerMonth) : '');
+    setEditProdUnitsInStock(product.unitsInStock != null ? String(product.unitsInStock) : '');
+    setEditProdReorderPoint(product.reorderPoint != null ? String(product.reorderPoint) : '');
+    setEditProdLeadTime(product.leadTimeDays != null ? String(product.leadTimeDays) : '');
   };
 
   const cancelEditProduct = () => {
@@ -500,6 +512,10 @@ export default function SettingsPage() {
           name: editProdName,
           price: Number(editProdPrice),
           cost: Number(editProdCost),
+          unitsSoldPerMonth: editProdUnitsSold,
+          unitsInStock: editProdUnitsInStock,
+          reorderPoint: editProdReorderPoint,
+          leadTimeDays: editProdLeadTime,
         }),
       });
       if (res.ok) {
@@ -802,7 +818,8 @@ export default function SettingsPage() {
                         const margin = ((product.price - product.cost) / (product.price || 1)) * 100;
                         const isEditing = editingProductId === product.id;
                         return (
-                          <tr key={product.id} className="text-sm">
+                        <React.Fragment key={product.id}>
+                          <tr className="text-sm">
                             <td className="py-3.5 font-medium text-black">
                               {isEditing ? (
                                 <input type="text" value={editProdName} onChange={(e) => setEditProdName(e.target.value)} className="w-full px-2 py-1 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm focus:outline-none focus:border-black transition-colors" />
@@ -843,6 +860,34 @@ export default function SettingsPage() {
                               )}
                             </td>
                           </tr>
+                        {isEditing && (
+                          <tr className="text-xs bg-[#F5F5F5]">
+                            <td colSpan={5} className="py-3 px-2">
+                              <p className="text-gray-400 font-semibold uppercase tracking-wider mb-2">
+                                Volume &amp; Inventory (optional — enables per-product pricing scenarios and stockout risk)
+                              </p>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div>
+                                  <label className="block text-gray-500 mb-1">Units Sold / Month</label>
+                                  <input type="number" min="0" value={editProdUnitsSold} onChange={(e) => setEditProdUnitsSold(e.target.value)} className="w-full px-2 py-1 bg-white border border-gray-200 rounded-lg text-black focus:outline-none focus:border-black transition-colors" />
+                                </div>
+                                <div>
+                                  <label className="block text-gray-500 mb-1">Units In Stock</label>
+                                  <input type="number" min="0" value={editProdUnitsInStock} onChange={(e) => setEditProdUnitsInStock(e.target.value)} className="w-full px-2 py-1 bg-white border border-gray-200 rounded-lg text-black focus:outline-none focus:border-black transition-colors" />
+                                </div>
+                                <div>
+                                  <label className="block text-gray-500 mb-1">Reorder Point</label>
+                                  <input type="number" min="0" value={editProdReorderPoint} onChange={(e) => setEditProdReorderPoint(e.target.value)} className="w-full px-2 py-1 bg-white border border-gray-200 rounded-lg text-black focus:outline-none focus:border-black transition-colors" />
+                                </div>
+                                <div>
+                                  <label className="block text-gray-500 mb-1">Supplier Lead Time (days)</label>
+                                  <input type="number" min="0" value={editProdLeadTime} onChange={(e) => setEditProdLeadTime(e.target.value)} className="w-full px-2 py-1 bg-white border border-gray-200 rounded-lg text-black focus:outline-none focus:border-black transition-colors" />
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                        </React.Fragment>
                         );
                       })}
                       {business.products.length === 0 && (
