@@ -18,11 +18,49 @@ export interface BaselineMetrics {
   // averageEmployeeSalary. Computed server-side from real employee records —
   // never sent to the client (see app/api/scenarios/[id]/results/route.ts).
   roleSalaries?: Record<string, number>;
+  // Product catalog with real sales volume. Only include products that have
+  // unitsSoldPerMonth set — callers filter before passing this in. When
+  // present and non-empty, revenue is decomposed per-product (price x volume,
+  // each with its own price-driven demand response) instead of treating
+  // baselineRevenue as one scalar. Absent/empty => identical behavior to
+  // before this existed.
+  products?: ProductBaseline[];
+}
+
+export interface ProductBaseline {
+  id: string;
+  name: string;
+  price: number;
+  unitsSoldPerMonth: number;
+  unitsInStock?: number | null;
+  reorderPoint?: number | null;
+  leadTimeDays?: number | null;
 }
 
 export interface RoleTarget {
   role: string;
   count: number;
+}
+
+export interface ProductAdjustment {
+  productId: string;
+  priceIncrease: number; // percent, same convention as the blanket lever
+}
+
+export interface ProductRevenueBreakdown {
+  productId: string;
+  productName: string;
+  priceIncrease: number;
+  demandMultiplier: number;
+  revenue: number;
+}
+
+export interface ProductInventoryStatus {
+  productId: string;
+  productName: string;
+  daysOfStockRemaining: number | null; // null when the product has no stock/volume data to compute from
+  atRisk: boolean; // stock would run out before a reorder could arrive, given supplier delay
+  belowReorderPoint: boolean; // current stock has already crossed the configured reorder threshold
 }
 
 export interface ScenarioAdjustments {
@@ -36,6 +74,10 @@ export interface ScenarioAdjustments {
   // employeeCount x one blended averageEmployeeSalary, and projectedHeadcount
   // becomes the sum of these counts.
   roleTargets?: RoleTarget[];
+  // Optional per-product price overrides. A product not listed here uses the
+  // blanket priceIncrease. Only takes effect when BaselineMetrics.products is
+  // also provided (there's nothing to decompose otherwise).
+  productAdjustments?: ProductAdjustment[];
 }
 
 export interface MonthlyProjection {
@@ -51,6 +93,10 @@ export interface MonthlyProjection {
   projectedInventoryCost: number;
   projectedFixedCosts: number;
   seasonalFactor: number;
+  // Present only when BaselineMetrics.products was provided — per-product
+  // revenue for this period. Varies by period (unlike SimulationExplain's
+  // constants) since each product's price/demand math is period-specific.
+  productBreakdown?: ProductRevenueBreakdown[];
 }
 
 // The assumption chain behind every period's projectedRevenue: baselineRevenue
@@ -72,6 +118,9 @@ export interface SimulationOutput {
   projectedInventoryRisk: number;
   monthlyData: MonthlyProjection[];
   explain: SimulationExplain;
+  // Per-product stockout risk — only for products with unitsInStock AND
+  // leadTimeDays set. Present only when BaselineMetrics.products was provided.
+  productInventory?: ProductInventoryStatus[];
 }
 
 export function runSimulation(
@@ -89,6 +138,7 @@ export function runSimulation(
     priceElasticityOverride,
     marketingElasticityOverride,
     roleSalaries,
+    products,
   } = baseline;
 
   const {
@@ -97,6 +147,7 @@ export function runSimulation(
     marketingBudget,
     supplierDelay,
     roleTargets,
+    productAdjustments,
   } = adjustments;
 
   // Role-costed payroll: each role's target headcount x that role's own
@@ -129,6 +180,20 @@ export function runSimulation(
   const priceDemandImpact = -(priceIncrease / 100) * priceElasticityCoefficient;
   const demandMultiplier = Math.max(0.2, 1 + priceDemandImpact + marketingDemandImpact);
 
+  // Product catalog decomposition: when a real per-product sales volume
+  // catalog is available, revenue is the sum of each product's own price x
+  // volume x its own price-driven demand response, instead of one scalar
+  // baselineRevenue x one blanket priceMultiplier. A product without an
+  // explicit override uses the blanket priceIncrease.
+  const hasProductCatalog = !!products && products.length > 0;
+  const getProductPricing = (product: ProductBaseline) => {
+    const override = productAdjustments?.find((pa) => pa.productId === product.id);
+    const productPriceIncrease = override ? override.priceIncrease : priceIncrease;
+    const productPriceDemandImpact = -(productPriceIncrease / 100) * priceElasticityCoefficient;
+    const productDemandMultiplier = Math.max(0.2, 1 + productPriceDemandImpact + marketingDemandImpact);
+    return { productPriceIncrease, productDemandMultiplier };
+  };
+
   // 2. Define seasonal factors and scale divisor based on forecast horizon selection
   const horizon = adjustments.horizon || '6m';
   let periods: string[] = [];
@@ -156,11 +221,40 @@ export function runSimulation(
 
   const monthlyData: MonthlyProjection[] = periods.map((month, index) => {
     const sFactor = seasonalFactors[index];
-
-    // Baseline calculation for this period
-    const monthBaselineRevenue = (baselineRevenue / divisor) * sFactor;
     const baselinePayroll = (baselineHeadcount * averageEmployeeSalary) / divisor;
-    
+
+    let monthBaselineRevenue: number;
+    let monthProjectedRevenue: number;
+    let productBreakdown: ProductRevenueBreakdown[] | undefined;
+
+    if (hasProductCatalog) {
+      let totalBaseline = 0;
+      let totalProjected = 0;
+      const breakdown: ProductRevenueBreakdown[] = [];
+      for (const product of products!) {
+        const { productPriceIncrease, productDemandMultiplier } = getProductPricing(product);
+        const productPriceMultiplier = 1 + productPriceIncrease / 100;
+        const productMonthlyBase = (product.price * product.unitsSoldPerMonth) / divisor;
+        const productBaselineRevenue = productMonthlyBase * sFactor;
+        const productProjectedRevenue = productMonthlyBase * productPriceMultiplier * productDemandMultiplier * sFactor;
+        totalBaseline += productBaselineRevenue;
+        totalProjected += productProjectedRevenue;
+        breakdown.push({
+          productId: product.id,
+          productName: product.name,
+          priceIncrease: productPriceIncrease,
+          demandMultiplier: productDemandMultiplier,
+          revenue: Math.round(productProjectedRevenue),
+        });
+      }
+      monthBaselineRevenue = totalBaseline;
+      monthProjectedRevenue = totalProjected;
+      productBreakdown = breakdown;
+    } else {
+      monthBaselineRevenue = (baselineRevenue / divisor) * sFactor;
+      monthProjectedRevenue = (baselineRevenue / divisor) * priceMultiplier * demandMultiplier * sFactor;
+    }
+
     const monthBaselineProfit =
       monthBaselineRevenue -
       baselinePayroll -
@@ -168,11 +262,11 @@ export function runSimulation(
       (baselineInventory / divisor) -
       (baselineFixedCosts / divisor);
 
-    // Projected calculation for this period
-    const monthProjectedRevenue = (baselineRevenue / divisor) * priceMultiplier * demandMultiplier * sFactor;
     const projectedPayroll = monthlyRolePayroll / divisor;
-    
-    // Inventory costs scale with demand
+
+    // Inventory costs scale with the overall (business-level) demand
+    // multiplier — this is the aggregate cost line, distinct from the
+    // per-product stockout risk computed below.
     const projectedInventoryCost = (baselineInventory / divisor) * demandMultiplier;
 
     const monthProjectedProfit =
@@ -193,6 +287,7 @@ export function runSimulation(
       projectedInventoryCost: Math.round(projectedInventoryCost),
       projectedFixedCosts: Math.round(baselineFixedCosts / divisor),
       seasonalFactor: sFactor,
+      productBreakdown,
     };
   });
 
@@ -208,12 +303,38 @@ export function runSimulation(
   const inventoryRiskRaw = 0.5 * demandMultiplier * (1 + delayFactor);
   const projectedInventoryRisk = Math.min(1.0, Math.max(0.05, inventoryRiskRaw));
 
+  // Per-product stockout risk: only for products with both unitsInStock and
+  // leadTimeDays set (some products may lack inventory data even when the
+  // catalog itself is present — e.g. a service line item with no stock).
+  let productInventory: ProductInventoryStatus[] | undefined;
+  if (hasProductCatalog) {
+    productInventory = products!
+      .filter((p) => p.unitsInStock != null && p.leadTimeDays != null)
+      .map((product) => {
+        const { productDemandMultiplier } = getProductPricing(product);
+        const dailyBurnRate = (product.unitsSoldPerMonth * productDemandMultiplier) / 30;
+        const daysOfStockRemaining = dailyBurnRate > 0 ? product.unitsInStock! / dailyBurnRate : null;
+        // Supplier delays lengthen the effective wait for a reorder to arrive.
+        const effectiveLeadTimeDays = product.leadTimeDays! * (1 + delayFactor);
+        const atRisk = daysOfStockRemaining !== null && daysOfStockRemaining < effectiveLeadTimeDays;
+        const belowReorderPoint = product.reorderPoint != null && product.unitsInStock! <= product.reorderPoint;
+        return {
+          productId: product.id,
+          productName: product.name,
+          daysOfStockRemaining: daysOfStockRemaining !== null ? Math.round(daysOfStockRemaining) : null,
+          atRisk,
+          belowReorderPoint,
+        };
+      });
+  }
+
   return {
     projectedRevenue: divisor > 1 ? Math.round(finalMonth.projectedRevenue * divisor) : finalMonth.projectedRevenue,
     projectedProfit: divisor > 1 ? Math.round(finalMonth.projectedProfit * divisor) : finalMonth.projectedProfit,
     projectedHeadcount: effectiveEmployeeCount,
     projectedInventoryRisk: parseFloat(projectedInventoryRisk.toFixed(2)),
     monthlyData,
+    productInventory,
     explain: {
       priceElasticityCoefficient,
       marketingElasticityCoefficient,

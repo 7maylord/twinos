@@ -350,6 +350,136 @@ async function main() {
     assert.strictEqual(finalMonth.projectedPayroll, 5000);
   });
 
+  await test('Simulation Engine - product catalog absent behaves identically to before (regression guard)', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000,
+    };
+    const adjustments = { priceIncrease: 10, employeeCount: 10, marketingBudget: 10000, supplierDelay: 'none' };
+
+    const withoutProductsKey = runSimulation(baseline, adjustments);
+    const withEmptyProducts = runSimulation({ ...baseline, products: [] }, adjustments);
+
+    assert.strictEqual(withoutProductsKey.projectedRevenue, withEmptyProducts.projectedRevenue);
+    assert.strictEqual(withEmptyProducts.productInventory, undefined);
+    assert.strictEqual(withEmptyProducts.monthlyData[0].productBreakdown, undefined);
+  });
+
+  await test('Simulation Engine - product catalog revenue sums per-product price x volume', () => {
+    const baseline = {
+      baselineRevenue: 999999, // should be ignored entirely when a product catalog is present
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000,
+      products: [
+        { id: 'p1', name: 'Espresso', price: 4.5, unitsSoldPerMonth: 1000 },
+        { id: 'p2', name: 'Latte', price: 5.5, unitsSoldPerMonth: 800 },
+      ],
+    };
+    const adjustments = { priceIncrease: 0, employeeCount: 10, marketingBudget: 10000, supplierDelay: 'none' };
+
+    const output = runSimulation(baseline, adjustments);
+    const finalMonth = output.monthlyData[output.monthlyData.length - 1];
+
+    // At 0% price increase and 0 marketing delta, demand multiplier is 1, so
+    // baseline revenue for the final month (seasonal factor 1.20 for Jun in
+    // the default 6m curve) should equal exactly (4.5*1000 + 5.5*800) * 1.20.
+    const expectedRevenue = Math.round((4.5 * 1000 + 5.5 * 800) * 1.20);
+    assert.strictEqual(finalMonth.projectedRevenue, expectedRevenue);
+    assert.ok(finalMonth.productBreakdown);
+    assert.strictEqual(finalMonth.productBreakdown!.length, 2);
+  });
+
+  await test('Simulation Engine - per-product price override only affects that product, blanket rate applies to the rest', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000,
+      products: [
+        { id: 'p1', name: 'Espresso', price: 4.5, unitsSoldPerMonth: 1000 },
+        { id: 'p2', name: 'Latte', price: 5.5, unitsSoldPerMonth: 800 },
+      ],
+    };
+    const adjustments = {
+      priceIncrease: 5, // blanket rate for products without an override
+      employeeCount: 10,
+      marketingBudget: 10000,
+      supplierDelay: 'none',
+      productAdjustments: [{ productId: 'p1', priceIncrease: 20 }],
+    };
+
+    const output = runSimulation(baseline, adjustments);
+    const finalMonth = output.monthlyData[output.monthlyData.length - 1];
+    const espresso = finalMonth.productBreakdown!.find((p) => p.productId === 'p1')!;
+    const latte = finalMonth.productBreakdown!.find((p) => p.productId === 'p2')!;
+
+    assert.strictEqual(espresso.priceIncrease, 20);
+    assert.strictEqual(latte.priceIncrease, 5); // falls back to the blanket rate
+  });
+
+  await test('Simulation Engine - per-product stockout risk flags products correctly, skips products with no inventory data', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000,
+      products: [
+        // Sells 300/month, only 20 units in stock, 14-day lead time -> will stock out before reorder arrives.
+        { id: 'p1', name: 'Croissant', price: 4.0, unitsSoldPerMonth: 300, unitsInStock: 20, reorderPoint: 50, leadTimeDays: 14 },
+        // Plenty of runway.
+        { id: 'p2', name: 'Tote Bag', price: 15.0, unitsSoldPerMonth: 10, unitsInStock: 500, reorderPoint: 20, leadTimeDays: 14 },
+        // No inventory data at all — should be excluded entirely.
+        { id: 'p3', name: 'Consulting Hour', price: 100.0, unitsSoldPerMonth: 20 },
+      ],
+    };
+    const adjustments = { priceIncrease: 0, employeeCount: 10, marketingBudget: 10000, supplierDelay: 'none' };
+
+    const output = runSimulation(baseline, adjustments);
+
+    assert.strictEqual(output.productInventory!.length, 2);
+    const croissant = output.productInventory!.find((p) => p.productId === 'p1')!;
+    const toteBag = output.productInventory!.find((p) => p.productId === 'p2')!;
+
+    assert.strictEqual(croissant.atRisk, true);
+    assert.strictEqual(croissant.belowReorderPoint, true); // 20 in stock <= 50 reorder point
+    assert.strictEqual(toteBag.atRisk, false);
+    assert.strictEqual(toteBag.belowReorderPoint, false);
+    assert.strictEqual(output.productInventory!.some((p) => p.productId === 'p3'), false);
+  });
+
+  await test('Simulation Engine - a supplier delay lengthens the effective lead time, increasing stockout risk', () => {
+    const baseline = {
+      baselineRevenue: 100000,
+      baselineMarketing: 10000,
+      baselineInventory: 15000,
+      baselineFixedCosts: 20000,
+      baselineHeadcount: 10,
+      averageEmployeeSalary: 4000,
+      products: [
+        { id: 'p1', name: 'Widget', price: 10, unitsSoldPerMonth: 300, unitsInStock: 160, reorderPoint: 50, leadTimeDays: 14 },
+      ],
+    };
+
+    const noDelay = runSimulation(baseline, { priceIncrease: 0, employeeCount: 10, marketingBudget: 10000, supplierDelay: 'none' });
+    const severeDelay = runSimulation(baseline, { priceIncrease: 0, employeeCount: 10, marketingBudget: 10000, supplierDelay: 'severe' });
+
+    // Same stock and burn rate, but a severe delay lengthens the effective
+    // lead time enough to flip a previously-safe product to at-risk.
+    assert.strictEqual(noDelay.productInventory![0].atRisk, false);
+    assert.strictEqual(severeDelay.productInventory![0].atRisk, true);
+  });
+
   // 2. Hill Climbing & Optimization Engine Tests
   await test('Hill Climbing - Change cost calculation penalties', () => {
     const baseMarketing = 10000;
