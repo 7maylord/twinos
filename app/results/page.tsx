@@ -12,6 +12,7 @@ import { ExplainPopover } from '@/components/results/explain-popover';
 import { ScenarioComments } from '@/components/results/scenario-comments';
 import { CashFlowChart } from '@/components/results/cashflow-chart';
 import { PredictedVsActualCard } from '@/components/results/predicted-vs-actual-card';
+import { ProductInventoryPanel } from '@/components/results/product-inventory-panel';
 import { runSimulationWithConfidenceBand } from '@/lib/simulation-engine';
 import { projectCashFlow, type CashFlowProjection } from '@/lib/cashflow-engine';
 
@@ -59,6 +60,22 @@ interface SimulationExplain {
   marketingDeltaPercent: number;
 }
 
+interface ProductRevenueBreakdown {
+  productId: string;
+  productName: string;
+  priceIncrease: number;
+  demandMultiplier: number;
+  revenue: number;
+}
+
+interface ProductInventoryStatus {
+  productId: string;
+  productName: string;
+  daysOfStockRemaining: number | null;
+  atRisk: boolean;
+  belowReorderPoint: boolean;
+}
+
 interface SimulationData {
   scenario: Scenario & { business: Business };
   result: SimulationResultRecord;
@@ -73,9 +90,11 @@ interface SimulationData {
     projectedMarketingCost?: number;
     projectedInventoryCost?: number;
     projectedFixedCosts?: number;
+    productBreakdown?: ProductRevenueBreakdown[];
   }[];
   explain?: SimulationExplain;
   cashFlow?: CashFlowProjection;
+  productInventory?: ProductInventoryStatus[];
   recommendation?: {
     summary: string;
     headline: string;
@@ -261,7 +280,19 @@ function ResultsContent() {
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:border-gray-300 transition-colors">
             <div className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center">
               Revenue Impact
-              {data.explain && (
+              {data.explain && finalMonthData.productBreakdown && finalMonthData.productBreakdown.length > 0 ? (
+                <ExplainPopover
+                  title="How Projected Revenue is calculated (per product)"
+                  formula="sum of (product price × units sold × price multiplier × demand multiplier)"
+                  rows={[
+                    ...finalMonthData.productBreakdown.map((p) => ({
+                      label: `${p.productName} (+${p.priceIncrease}%)`,
+                      value: `$${p.revenue.toLocaleString()}`,
+                    })),
+                    { label: '= Projected Revenue', value: `$${projectedRevenue.toLocaleString()}` },
+                  ]}
+                />
+              ) : data.explain && (
                 <ExplainPopover
                   title={
                     scenario.priceElasticityOverride != null || scenario.marketingElasticityOverride != null
@@ -433,6 +464,11 @@ function ResultsContent() {
             </>
           );
         })()}
+
+        {/* Per-product stockout risk */}
+        {data.productInventory && data.productInventory.length > 0 && (
+          <ProductInventoryPanel products={data.productInventory} />
+        )}
 
         {/* Predicted vs. Actual (only once enough time has passed and a sync has backfilled it) */}
         {result.actualRevenue != null && result.actualProfit != null && result.actualCapturedAt && (
