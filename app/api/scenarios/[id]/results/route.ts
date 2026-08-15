@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { runSimulationWithConfidenceBand, computeRoleSalaries, RoleTarget } from '@/lib/simulation-engine';
+import { runSimulationWithConfidenceBand, computeRoleSalaries, RoleTarget, ProductAdjustment, ProductBaseline } from '@/lib/simulation-engine';
 import { projectCashFlow } from '@/lib/cashflow-engine';
 
 export async function GET(
@@ -29,6 +29,10 @@ export async function GET(
             // scenarios (computeRoleSalaries below) — employees is destructured
             // out below and never reaches the response.
             employees: { select: { salary: true, role: true } },
+            // cost is deliberately excluded (margin data) — products is
+            // destructured out below and never reaches the response either;
+            // only the derived productBreakdown/productInventory do.
+            products: { select: { id: true, name: true, price: true, unitsSoldPerMonth: true, unitsInStock: true, reorderPoint: true, leadTimeDays: true } },
           },
         },
         simulationResults: {
@@ -37,6 +41,7 @@ export async function GET(
           },
           take: 1,
         },
+        productAdjustments: true,
       },
     });
 
@@ -57,10 +62,26 @@ export async function GET(
       console.error('Failed to parse monthly data json:', e);
     }
 
-    const { employees, ...businessRest } = scenario.business;
+    const { employees, products, ...businessRest } = scenario.business;
     const employeeCount = employees.length;
     const totalPayroll = employees.reduce((sum, e) => sum + e.salary, 0);
     const business = { ...businessRest, employeeCount, totalPayroll };
+
+    const productsWithVolume: ProductBaseline[] = products
+      .filter((p) => p.unitsSoldPerMonth != null)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        unitsSoldPerMonth: p.unitsSoldPerMonth!,
+        unitsInStock: p.unitsInStock,
+        reorderPoint: p.reorderPoint,
+        leadTimeDays: p.leadTimeDays,
+      }));
+    const storedProductAdjustments: ProductAdjustment[] = scenario.productAdjustments.map((pa) => ({
+      productId: pa.productId,
+      priceIncrease: pa.priceIncrease,
+    }));
 
     // Confidence band: reruns the deterministic engine with the elasticity
     // assumption perturbed +/-25% to show a low/high range alongside the
@@ -88,6 +109,7 @@ export async function GET(
         priceElasticityOverride: scenario.priceElasticityOverride,
         marketingElasticityOverride: scenario.marketingElasticityOverride,
         roleSalaries: computeRoleSalaries(employees),
+        products: productsWithVolume,
       },
       {
         priceIncrease: scenario.priceIncrease,
@@ -95,6 +117,7 @@ export async function GET(
         marketingBudget: scenario.marketingBudget,
         supplierDelay: scenario.supplierDelay,
         roleTargets: storedRoleTargets,
+        productAdjustments: storedProductAdjustments,
       }
     );
 
@@ -116,6 +139,7 @@ export async function GET(
         projectedMarketingCost: band?.projectedMarketingCost,
         projectedInventoryCost: band?.projectedInventoryCost,
         projectedFixedCosts: band?.projectedFixedCosts,
+        productBreakdown: band?.productBreakdown,
       };
     });
 
@@ -125,6 +149,7 @@ export async function GET(
       scenario: { ...scenario, business },
       result: latestResult,
       monthlyData: monthlyDataWithBand,
+      productInventory: confidenceBand.expected.productInventory,
       confidenceBand: {
         projectedRevenueLow: confidenceBand.projectedRevenueLow,
         projectedRevenueHigh: confidenceBand.projectedRevenueHigh,

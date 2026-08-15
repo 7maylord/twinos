@@ -389,6 +389,7 @@ export const ModelName = {
   Product: 'Product',
   Employee: 'Employee',
   Scenario: 'Scenario',
+  ScenarioProductAdjustment: 'ScenarioProductAdjustment',
   ScenarioComment: 'ScenarioComment',
   SimulationResult: 'SimulationResult'
 } as const
@@ -406,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "business" | "product" | "employee" | "scenario" | "scenarioComment" | "simulationResult"
+    modelProps: "user" | "business" | "product" | "employee" | "scenario" | "scenarioProductAdjustment" | "scenarioComment" | "simulationResult"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -780,6 +781,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ScenarioProductAdjustment: {
+      payload: Prisma.$ScenarioProductAdjustmentPayload<ExtArgs>
+      fields: Prisma.ScenarioProductAdjustmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ScenarioProductAdjustmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ScenarioProductAdjustmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload>
+        }
+        findFirst: {
+          args: Prisma.ScenarioProductAdjustmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ScenarioProductAdjustmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload>
+        }
+        findMany: {
+          args: Prisma.ScenarioProductAdjustmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload>[]
+        }
+        create: {
+          args: Prisma.ScenarioProductAdjustmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload>
+        }
+        createMany: {
+          args: Prisma.ScenarioProductAdjustmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ScenarioProductAdjustmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload>[]
+        }
+        delete: {
+          args: Prisma.ScenarioProductAdjustmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload>
+        }
+        update: {
+          args: Prisma.ScenarioProductAdjustmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.ScenarioProductAdjustmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ScenarioProductAdjustmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ScenarioProductAdjustmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.ScenarioProductAdjustmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ScenarioProductAdjustmentPayload>
+        }
+        aggregate: {
+          args: Prisma.ScenarioProductAdjustmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateScenarioProductAdjustment>
+        }
+        groupBy: {
+          args: Prisma.ScenarioProductAdjustmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScenarioProductAdjustmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ScenarioProductAdjustmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ScenarioProductAdjustmentCountAggregateOutputType> | number
+        }
+      }
+    }
     ScenarioComment: {
       payload: Prisma.$ScenarioCommentPayload<ExtArgs>
       fields: Prisma.ScenarioCommentFieldRefs
@@ -1009,7 +1084,11 @@ export const ProductScalarFieldEnum = {
   name: 'name',
   price: 'price',
   cost: 'cost',
-  tenantId: 'tenantId'
+  tenantId: 'tenantId',
+  unitsSoldPerMonth: 'unitsSoldPerMonth',
+  unitsInStock: 'unitsInStock',
+  reorderPoint: 'reorderPoint',
+  leadTimeDays: 'leadTimeDays'
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
@@ -1045,6 +1124,16 @@ export const ScenarioScalarFieldEnum = {
 } as const
 
 export type ScenarioScalarFieldEnum = (typeof ScenarioScalarFieldEnum)[keyof typeof ScenarioScalarFieldEnum]
+
+
+export const ScenarioProductAdjustmentScalarFieldEnum = {
+  id: 'id',
+  scenarioId: 'scenarioId',
+  productId: 'productId',
+  priceIncrease: 'priceIncrease'
+} as const
+
+export type ScenarioProductAdjustmentScalarFieldEnum = (typeof ScenarioProductAdjustmentScalarFieldEnum)[keyof typeof ScenarioProductAdjustmentScalarFieldEnum]
 
 
 export const ScenarioCommentScalarFieldEnum = {
@@ -1276,6 +1365,7 @@ export type GlobalOmitConfig = {
   product?: Prisma.ProductOmit
   employee?: Prisma.EmployeeOmit
   scenario?: Prisma.ScenarioOmit
+  scenarioProductAdjustment?: Prisma.ScenarioProductAdjustmentOmit
   scenarioComment?: Prisma.ScenarioCommentOmit
   simulationResult?: Prisma.SimulationResultOmit
 }

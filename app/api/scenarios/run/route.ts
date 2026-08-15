@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
-import { runSimulation, computeRoleSalaries, RoleTarget } from '@/lib/simulation-engine';
+import { runSimulation, computeRoleSalaries, RoleTarget, ProductAdjustment, ProductBaseline } from '@/lib/simulation-engine';
 import { cacheForecast } from '@/lib/dynamodb';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    let { scenarioId, name, priceIncrease, employeeCount, marketingBudget, supplierDelay, businessId, priceElasticityOverride, marketingElasticityOverride, roleTargets } = body;
+    let { scenarioId, name, priceIncrease, employeeCount, marketingBudget, supplierDelay, businessId, priceElasticityOverride, marketingElasticityOverride, roleTargets, productAdjustments } = body;
 
     // Sanitize role targets: drop malformed entries rather than reject the
     // whole request, and cap the list length as a defensive bound.
@@ -18,6 +18,16 @@ export async function POST(request: Request) {
           .map((rt: any) => ({ role: rt.role.trim(), count: Math.round(Number(rt.count)) }))
       : undefined;
     const roleTargetsJson = sanitizedRoleTargets && sanitizedRoleTargets.length > 0 ? JSON.stringify(sanitizedRoleTargets) : undefined;
+
+    // Sanitize product adjustments the same way — drop malformed entries,
+    // cap the list length. Ownership of each productId is verified below by
+    // scoping the create to products actually belonging to the target business.
+    const sanitizedProductAdjustments: ProductAdjustment[] = Array.isArray(productAdjustments)
+      ? productAdjustments
+          .filter((pa: any) => typeof pa?.productId === 'string' && pa.productId.trim() && Number.isFinite(Number(pa.priceIncrease)))
+          .slice(0, 50)
+          .map((pa: any) => ({ productId: pa.productId.trim(), priceIncrease: Math.min(50, Math.max(0, Number(pa.priceIncrease))) }))
+      : [];
 
     // Elasticity coefficients are conceptually 0 (fully inelastic) to ~2 (highly
     // elastic); clamp so a bad/adversarial input can't push economically
@@ -35,7 +45,10 @@ export async function POST(request: Request) {
     if (scenarioId) {
       scenario = await prisma.scenario.findUnique({
         where: { id: scenarioId },
-        include: { business: { include: { employees: true } } },
+        include: {
+          business: { include: { employees: true, products: true } },
+          productAdjustments: true,
+        },
       });
       if (!scenario || !(await verifyBusinessOwnership(scenario.businessId))) {
         return NextResponse.json({ error: 'Scenario not found' }, { status: 404 });
@@ -56,6 +69,17 @@ export async function POST(request: Request) {
         }
         targetBusinessId = activeBusiness.id;
       }
+
+      // Only keep adjustments for products that actually belong to this
+      // business — a stray/foreign productId would just never match anything
+      // in the engine's own product loop, but there's no reason to persist it.
+      const ownedProducts = await prisma.product.findMany({
+        where: { businessId: targetBusinessId },
+        select: { id: true },
+      });
+      const ownedProductIds = new Set(ownedProducts.map((p) => p.id));
+      const validProductAdjustments = sanitizedProductAdjustments.filter((pa) => ownedProductIds.has(pa.productId));
+
       scenario = await prisma.scenario.create({
         data: {
           businessId: targetBusinessId,
@@ -68,8 +92,14 @@ export async function POST(request: Request) {
           marketingElasticityOverride,
           roleTargetsJson,
           status: 'PENDING',
+          productAdjustments: {
+            create: validProductAdjustments.map((pa) => ({ productId: pa.productId, priceIncrease: pa.priceIncrease })),
+          },
         },
-        include: { business: { include: { employees: true } } },
+        include: {
+          business: { include: { employees: true, products: true } },
+          productAdjustments: true,
+        },
       });
       scenarioId = scenario.id;
     }
@@ -88,6 +118,23 @@ export async function POST(request: Request) {
       }
     }
 
+    // Only products with real sales volume participate in per-product revenue.
+    const productsWithVolume: ProductBaseline[] = business.products
+      .filter((p) => p.unitsSoldPerMonth != null)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        unitsSoldPerMonth: p.unitsSoldPerMonth!,
+        unitsInStock: p.unitsInStock,
+        reorderPoint: p.reorderPoint,
+        leadTimeDays: p.leadTimeDays,
+      }));
+    const storedProductAdjustments: ProductAdjustment[] = scenario.productAdjustments.map((pa) => ({
+      productId: pa.productId,
+      priceIncrease: pa.priceIncrease,
+    }));
+
     // Run the simulation calculations
     const simulationOutput = runSimulation(
       {
@@ -101,6 +148,7 @@ export async function POST(request: Request) {
         priceElasticityOverride: scenario.priceElasticityOverride,
         marketingElasticityOverride: scenario.marketingElasticityOverride,
         roleSalaries: computeRoleSalaries(employees),
+        products: productsWithVolume,
       },
       {
         priceIncrease: scenario.priceIncrease,
@@ -108,6 +156,7 @@ export async function POST(request: Request) {
         marketingBudget: scenario.marketingBudget,
         supplierDelay: scenario.supplierDelay,
         roleTargets: storedRoleTargets,
+        productAdjustments: storedProductAdjustments,
       }
     );
 

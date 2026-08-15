@@ -70,7 +70,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { id, name, price, cost } = body;
+    const { id, name, price, cost, unitsSoldPerMonth, unitsInStock, reorderPoint, leadTimeDays } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
@@ -86,10 +86,25 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
+    // Empty string means "clear this optional field" (nullable columns).
+    const parseOptionalNumber = (value: unknown): number | null | undefined => {
+      if (value === undefined) return undefined;
+      if (value === null || value === '') return null;
+      const num = Number(value);
+      return Number.isFinite(num) ? num : undefined;
+    };
+
     const updateData: Record<string, any> = {};
     if (name !== undefined) updateData.name = name;
     if (price !== undefined) updateData.price = Number(price);
     if (cost !== undefined) updateData.cost = Number(cost);
+    if (unitsSoldPerMonth !== undefined) updateData.unitsSoldPerMonth = parseOptionalNumber(unitsSoldPerMonth);
+    if (unitsInStock !== undefined) updateData.unitsInStock = parseOptionalNumber(unitsInStock);
+    if (reorderPoint !== undefined) updateData.reorderPoint = parseOptionalNumber(reorderPoint);
+    if (leadTimeDays !== undefined) {
+      const parsed = parseOptionalNumber(leadTimeDays);
+      updateData.leadTimeDays = parsed != null ? Math.round(parsed) : parsed;
+    }
 
     const product = await prisma.product.update({
       where: { id },

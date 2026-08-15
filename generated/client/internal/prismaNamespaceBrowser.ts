@@ -56,6 +56,7 @@ export const ModelName = {
   Product: 'Product',
   Employee: 'Employee',
   Scenario: 'Scenario',
+  ScenarioProductAdjustment: 'ScenarioProductAdjustment',
   ScenarioComment: 'ScenarioComment',
   SimulationResult: 'SimulationResult'
 } as const
@@ -118,7 +119,11 @@ export const ProductScalarFieldEnum = {
   name: 'name',
   price: 'price',
   cost: 'cost',
-  tenantId: 'tenantId'
+  tenantId: 'tenantId',
+  unitsSoldPerMonth: 'unitsSoldPerMonth',
+  unitsInStock: 'unitsInStock',
+  reorderPoint: 'reorderPoint',
+  leadTimeDays: 'leadTimeDays'
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
@@ -154,6 +159,16 @@ export const ScenarioScalarFieldEnum = {
 } as const
 
 export type ScenarioScalarFieldEnum = (typeof ScenarioScalarFieldEnum)[keyof typeof ScenarioScalarFieldEnum]
+
+
+export const ScenarioProductAdjustmentScalarFieldEnum = {
+  id: 'id',
+  scenarioId: 'scenarioId',
+  productId: 'productId',
+  priceIncrease: 'priceIncrease'
+} as const
+
+export type ScenarioProductAdjustmentScalarFieldEnum = (typeof ScenarioProductAdjustmentScalarFieldEnum)[keyof typeof ScenarioProductAdjustmentScalarFieldEnum]
 
 
 export const ScenarioCommentScalarFieldEnum = {

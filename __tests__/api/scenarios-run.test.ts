@@ -14,6 +14,9 @@ const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.ho
     simulationResult: {
       create: vi.fn(),
     },
+    product: {
+      findMany: vi.fn().mockResolvedValue([]),
+    },
   },
 }));
 
@@ -46,6 +49,7 @@ const BASE_SCENARIO = {
   supplierDelay: 'none',
   status: 'PENDING',
   business: { ...BUSINESS_A },
+  productAdjustments: [],
 };
 
 beforeEach(() => vi.clearAllMocks());
@@ -192,6 +196,33 @@ describe('POST /api/scenarios/run — new scenario path', () => {
 
     expect(mockPrisma.scenario.create).toHaveBeenCalledWith(
       expect.objectContaining({ data: expect.objectContaining({ roleTargetsJson: undefined }) })
+    );
+  });
+
+  it('only persists product adjustments for products actually owned by the target business', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
+    mockPrisma.product.findMany.mockResolvedValue([{ id: 'prod-1' }]); // only prod-1 belongs to BUSINESS_A
+    mockPrisma.scenario.create.mockResolvedValue(BASE_SCENARIO);
+    mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
+    mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
+
+    const req = makeRequest({
+      name: 'Product Pricing Test',
+      businessId: BUSINESS_A.id,
+      productAdjustments: [
+        { productId: 'prod-1', priceIncrease: 15 },
+        { productId: 'prod-not-mine', priceIncrease: 30 }, // belongs to another tenant — dropped
+      ],
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.scenario.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          productAdjustments: { create: [{ productId: 'prod-1', priceIncrease: 15 }] },
+        }),
+      })
     );
   });
 });

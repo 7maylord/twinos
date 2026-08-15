@@ -56,6 +56,18 @@ model Product {
   price      Float
   cost       Float
   tenantId   String?
+
+  // Sales volume + inventory planning — all optional. When unitsSoldPerMonth
+  // is set, this product participates in per-product revenue decomposition
+  // (see lib/simulation-engine.ts); otherwise it's excluded, same as before
+  // these fields existed. unitsInStock/reorderPoint/leadTimeDays independently
+  // gate per-product stockout risk.
+  unitsSoldPerMonth Float?
+  unitsInStock      Float?
+  reorderPoint      Float?
+  leadTimeDays      Int?
+
+  scenarioAdjustments ScenarioProductAdjustment[]
 }
 
 model Employee {
@@ -96,8 +108,25 @@ model Scenario {
   // a free-text field, not a FK'd entity.
   roleTargetsJson String?
 
-  simulationResults SimulationResult[]
-  comments          ScenarioComment[]
+  simulationResults   SimulationResult[]
+  comments            ScenarioComment[]
+  productAdjustments  ScenarioProductAdjustment[]
+}
+
+// Per-product price override for a scenario. A product with no row here uses
+// the scenario's blanket priceIncrease (see lib/simulation-engine.ts). Unlike
+// role targets (free-text JSON, since roles aren't a FK'd entity), products
+// are real rows that can be deleted — a join table with onDelete: Cascade on
+// both sides keeps this from referencing a stale/deleted product.
+model ScenarioProductAdjustment {
+  id            String   @id @default(uuid())
+  scenarioId    String
+  scenario      Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  priceIncrease Float
+
+  @@unique([scenarioId, productId])
 }
 
 model ScenarioComment {

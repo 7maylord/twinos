@@ -29,11 +29,19 @@ export type AggregateProduct = {
 export type ProductAvgAggregateOutputType = {
   price: number | null
   cost: number | null
+  unitsSoldPerMonth: number | null
+  unitsInStock: number | null
+  reorderPoint: number | null
+  leadTimeDays: number | null
 }
 
 export type ProductSumAggregateOutputType = {
   price: number | null
   cost: number | null
+  unitsSoldPerMonth: number | null
+  unitsInStock: number | null
+  reorderPoint: number | null
+  leadTimeDays: number | null
 }
 
 export type ProductMinAggregateOutputType = {
@@ -43,6 +51,10 @@ export type ProductMinAggregateOutputType = {
   price: number | null
   cost: number | null
   tenantId: string | null
+  unitsSoldPerMonth: number | null
+  unitsInStock: number | null
+  reorderPoint: number | null
+  leadTimeDays: number | null
 }
 
 export type ProductMaxAggregateOutputType = {
@@ -52,6 +64,10 @@ export type ProductMaxAggregateOutputType = {
   price: number | null
   cost: number | null
   tenantId: string | null
+  unitsSoldPerMonth: number | null
+  unitsInStock: number | null
+  reorderPoint: number | null
+  leadTimeDays: number | null
 }
 
 export type ProductCountAggregateOutputType = {
@@ -61,6 +77,10 @@ export type ProductCountAggregateOutputType = {
   price: number
   cost: number
   tenantId: number
+  unitsSoldPerMonth: number
+  unitsInStock: number
+  reorderPoint: number
+  leadTimeDays: number
   _all: number
 }
 
@@ -68,11 +88,19 @@ export type ProductCountAggregateOutputType = {
 export type ProductAvgAggregateInputType = {
   price?: true
   cost?: true
+  unitsSoldPerMonth?: true
+  unitsInStock?: true
+  reorderPoint?: true
+  leadTimeDays?: true
 }
 
 export type ProductSumAggregateInputType = {
   price?: true
   cost?: true
+  unitsSoldPerMonth?: true
+  unitsInStock?: true
+  reorderPoint?: true
+  leadTimeDays?: true
 }
 
 export type ProductMinAggregateInputType = {
@@ -82,6 +110,10 @@ export type ProductMinAggregateInputType = {
   price?: true
   cost?: true
   tenantId?: true
+  unitsSoldPerMonth?: true
+  unitsInStock?: true
+  reorderPoint?: true
+  leadTimeDays?: true
 }
 
 export type ProductMaxAggregateInputType = {
@@ -91,6 +123,10 @@ export type ProductMaxAggregateInputType = {
   price?: true
   cost?: true
   tenantId?: true
+  unitsSoldPerMonth?: true
+  unitsInStock?: true
+  reorderPoint?: true
+  leadTimeDays?: true
 }
 
 export type ProductCountAggregateInputType = {
@@ -100,6 +136,10 @@ export type ProductCountAggregateInputType = {
   price?: true
   cost?: true
   tenantId?: true
+  unitsSoldPerMonth?: true
+  unitsInStock?: true
+  reorderPoint?: true
+  leadTimeDays?: true
   _all?: true
 }
 
@@ -196,6 +236,10 @@ export type ProductGroupByOutputType = {
   price: number
   cost: number
   tenantId: string | null
+  unitsSoldPerMonth: number | null
+  unitsInStock: number | null
+  reorderPoint: number | null
+  leadTimeDays: number | null
   _count: ProductCountAggregateOutputType | null
   _avg: ProductAvgAggregateOutputType | null
   _sum: ProductSumAggregateOutputType | null
@@ -228,7 +272,12 @@ export type ProductWhereInput = {
   price?: Prisma.FloatFilter<"Product"> | number
   cost?: Prisma.FloatFilter<"Product"> | number
   tenantId?: Prisma.StringNullableFilter<"Product"> | string | null
+  unitsSoldPerMonth?: Prisma.FloatNullableFilter<"Product"> | number | null
+  unitsInStock?: Prisma.FloatNullableFilter<"Product"> | number | null
+  reorderPoint?: Prisma.FloatNullableFilter<"Product"> | number | null
+  leadTimeDays?: Prisma.IntNullableFilter<"Product"> | number | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentListRelationFilter
 }
 
 export type ProductOrderByWithRelationInput = {
@@ -238,7 +287,12 @@ export type ProductOrderByWithRelationInput = {
   price?: Prisma.SortOrder
   cost?: Prisma.SortOrder
   tenantId?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitsSoldPerMonth?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitsInStock?: Prisma.SortOrderInput | Prisma.SortOrder
+  reorderPoint?: Prisma.SortOrderInput | Prisma.SortOrder
+  leadTimeDays?: Prisma.SortOrderInput | Prisma.SortOrder
   business?: Prisma.BusinessOrderByWithRelationInput
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentOrderByRelationAggregateInput
 }
 
 export type ProductWhereUniqueInput = Prisma.AtLeast<{
@@ -251,7 +305,12 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   price?: Prisma.FloatFilter<"Product"> | number
   cost?: Prisma.FloatFilter<"Product"> | number
   tenantId?: Prisma.StringNullableFilter<"Product"> | string | null
+  unitsSoldPerMonth?: Prisma.FloatNullableFilter<"Product"> | number | null
+  unitsInStock?: Prisma.FloatNullableFilter<"Product"> | number | null
+  reorderPoint?: Prisma.FloatNullableFilter<"Product"> | number | null
+  leadTimeDays?: Prisma.IntNullableFilter<"Product"> | number | null
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentListRelationFilter
 }, "id">
 
 export type ProductOrderByWithAggregationInput = {
@@ -261,6 +320,10 @@ export type ProductOrderByWithAggregationInput = {
   price?: Prisma.SortOrder
   cost?: Prisma.SortOrder
   tenantId?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitsSoldPerMonth?: Prisma.SortOrderInput | Prisma.SortOrder
+  unitsInStock?: Prisma.SortOrderInput | Prisma.SortOrder
+  reorderPoint?: Prisma.SortOrderInput | Prisma.SortOrder
+  leadTimeDays?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ProductCountOrderByAggregateInput
   _avg?: Prisma.ProductAvgOrderByAggregateInput
   _max?: Prisma.ProductMaxOrderByAggregateInput
@@ -278,6 +341,10 @@ export type ProductScalarWhereWithAggregatesInput = {
   price?: Prisma.FloatWithAggregatesFilter<"Product"> | number
   cost?: Prisma.FloatWithAggregatesFilter<"Product"> | number
   tenantId?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
+  unitsSoldPerMonth?: Prisma.FloatNullableWithAggregatesFilter<"Product"> | number | null
+  unitsInStock?: Prisma.FloatNullableWithAggregatesFilter<"Product"> | number | null
+  reorderPoint?: Prisma.FloatNullableWithAggregatesFilter<"Product"> | number | null
+  leadTimeDays?: Prisma.IntNullableWithAggregatesFilter<"Product"> | number | null
 }
 
 export type ProductCreateInput = {
@@ -286,7 +353,12 @@ export type ProductCreateInput = {
   price: number
   cost: number
   tenantId?: string | null
+  unitsSoldPerMonth?: number | null
+  unitsInStock?: number | null
+  reorderPoint?: number | null
+  leadTimeDays?: number | null
   business: Prisma.BusinessCreateNestedOneWithoutProductsInput
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateInput = {
@@ -296,6 +368,11 @@ export type ProductUncheckedCreateInput = {
   price: number
   cost: number
   tenantId?: string | null
+  unitsSoldPerMonth?: number | null
+  unitsInStock?: number | null
+  reorderPoint?: number | null
+  leadTimeDays?: number | null
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductUpdateInput = {
@@ -304,7 +381,12 @@ export type ProductUpdateInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   cost?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsSoldPerMonth?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  unitsInStock?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reorderPoint?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   business?: Prisma.BusinessUpdateOneRequiredWithoutProductsNestedInput
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateInput = {
@@ -314,6 +396,11 @@ export type ProductUncheckedUpdateInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   cost?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsSoldPerMonth?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  unitsInStock?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reorderPoint?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductCreateManyInput = {
@@ -323,6 +410,10 @@ export type ProductCreateManyInput = {
   price: number
   cost: number
   tenantId?: string | null
+  unitsSoldPerMonth?: number | null
+  unitsInStock?: number | null
+  reorderPoint?: number | null
+  leadTimeDays?: number | null
 }
 
 export type ProductUpdateManyMutationInput = {
@@ -331,6 +422,10 @@ export type ProductUpdateManyMutationInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   cost?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsSoldPerMonth?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  unitsInStock?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reorderPoint?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type ProductUncheckedUpdateManyInput = {
@@ -340,6 +435,10 @@ export type ProductUncheckedUpdateManyInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   cost?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsSoldPerMonth?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  unitsInStock?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reorderPoint?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type ProductListRelationFilter = {
@@ -359,11 +458,19 @@ export type ProductCountOrderByAggregateInput = {
   price?: Prisma.SortOrder
   cost?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
+  unitsSoldPerMonth?: Prisma.SortOrder
+  unitsInStock?: Prisma.SortOrder
+  reorderPoint?: Prisma.SortOrder
+  leadTimeDays?: Prisma.SortOrder
 }
 
 export type ProductAvgOrderByAggregateInput = {
   price?: Prisma.SortOrder
   cost?: Prisma.SortOrder
+  unitsSoldPerMonth?: Prisma.SortOrder
+  unitsInStock?: Prisma.SortOrder
+  reorderPoint?: Prisma.SortOrder
+  leadTimeDays?: Prisma.SortOrder
 }
 
 export type ProductMaxOrderByAggregateInput = {
@@ -373,6 +480,10 @@ export type ProductMaxOrderByAggregateInput = {
   price?: Prisma.SortOrder
   cost?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
+  unitsSoldPerMonth?: Prisma.SortOrder
+  unitsInStock?: Prisma.SortOrder
+  reorderPoint?: Prisma.SortOrder
+  leadTimeDays?: Prisma.SortOrder
 }
 
 export type ProductMinOrderByAggregateInput = {
@@ -382,11 +493,24 @@ export type ProductMinOrderByAggregateInput = {
   price?: Prisma.SortOrder
   cost?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
+  unitsSoldPerMonth?: Prisma.SortOrder
+  unitsInStock?: Prisma.SortOrder
+  reorderPoint?: Prisma.SortOrder
+  leadTimeDays?: Prisma.SortOrder
 }
 
 export type ProductSumOrderByAggregateInput = {
   price?: Prisma.SortOrder
   cost?: Prisma.SortOrder
+  unitsSoldPerMonth?: Prisma.SortOrder
+  unitsInStock?: Prisma.SortOrder
+  reorderPoint?: Prisma.SortOrder
+  leadTimeDays?: Prisma.SortOrder
+}
+
+export type ProductScalarRelationFilter = {
+  is?: Prisma.ProductWhereInput
+  isNot?: Prisma.ProductWhereInput
 }
 
 export type ProductCreateNestedManyWithoutBusinessInput = {
@@ -431,12 +555,47 @@ export type ProductUncheckedUpdateManyWithoutBusinessNestedInput = {
   deleteMany?: Prisma.ProductScalarWhereInput | Prisma.ProductScalarWhereInput[]
 }
 
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type ProductCreateNestedOneWithoutScenarioAdjustmentsInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutScenarioAdjustmentsInput, Prisma.ProductUncheckedCreateWithoutScenarioAdjustmentsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutScenarioAdjustmentsInput
+  connect?: Prisma.ProductWhereUniqueInput
+}
+
+export type ProductUpdateOneRequiredWithoutScenarioAdjustmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProductCreateWithoutScenarioAdjustmentsInput, Prisma.ProductUncheckedCreateWithoutScenarioAdjustmentsInput>
+  connectOrCreate?: Prisma.ProductCreateOrConnectWithoutScenarioAdjustmentsInput
+  upsert?: Prisma.ProductUpsertWithoutScenarioAdjustmentsInput
+  connect?: Prisma.ProductWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProductUpdateToOneWithWhereWithoutScenarioAdjustmentsInput, Prisma.ProductUpdateWithoutScenarioAdjustmentsInput>, Prisma.ProductUncheckedUpdateWithoutScenarioAdjustmentsInput>
+}
+
 export type ProductCreateWithoutBusinessInput = {
   id?: string
   name: string
   price: number
   cost: number
   tenantId?: string | null
+  unitsSoldPerMonth?: number | null
+  unitsInStock?: number | null
+  reorderPoint?: number | null
+  leadTimeDays?: number | null
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentCreateNestedManyWithoutProductInput
 }
 
 export type ProductUncheckedCreateWithoutBusinessInput = {
@@ -445,6 +604,11 @@ export type ProductUncheckedCreateWithoutBusinessInput = {
   price: number
   cost: number
   tenantId?: string | null
+  unitsSoldPerMonth?: number | null
+  unitsInStock?: number | null
+  reorderPoint?: number | null
+  leadTimeDays?: number | null
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentUncheckedCreateNestedManyWithoutProductInput
 }
 
 export type ProductCreateOrConnectWithoutBusinessInput = {
@@ -483,6 +647,78 @@ export type ProductScalarWhereInput = {
   price?: Prisma.FloatFilter<"Product"> | number
   cost?: Prisma.FloatFilter<"Product"> | number
   tenantId?: Prisma.StringNullableFilter<"Product"> | string | null
+  unitsSoldPerMonth?: Prisma.FloatNullableFilter<"Product"> | number | null
+  unitsInStock?: Prisma.FloatNullableFilter<"Product"> | number | null
+  reorderPoint?: Prisma.FloatNullableFilter<"Product"> | number | null
+  leadTimeDays?: Prisma.IntNullableFilter<"Product"> | number | null
+}
+
+export type ProductCreateWithoutScenarioAdjustmentsInput = {
+  id?: string
+  name: string
+  price: number
+  cost: number
+  tenantId?: string | null
+  unitsSoldPerMonth?: number | null
+  unitsInStock?: number | null
+  reorderPoint?: number | null
+  leadTimeDays?: number | null
+  business: Prisma.BusinessCreateNestedOneWithoutProductsInput
+}
+
+export type ProductUncheckedCreateWithoutScenarioAdjustmentsInput = {
+  id?: string
+  businessId: string
+  name: string
+  price: number
+  cost: number
+  tenantId?: string | null
+  unitsSoldPerMonth?: number | null
+  unitsInStock?: number | null
+  reorderPoint?: number | null
+  leadTimeDays?: number | null
+}
+
+export type ProductCreateOrConnectWithoutScenarioAdjustmentsInput = {
+  where: Prisma.ProductWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProductCreateWithoutScenarioAdjustmentsInput, Prisma.ProductUncheckedCreateWithoutScenarioAdjustmentsInput>
+}
+
+export type ProductUpsertWithoutScenarioAdjustmentsInput = {
+  update: Prisma.XOR<Prisma.ProductUpdateWithoutScenarioAdjustmentsInput, Prisma.ProductUncheckedUpdateWithoutScenarioAdjustmentsInput>
+  create: Prisma.XOR<Prisma.ProductCreateWithoutScenarioAdjustmentsInput, Prisma.ProductUncheckedCreateWithoutScenarioAdjustmentsInput>
+  where?: Prisma.ProductWhereInput
+}
+
+export type ProductUpdateToOneWithWhereWithoutScenarioAdjustmentsInput = {
+  where?: Prisma.ProductWhereInput
+  data: Prisma.XOR<Prisma.ProductUpdateWithoutScenarioAdjustmentsInput, Prisma.ProductUncheckedUpdateWithoutScenarioAdjustmentsInput>
+}
+
+export type ProductUpdateWithoutScenarioAdjustmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  cost?: Prisma.FloatFieldUpdateOperationsInput | number
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsSoldPerMonth?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  unitsInStock?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reorderPoint?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  business?: Prisma.BusinessUpdateOneRequiredWithoutProductsNestedInput
+}
+
+export type ProductUncheckedUpdateWithoutScenarioAdjustmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  businessId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  cost?: Prisma.FloatFieldUpdateOperationsInput | number
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsSoldPerMonth?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  unitsInStock?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reorderPoint?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type ProductCreateManyBusinessInput = {
@@ -491,6 +727,10 @@ export type ProductCreateManyBusinessInput = {
   price: number
   cost: number
   tenantId?: string | null
+  unitsSoldPerMonth?: number | null
+  unitsInStock?: number | null
+  reorderPoint?: number | null
+  leadTimeDays?: number | null
 }
 
 export type ProductUpdateWithoutBusinessInput = {
@@ -499,6 +739,11 @@ export type ProductUpdateWithoutBusinessInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   cost?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsSoldPerMonth?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  unitsInStock?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reorderPoint?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateWithoutBusinessInput = {
@@ -507,6 +752,11 @@ export type ProductUncheckedUpdateWithoutBusinessInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   cost?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsSoldPerMonth?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  unitsInStock?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reorderPoint?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  scenarioAdjustments?: Prisma.ScenarioProductAdjustmentUncheckedUpdateManyWithoutProductNestedInput
 }
 
 export type ProductUncheckedUpdateManyWithoutBusinessInput = {
@@ -515,8 +765,41 @@ export type ProductUncheckedUpdateManyWithoutBusinessInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   cost?: Prisma.FloatFieldUpdateOperationsInput | number
   tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  unitsSoldPerMonth?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  unitsInStock?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  reorderPoint?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  leadTimeDays?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
+
+/**
+ * Count Type ProductCountOutputType
+ */
+
+export type ProductCountOutputType = {
+  scenarioAdjustments: number
+}
+
+export type ProductCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  scenarioAdjustments?: boolean | ProductCountOutputTypeCountScenarioAdjustmentsArgs
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProductCountOutputType
+   */
+  select?: Prisma.ProductCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ProductCountOutputType without action
+ */
+export type ProductCountOutputTypeCountScenarioAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ScenarioProductAdjustmentWhereInput
+}
 
 
 export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -526,7 +809,13 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   price?: boolean
   cost?: boolean
   tenantId?: boolean
+  unitsSoldPerMonth?: boolean
+  unitsInStock?: boolean
+  reorderPoint?: boolean
+  leadTimeDays?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
+  scenarioAdjustments?: boolean | Prisma.Product$scenarioAdjustmentsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
 export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -536,6 +825,10 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   price?: boolean
   cost?: boolean
   tenantId?: boolean
+  unitsSoldPerMonth?: boolean
+  unitsInStock?: boolean
+  reorderPoint?: boolean
+  leadTimeDays?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -546,6 +839,10 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   price?: boolean
   cost?: boolean
   tenantId?: boolean
+  unitsSoldPerMonth?: boolean
+  unitsInStock?: boolean
+  reorderPoint?: boolean
+  leadTimeDays?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["product"]>
 
@@ -556,11 +853,17 @@ export type ProductSelectScalar = {
   price?: boolean
   cost?: boolean
   tenantId?: boolean
+  unitsSoldPerMonth?: boolean
+  unitsInStock?: boolean
+  reorderPoint?: boolean
+  leadTimeDays?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "name" | "price" | "cost" | "tenantId", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "name" | "price" | "cost" | "tenantId" | "unitsSoldPerMonth" | "unitsInStock" | "reorderPoint" | "leadTimeDays", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
+  scenarioAdjustments?: boolean | Prisma.Product$scenarioAdjustmentsArgs<ExtArgs>
+  _count?: boolean | Prisma.ProductCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProductIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
@@ -573,6 +876,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Product"
   objects: {
     business: Prisma.$BusinessPayload<ExtArgs>
+    scenarioAdjustments: Prisma.$ScenarioProductAdjustmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -581,6 +885,10 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     price: number
     cost: number
     tenantId: string | null
+    unitsSoldPerMonth: number | null
+    unitsInStock: number | null
+    reorderPoint: number | null
+    leadTimeDays: number | null
   }, ExtArgs["result"]["product"]>
   composites: {}
 }
@@ -976,6 +1284,7 @@ readonly fields: ProductFieldRefs;
 export interface Prisma__ProductClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   business<T extends Prisma.BusinessDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BusinessDefaultArgs<ExtArgs>>): Prisma.Prisma__BusinessClient<runtime.Types.Result.GetResult<Prisma.$BusinessPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  scenarioAdjustments<T extends Prisma.Product$scenarioAdjustmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Product$scenarioAdjustmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScenarioProductAdjustmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1011,6 +1320,10 @@ export interface ProductFieldRefs {
   readonly price: Prisma.FieldRef<"Product", 'Float'>
   readonly cost: Prisma.FieldRef<"Product", 'Float'>
   readonly tenantId: Prisma.FieldRef<"Product", 'String'>
+  readonly unitsSoldPerMonth: Prisma.FieldRef<"Product", 'Float'>
+  readonly unitsInStock: Prisma.FieldRef<"Product", 'Float'>
+  readonly reorderPoint: Prisma.FieldRef<"Product", 'Float'>
+  readonly leadTimeDays: Prisma.FieldRef<"Product", 'Int'>
 }
     
 
@@ -1409,6 +1722,30 @@ export type ProductDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Products to delete.
    */
   limit?: number
+}
+
+/**
+ * Product.scenarioAdjustments
+ */
+export type Product$scenarioAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ScenarioProductAdjustment
+   */
+  select?: Prisma.ScenarioProductAdjustmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ScenarioProductAdjustment
+   */
+  omit?: Prisma.ScenarioProductAdjustmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ScenarioProductAdjustmentInclude<ExtArgs> | null
+  where?: Prisma.ScenarioProductAdjustmentWhereInput
+  orderBy?: Prisma.ScenarioProductAdjustmentOrderByWithRelationInput | Prisma.ScenarioProductAdjustmentOrderByWithRelationInput[]
+  cursor?: Prisma.ScenarioProductAdjustmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ScenarioProductAdjustmentScalarFieldEnum | Prisma.ScenarioProductAdjustmentScalarFieldEnum[]
 }
 
 /**

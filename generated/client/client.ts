@@ -67,6 +67,11 @@ export type Employee = Prisma.EmployeeModel
  */
 export type Scenario = Prisma.ScenarioModel
 /**
+ * Model ScenarioProductAdjustment
+ * 
+ */
+export type ScenarioProductAdjustment = Prisma.ScenarioProductAdjustmentModel
+/**
  * Model ScenarioComment
  * 
  */
