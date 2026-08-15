@@ -26,6 +26,8 @@ export default function ScenarioForm() {
   const [marketingElasticityInput, setMarketingElasticityInput] = useState('');
   const [roleBreakdown, setRoleBreakdown] = useState(false);
   const [roleTargetCounts, setRoleTargetCounts] = useState<Record<string, number>>({});
+  const [productPricingBreakdown, setProductPricingBreakdown] = useState(false);
+  const [productPriceIncreases, setProductPriceIncreases] = useState<Record<string, number>>({});
 
   useEffect(() => {
     async function fetchBusiness() {
@@ -41,6 +43,11 @@ export default function ScenarioForm() {
             counts[emp.role] = (counts[emp.role] || 0) + 1;
           }
           setRoleTargetCounts(counts);
+          const priceIncreases: Record<string, number> = {};
+          for (const product of data.products || []) {
+            if (product.unitsSoldPerMonth != null) priceIncreases[product.id] = 0;
+          }
+          setProductPriceIncreases(priceIncreases);
         }
       } catch (err) {
         console.error('Error fetching business for scenario form:', err);
@@ -65,6 +72,7 @@ export default function ScenarioForm() {
     setPriceElasticityInput('');
     setMarketingElasticityInput('');
     setRoleBreakdown(false);
+    setProductPricingBreakdown(false);
   };
 
   const roleTargetTotal = Object.values(roleTargetCounts).reduce((sum, c) => sum + c, 0);
@@ -89,6 +97,9 @@ export default function ScenarioForm() {
           marketingElasticityOverride: marketingElasticityInput === '' ? undefined : Number(marketingElasticityInput),
           roleTargets: roleBreakdown
             ? Object.entries(roleTargetCounts).map(([role, count]) => ({ role, count }))
+            : undefined,
+          productAdjustments: productPricingBreakdown
+            ? Object.entries(productPriceIncreases).map(([productId, increase]) => ({ productId, priceIncrease: increase }))
             : undefined,
         }),
       });
@@ -218,25 +229,69 @@ export default function ScenarioForm() {
         />
       </div>
 
-      {/* Price Increase Slider */}
+      {/* Price Increase Slider / Per-Product Pricing */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
           <label className="text-sm font-semibold text-gray-700">Price Increase</label>
-          <span className="text-lg font-medium text-black">{priceIncrease}%</span>
+          <div className="flex items-center gap-3">
+            {!productPricingBreakdown && <span className="text-lg font-medium text-black">{priceIncrease}%</span>}
+            {business && Object.keys(productPriceIncreases).length > 1 && (
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => setProductPricingBreakdown((v) => !v)}
+                className="text-xs font-semibold text-[#2B2644] hover:underline disabled:opacity-60"
+              >
+                {productPricingBreakdown ? 'Use single rate instead' : 'Break down by product'}
+              </button>
+            )}
+          </div>
         </div>
-        <input
-          type="range"
-          min="0"
-          max="50"
-          disabled={submitting || !business}
-          value={priceIncrease}
-          onChange={(e) => setPriceIncrease(Number(e.target.value))}
-          className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black disabled:opacity-60"
-        />
-        <div className="flex justify-between text-xs text-gray-400 mt-2">
-          <span>0% (Baseline)</span>
-          <span>50% Max</span>
-        </div>
+
+        {productPricingBreakdown ? (
+          <div className="space-y-3">
+            <p className="text-xs text-gray-500">
+              Unlisted price changes fall back to a blanket {priceIncrease}% (adjust below if you want a different fallback).
+            </p>
+            {business.products
+              .filter((p: any) => p.unitsSoldPerMonth != null)
+              .map((product: any) => (
+                <div key={product.id} className="flex items-center justify-between gap-3">
+                  <span className="text-sm text-gray-700">{product.name}</span>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      min="0"
+                      max="50"
+                      disabled={submitting}
+                      value={productPriceIncreases[product.id] ?? 0}
+                      onChange={(e) =>
+                        setProductPriceIncreases((prev) => ({ ...prev, [product.id]: Math.min(50, Math.max(0, Number(e.target.value))) }))
+                      }
+                      className="w-20 px-3 py-1.5 bg-[#F5F5F5] border border-gray-200 rounded-lg text-black text-sm text-right focus:outline-none focus:border-black transition-colors disabled:opacity-60"
+                    />
+                    <span className="text-xs text-gray-400">%</span>
+                  </div>
+                </div>
+              ))}
+          </div>
+        ) : (
+          <>
+            <input
+              type="range"
+              min="0"
+              max="50"
+              disabled={submitting || !business}
+              value={priceIncrease}
+              onChange={(e) => setPriceIncrease(Number(e.target.value))}
+              className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black disabled:opacity-60"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <span>0% (Baseline)</span>
+              <span>50% Max</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Employee Count Slider / Role Breakdown */}
