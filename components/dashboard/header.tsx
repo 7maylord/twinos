@@ -1,8 +1,9 @@
 'use client';
 
-import { Menu, Bell, User } from 'lucide-react';
+import { Menu, User } from 'lucide-react';
 import { Show, UserButton } from '@clerk/nextjs';
 import BusinessSwitcher from './business-switcher';
+import NotificationBell from './notification-bell';
 import { useEffect, useState } from 'react';
 import { getBusinesses } from '@/app/actions/business-actions';
 
@@ -35,10 +36,8 @@ export default function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-2">
-        <button className="p-2.5 hover:bg-gray-200/50 rounded-full transition-colors">
-          <Bell className="w-5 h-5 text-gray-700" />
-        </button>
-        
+        <NotificationBell />
+
         <Show
           when="signed-in"
           fallback={

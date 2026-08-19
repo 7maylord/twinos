@@ -20,8 +20,12 @@ const isProtectedRoute = createRouteMatcher([
   '/api/scenarios/parse-intent',
   '/api/scenarios/(.*)/comments',
   '/api/action-items(.*)',
+  '/api/notifications(.*)',
   '/api/integrations(.*)',
   '/api/admin(.*)',
+  // /api/cron/* is deliberately excluded: Vercel invokes it on a schedule
+  // with no Clerk session, and it authenticates via CRON_SECRET instead (see
+  // app/api/cron/check-stale-predictions/route.ts).
 ]);
 
 export default function proxy(request: NextRequest, event: NextFetchEvent) {
