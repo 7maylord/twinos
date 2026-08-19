@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import Link from 'next/link';
 import { getScenarioTemplates, applyScenarioTemplate, CRISIS_TEMPLATES } from '@/lib/scenario-templates';
 import { getIndustryProfile } from '@/lib/industry-profiles';
+import { checkLayoffCompliance } from '@/lib/compliance-rules';
 
 export default function ScenarioForm() {
   const router = useRouter();
@@ -78,6 +79,10 @@ export default function ScenarioForm() {
   };
 
   const roleTargetTotal = Object.values(roleTargetCounts).reduce((sum, c) => sum + c, 0);
+  const effectiveEmployeeCount = roleBreakdown ? roleTargetTotal : employeeCount;
+  const layoffWarnings = business
+    ? checkLayoffCompliance(business.employees?.length || 0, effectiveEmployeeCount)
+    : [];
 
   const handleParseIntent = async () => {
     if (!nlInput.trim() || nlParsing) return;
@@ -421,6 +426,18 @@ export default function ScenarioForm() {
             </div>
           </>
         )}
+
+        {layoffWarnings.map((warning) => (
+          <div
+            key={warning.law}
+            className={`mt-3 flex items-start gap-2 p-3 rounded-xl border text-xs ${
+              warning.severity === 'warning' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-gray-50 border-gray-200 text-gray-700'
+            }`}
+          >
+            <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+            <span>{warning.message}</span>
+          </div>
+        ))}
       </div>
 
       {/* Marketing Budget Slider */}

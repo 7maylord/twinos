@@ -1,4 +1,5 @@
 import { getIndustryProfile } from './industry-profiles';
+import { checkLayoffCompliance } from './compliance-rules';
 
 export interface BaselineMetrics {
   baselineRevenue: number;
@@ -451,6 +452,9 @@ export function getChangeCost(
 export interface ActionPlanItem {
   category: 'price' | 'headcount' | 'marketing' | 'none';
   description: string;
+  // General guidance (not legal advice) when a headcount reduction crosses
+  // a well-documented threshold — see lib/compliance-rules.ts.
+  complianceWarning?: string;
 }
 
 export interface OptimizationResult {
@@ -604,9 +608,11 @@ export function optimizeScenario(
       const floorNote = bestAdjustments.employeeCount <= Math.ceil(minHeadcount * 1.1)
         ? ` This is near the operational floor — consider natural attrition before active cuts.`
         : '';
+      const layoffWarnings = checkLayoffCompliance(baselineHeadcount, bestAdjustments.employeeCount);
       actionPlan.push({
         category: 'headcount',
         description: `Reduce headcount by ${Math.abs(eDiff)} — saves ~$${Math.round(payrollImpact / 1000)}K/mo in payroll.${floorNote}`,
+        complianceWarning: layoffWarnings[0]?.message,
       });
     } else {
       actionPlan.push({
