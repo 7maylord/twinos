@@ -133,7 +133,7 @@ The recommended actions are not generic templates. Each item is calculated from 
 | Primary DB   | AWS Aurora PostgreSQL (prod) / SQLite (dev) | Users, businesses, products, employees, scenarios                                    |
 | Cache / Logs | Amazon DynamoDB                             | Forecast cache, optimization run logs                                                |
 | UI           | React 18, Tailwind CSS, Recharts            | Charts, dashboards, responsive layout                                                |
-| AI           | Gemini 1.5 Flash (Google)                   | Scenario recommendation narratives; falls back to rule-based engine if key is absent |
+| AI           | Gemini (Google, `gemini-flash-latest`)      | Scenario recommendation narratives and natural-language scenario drafting; falls back to rule-based engine (recommendations) or a clear error (NL drafting) if key is absent |
 | Integrations | QuickBooks, Shopify, Square                 | Live financial, catalog, and payroll sync                                            |
 | Testing      | Vitest                                      | Unit tests for all API routes                                                        |
 

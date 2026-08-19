@@ -93,7 +93,11 @@ export async function GET(request: Request) {
           Write a concise, professional assessment.
         `;
 
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+        // "-latest" alias rather than a dated model version: gemini-1.5-flash
+        // (the previous value here) has since been deprecated by Google,
+        // which made this endpoint silently fall through to the rule-based
+        // generator below on every request without surfacing the failure.
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`;
         
         const geminiRes = await fetch(geminiUrl, {
           method: 'POST',
