@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Play, AlertTriangle, Sparkles, ChevronDown, ChevronUp, Siren, ArrowRight } from 'lucide-react';
+import { Play, AlertTriangle, Sparkles, ChevronDown, ChevronUp, Siren, ArrowRight, Wand2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -28,6 +28,8 @@ export default function ScenarioForm() {
   const [roleTargetCounts, setRoleTargetCounts] = useState<Record<string, number>>({});
   const [productPricingBreakdown, setProductPricingBreakdown] = useState(false);
   const [productPriceIncreases, setProductPriceIncreases] = useState<Record<string, number>>({});
+  const [nlInput, setNlInput] = useState('');
+  const [nlParsing, setNlParsing] = useState(false);
 
   useEffect(() => {
     async function fetchBusiness() {
@@ -76,6 +78,38 @@ export default function ScenarioForm() {
   };
 
   const roleTargetTotal = Object.values(roleTargetCounts).reduce((sum, c) => sum + c, 0);
+
+  const handleParseIntent = async () => {
+    if (!nlInput.trim() || nlParsing) return;
+    setNlParsing(true);
+    try {
+      const res = await fetch('/api/scenarios/parse-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: nlInput }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setScenarioName(data.scenarioName);
+        setPriceIncrease(data.priceIncrease);
+        setEmployeeCount(data.employeeCount);
+        setMarketingBudget(data.marketingBudget);
+        setSupplierDelay(data.supplierDelay);
+        setPriceElasticityInput('');
+        setMarketingElasticityInput('');
+        setRoleBreakdown(false);
+        setProductPricingBreakdown(false);
+        toast.success('Scenario drafted — review the levers below before running it.');
+      } else {
+        toast.error(data.error || 'Failed to parse that request.');
+      }
+    } catch (err) {
+      console.error('Error parsing scenario intent:', err);
+      toast.error('Network error parsing scenario request.');
+    } finally {
+      setNlParsing(false);
+    }
+  };
 
   const handleRunSimulation = async () => {
     if (!business || !scenarioName.trim()) return;
@@ -152,6 +186,39 @@ export default function ScenarioForm() {
           <a href="/onboarding" className="py-2.5 px-5 bg-amber-950 text-white text-xs font-semibold rounded-full hover:bg-amber-900 transition-colors shadow-sm self-start sm:self-auto shrink-0 text-center">
             Create Twin
           </a>
+        </div>
+      )}
+
+      {/* Natural-language scenario drafting */}
+      {business && (
+        <div className="mb-8">
+          <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-3">
+            <Wand2 className="w-4 h-4" />
+            Describe a Scenario
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={nlInput}
+              disabled={nlParsing || submitting}
+              onChange={(e) => setNlInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleParseIntent()}
+              placeholder="e.g. hire 3 more baristas and raise prices 8%"
+              maxLength={500}
+              className="flex-1 px-4 py-3 bg-[#F5F5F5] border border-gray-200 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:border-black transition-colors disabled:opacity-60"
+            />
+            <button
+              type="button"
+              onClick={handleParseIntent}
+              disabled={nlParsing || submitting || !nlInput.trim()}
+              className="px-5 py-3 bg-[#2B2644] hover:bg-[#1f1b33] text-white rounded-xl font-medium text-sm transition-colors disabled:opacity-50 shrink-0"
+            >
+              {nlParsing ? 'Drafting...' : 'Draft'}
+            </button>
+          </div>
+          <p className="text-xs text-gray-400 mt-2">
+            Drafts the levers below for you to review — it won't run the simulation on its own.
+          </p>
         </div>
       )}
 
