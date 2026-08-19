@@ -552,12 +552,14 @@ async function main() {
     const result = optimizeScenario(baseline, 'profit', 30);
 
     assert.ok(result.actionPlan.length > 0);
+    // Each item now carries a structured category alongside its prose description.
+    assert.ok(result.actionPlan.every(item => ['price', 'headcount', 'marketing', 'none'].includes(item.category)));
 
     // Verify that recommendations describe actions corresponding to bestAdjustments
-    const hasPriceAction = result.actionPlan.some(plan => plan.includes('prices'));
-    const hasHireAction = result.actionPlan.some(plan => plan.includes('Hire'));
-    const hasReduceAction = result.actionPlan.some(plan => plan.includes('Reduce') || plan.includes('headcount'));
-    const hasMarketingAction = result.actionPlan.some(plan => plan.includes('marketing'));
+    const hasPriceAction = result.actionPlan.some(item => item.description.includes('prices'));
+    const hasHireAction = result.actionPlan.some(item => item.description.includes('Hire'));
+    const hasReduceAction = result.actionPlan.some(item => item.description.includes('Reduce') || item.description.includes('headcount'));
+    const hasMarketingAction = result.actionPlan.some(item => item.description.includes('marketing'));
 
     if (result.bestAdjustments.priceIncrease > 0) {
       assert.ok(hasPriceAction, 'Should recommend price action');

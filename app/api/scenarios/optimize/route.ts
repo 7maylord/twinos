@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         timestamp: new Date().toISOString(),
         targetMetric: `${targetType} - ${targetGrowthPct}% Growth`,
         exploredScenarios: maxIterations,
-        recommendedChanges: actionPlan,
+        recommendedChanges: actionPlan.map((item) => item.description),
       });
     } catch (dbErr) {
       console.error('Failed logging optimization run:', dbErr);

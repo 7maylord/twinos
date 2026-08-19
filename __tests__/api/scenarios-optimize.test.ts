@@ -26,7 +26,7 @@ vi.mock('@/lib/simulation-engine', () => ({
       projectedHeadcount: 10,
       projectedInventoryRisk: 0.1,
     },
-    actionPlan: ['Increase price by 5%'],
+    actionPlan: [{ category: 'price', description: 'Increase price by 5%' }],
   }),
 }));
 

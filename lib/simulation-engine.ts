@@ -448,12 +448,17 @@ export function getChangeCost(
   return (pDiff * pDiff * 1.0) + (eDiff * eDiff * 5.0) + (mDiff * mDiff * 1.5);
 }
 
+export interface ActionPlanItem {
+  category: 'price' | 'headcount' | 'marketing' | 'none';
+  description: string;
+}
+
 export interface OptimizationResult {
   targetValue: number;
   baselineValue: number;
   bestAdjustments: ScenarioAdjustments;
   optimalOutput: SimulationOutput;
-  actionPlan: string[];
+  actionPlan: ActionPlanItem[];
 }
 
 export function optimizeScenario(
@@ -573,7 +578,7 @@ export function optimizeScenario(
 
   // --- Contextual action plan ---
   // Compute the deltas and their financial impact so each recommendation explains WHY.
-  const actionPlan: string[] = [];
+  const actionPlan: ActionPlanItem[] = [];
 
   const pDiff = bestAdjustments.priceIncrease;
   const eDiff = bestAdjustments.employeeCount - baselineHeadcount;
@@ -585,9 +590,10 @@ export function optimizeScenario(
     const riskNote = pDiff > 15
       ? ` Price increases above 15% typically trigger meaningful churn — validate with a short pilot before full rollout.`
       : '';
-    actionPlan.push(
-      `Raise prices by ${pDiff.toFixed(1)}% — the elasticity model projects this adds ~$${Math.round(revenueUplift / 1000)}K revenue in the final period despite the small demand dip.${riskNote}`
-    );
+    actionPlan.push({
+      category: 'price',
+      description: `Raise prices by ${pDiff.toFixed(1)}% — the elasticity model projects this adds ~$${Math.round(revenueUplift / 1000)}K revenue in the final period despite the small demand dip.${riskNote}`,
+    });
   }
 
   // Headcount change — only surface for profit targets or if the optimizer made a meaningful move.
@@ -598,13 +604,15 @@ export function optimizeScenario(
       const floorNote = bestAdjustments.employeeCount <= Math.ceil(minHeadcount * 1.1)
         ? ` This is near the operational floor — consider natural attrition before active cuts.`
         : '';
-      actionPlan.push(
-        `Reduce headcount by ${Math.abs(eDiff)} — saves ~$${Math.round(payrollImpact / 1000)}K/mo in payroll.${floorNote}`
-      );
+      actionPlan.push({
+        category: 'headcount',
+        description: `Reduce headcount by ${Math.abs(eDiff)} — saves ~$${Math.round(payrollImpact / 1000)}K/mo in payroll.${floorNote}`,
+      });
     } else {
-      actionPlan.push(
-        `Hire ${eDiff} additional staff — adds ~$${Math.round(payrollImpact / 1000)}K/mo in payroll cost, justified by the projected revenue growth.`
-      );
+      actionPlan.push({
+        category: 'headcount',
+        description: `Hire ${eDiff} additional staff — adds ~$${Math.round(payrollImpact / 1000)}K/mo in payroll cost, justified by the projected revenue growth.`,
+      });
     }
   }
 
@@ -613,23 +621,26 @@ export function optimizeScenario(
     const currentMarketingRatio = (bestAdjustments.marketingBudget / (optimalOutput.projectedRevenue || baselineRevenue)) * 100;
     if (mDiff > 0) {
       if (currentMarketingRatio > 20) {
-        actionPlan.push(
-          `Reallocate your $${bestAdjustments.marketingBudget.toLocaleString()} marketing budget toward higher-ROI channels — at ${currentMarketingRatio.toFixed(0)}% of projected revenue, further raw spend increases yield diminishing returns.`
-        );
+        actionPlan.push({
+          category: 'marketing',
+          description: `Reallocate your $${bestAdjustments.marketingBudget.toLocaleString()} marketing budget toward higher-ROI channels — at ${currentMarketingRatio.toFixed(0)}% of projected revenue, further raw spend increases yield diminishing returns.`,
+        });
       } else {
-        actionPlan.push(
-          `Increase marketing spend by $${mDiff.toLocaleString()}/mo (to $${bestAdjustments.marketingBudget.toLocaleString()} total, ${currentMarketingRatio.toFixed(0)}% of projected revenue) — modelled to drive incremental demand beyond price alone.`
-        );
+        actionPlan.push({
+          category: 'marketing',
+          description: `Increase marketing spend by $${mDiff.toLocaleString()}/mo (to $${bestAdjustments.marketingBudget.toLocaleString()} total, ${currentMarketingRatio.toFixed(0)}% of projected revenue) — modelled to drive incremental demand beyond price alone.`,
+        });
       }
     } else {
-      actionPlan.push(
-        `Cut marketing spend by $${Math.abs(mDiff).toLocaleString()}/mo — the current budget's demand return is too low to justify the cost for this target.`
-      );
+      actionPlan.push({
+        category: 'marketing',
+        description: `Cut marketing spend by $${Math.abs(mDiff).toLocaleString()}/mo — the current budget's demand return is too low to justify the cost for this target.`,
+      });
     }
   }
 
   if (actionPlan.length === 0) {
-    actionPlan.push('No adjustments required — your current baseline already satisfies this target.');
+    actionPlan.push({ category: 'none', description: 'No adjustments required — your current baseline already satisfies this target.' });
   }
 
   return {
