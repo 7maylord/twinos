@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Sidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
-import { Target, TrendingUp, RefreshCw, Sparkles, CheckSquare, Download } from 'lucide-react';
+import { Target, TrendingUp, RefreshCw, Sparkles, CheckSquare, Download, ListChecks } from 'lucide-react';
 import { toast } from 'sonner';
+import { ActionItemsList, type ActionItemsListHandle } from '@/components/optimize/action-items-list';
 import {
   BarChart,
   Bar,
@@ -36,7 +37,7 @@ interface OptimizationResult {
     marketingBudget: number;
     supplierDelay: string;
   };
-  actionPlan: string[];
+  actionPlan: { category: string; description: string }[];
 }
 
 export default function OptimizePage() {
@@ -45,6 +46,32 @@ export default function OptimizePage() {
   const [loading, setLoading] = useState(false);
   const [stepMsg, setStepMsg] = useState('');
   const [result, setResult] = useState<OptimizationResult | null>(null);
+  const [savingTasks, setSavingTasks] = useState(false);
+  const actionItemsRef = useRef<ActionItemsListHandle>(null);
+
+  const handleSaveAsTasks = async () => {
+    if (!result) return;
+    setSavingTasks(true);
+    try {
+      const res = await fetch('/api/action-items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: result.actionPlan }),
+      });
+      if (res.ok) {
+        toast.success('Saved action plan as tasks.');
+        actionItemsRef.current?.refresh();
+      } else {
+        const err = await res.json();
+        toast.error(`Failed to save tasks: ${err.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Network error saving tasks.');
+    } finally {
+      setSavingTasks(false);
+    }
+  };
 
   const runOptimization = async () => {
     setLoading(true);
@@ -343,13 +370,22 @@ export default function OptimizePage() {
                       <div className="space-y-3">
                         {result.actionPlan.map((action, index) => (
                           <div key={index} className="flex gap-3 items-start bg-white/10 rounded-xl p-3 border border-white/10 hover:bg-white/15 transition-colors">
-                            <CheckSquare className="text-white/60 flex-shrink-0 mt-0.5 cursor-pointer hover:text-white transition-colors" size={16} />
+                            <CheckSquare className="text-white/60 flex-shrink-0 mt-0.5" size={16} />
                             <p className="text-xs text-white/90 leading-relaxed font-medium">
-                              {action}
+                              {action.description}
                             </p>
                           </div>
                         ))}
                       </div>
+
+                      <button
+                        onClick={handleSaveAsTasks}
+                        disabled={savingTasks}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-white/10 hover:bg-white/20 rounded-full text-xs font-semibold text-white transition-colors disabled:opacity-60 print:hidden"
+                      >
+                        <ListChecks size={14} />
+                        {savingTasks ? 'Saving...' : 'Save as Tasks'}
+                      </button>
                     </div>
                   </div>
 
@@ -372,6 +408,9 @@ export default function OptimizePage() {
               </div>
             </div>
           )}
+
+          {/* Saved action items persist across optimizer runs */}
+          <ActionItemsList ref={actionItemsRef} />
         </div>
       </main>
     </div>
