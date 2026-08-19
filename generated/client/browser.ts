@@ -53,6 +53,11 @@ export type ScenarioProductAdjustment = Prisma.ScenarioProductAdjustmentModel
  */
 export type ScenarioComment = Prisma.ScenarioCommentModel
 /**
+ * Model ActionItem
+ * 
+ */
+export type ActionItem = Prisma.ActionItemModel
+/**
  * Model SimulationResult
  * 
  */

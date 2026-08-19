@@ -18,6 +18,7 @@ const isProtectedRoute = createRouteMatcher([
   '/api/scenarios/run',
   '/api/scenarios/optimize',
   '/api/scenarios/(.*)/comments',
+  '/api/action-items(.*)',
   '/api/integrations(.*)',
   '/api/admin(.*)',
 ]);

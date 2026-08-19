@@ -29,6 +29,7 @@ model Business {
   products          Product[]
   employees         Employee[]
   scenarios         Scenario[]
+  actionItems       ActionItem[]
 
   // QuickBooks Online Connection Details
   qboCompanyId               String?
@@ -136,6 +137,22 @@ model ScenarioComment {
   authorEmail String
   body        String
   createdAt   DateTime @default(now())
+}
+
+// Attached to Business, not Scenario: the counterfactual optimizer
+// (app/api/scenarios/optimize) that generates these plans is ad-hoc
+// goal-seeking against the business's baseline — it never creates or
+// references a Scenario row, so there's nothing scenario-shaped to attach to.
+model ActionItem {
+  id          String    @id @default(uuid())
+  businessId  String
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category    String    // price | headcount | marketing | none
+  description String
+  status      String    @default("pending") // pending, in_progress, done
+  assignee    String?
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
 }
 
 model SimulationResult {

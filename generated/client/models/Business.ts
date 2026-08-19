@@ -360,6 +360,7 @@ export type BusinessWhereInput = {
   products?: Prisma.ProductListRelationFilter
   employees?: Prisma.EmployeeListRelationFilter
   scenarios?: Prisma.ScenarioListRelationFilter
+  actionItems?: Prisma.ActionItemListRelationFilter
 }
 
 export type BusinessOrderByWithRelationInput = {
@@ -388,6 +389,7 @@ export type BusinessOrderByWithRelationInput = {
   products?: Prisma.ProductOrderByRelationAggregateInput
   employees?: Prisma.EmployeeOrderByRelationAggregateInput
   scenarios?: Prisma.ScenarioOrderByRelationAggregateInput
+  actionItems?: Prisma.ActionItemOrderByRelationAggregateInput
 }
 
 export type BusinessWhereUniqueInput = Prisma.AtLeast<{
@@ -419,6 +421,7 @@ export type BusinessWhereUniqueInput = Prisma.AtLeast<{
   products?: Prisma.ProductListRelationFilter
   employees?: Prisma.EmployeeListRelationFilter
   scenarios?: Prisma.ScenarioListRelationFilter
+  actionItems?: Prisma.ActionItemListRelationFilter
 }, "id">
 
 export type BusinessOrderByWithAggregationInput = {
@@ -502,6 +505,7 @@ export type BusinessCreateInput = {
   products?: Prisma.ProductCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateInput = {
@@ -529,6 +533,7 @@ export type BusinessUncheckedCreateInput = {
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUpdateInput = {
@@ -556,6 +561,7 @@ export type BusinessUpdateInput = {
   products?: Prisma.ProductUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateInput = {
@@ -583,6 +589,7 @@ export type BusinessUncheckedUpdateInput = {
   products?: Prisma.ProductUncheckedUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateManyInput = {
@@ -857,6 +864,20 @@ export type BusinessUpdateOneRequiredWithoutScenariosNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BusinessUpdateToOneWithWhereWithoutScenariosInput, Prisma.BusinessUpdateWithoutScenariosInput>, Prisma.BusinessUncheckedUpdateWithoutScenariosInput>
 }
 
+export type BusinessCreateNestedOneWithoutActionItemsInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutActionItemsInput, Prisma.BusinessUncheckedCreateWithoutActionItemsInput>
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutActionItemsInput
+  connect?: Prisma.BusinessWhereUniqueInput
+}
+
+export type BusinessUpdateOneRequiredWithoutActionItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.BusinessCreateWithoutActionItemsInput, Prisma.BusinessUncheckedCreateWithoutActionItemsInput>
+  connectOrCreate?: Prisma.BusinessCreateOrConnectWithoutActionItemsInput
+  upsert?: Prisma.BusinessUpsertWithoutActionItemsInput
+  connect?: Prisma.BusinessWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BusinessUpdateToOneWithWhereWithoutActionItemsInput, Prisma.BusinessUpdateWithoutActionItemsInput>, Prisma.BusinessUncheckedUpdateWithoutActionItemsInput>
+}
+
 export type BusinessCreateWithoutOwnerInput = {
   id?: string
   name: string
@@ -881,6 +902,7 @@ export type BusinessCreateWithoutOwnerInput = {
   products?: Prisma.ProductCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutOwnerInput = {
@@ -907,6 +929,7 @@ export type BusinessUncheckedCreateWithoutOwnerInput = {
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutOwnerInput = {
@@ -986,6 +1009,7 @@ export type BusinessCreateWithoutProductsInput = {
   owner: Prisma.UserCreateNestedOneWithoutBusinessesInput
   employees?: Prisma.EmployeeCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutProductsInput = {
@@ -1012,6 +1036,7 @@ export type BusinessUncheckedCreateWithoutProductsInput = {
   squareTokenExpiresAt?: Date | string | null
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutProductsInput = {
@@ -1054,6 +1079,7 @@ export type BusinessUpdateWithoutProductsInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutBusinessesNestedInput
   employees?: Prisma.EmployeeUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutProductsInput = {
@@ -1080,6 +1106,7 @@ export type BusinessUncheckedUpdateWithoutProductsInput = {
   squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateWithoutEmployeesInput = {
@@ -1106,6 +1133,7 @@ export type BusinessCreateWithoutEmployeesInput = {
   owner: Prisma.UserCreateNestedOneWithoutBusinessesInput
   products?: Prisma.ProductCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutEmployeesInput = {
@@ -1132,6 +1160,7 @@ export type BusinessUncheckedCreateWithoutEmployeesInput = {
   squareTokenExpiresAt?: Date | string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBusinessInput
   scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutEmployeesInput = {
@@ -1174,6 +1203,7 @@ export type BusinessUpdateWithoutEmployeesInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutBusinessesNestedInput
   products?: Prisma.ProductUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutEmployeesInput = {
@@ -1200,6 +1230,7 @@ export type BusinessUncheckedUpdateWithoutEmployeesInput = {
   squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateWithoutScenariosInput = {
@@ -1226,6 +1257,7 @@ export type BusinessCreateWithoutScenariosInput = {
   owner: Prisma.UserCreateNestedOneWithoutBusinessesInput
   products?: Prisma.ProductCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessUncheckedCreateWithoutScenariosInput = {
@@ -1252,6 +1284,7 @@ export type BusinessUncheckedCreateWithoutScenariosInput = {
   squareTokenExpiresAt?: Date | string | null
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBusinessInput
   employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutBusinessInput
+  actionItems?: Prisma.ActionItemUncheckedCreateNestedManyWithoutBusinessInput
 }
 
 export type BusinessCreateOrConnectWithoutScenariosInput = {
@@ -1294,6 +1327,7 @@ export type BusinessUpdateWithoutScenariosInput = {
   owner?: Prisma.UserUpdateOneRequiredWithoutBusinessesNestedInput
   products?: Prisma.ProductUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutScenariosInput = {
@@ -1320,6 +1354,131 @@ export type BusinessUncheckedUpdateWithoutScenariosInput = {
   squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   products?: Prisma.ProductUncheckedUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUncheckedUpdateManyWithoutBusinessNestedInput
+}
+
+export type BusinessCreateWithoutActionItemsInput = {
+  id?: string
+  name: string
+  industry?: string | null
+  tenantId?: string | null
+  baselineRevenue?: number
+  baselineMarketing?: number
+  baselineInventory?: number
+  baselineFixedCosts?: number
+  createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
+  owner: Prisma.UserCreateNestedOneWithoutBusinessesInput
+  products?: Prisma.ProductCreateNestedManyWithoutBusinessInput
+  employees?: Prisma.EmployeeCreateNestedManyWithoutBusinessInput
+  scenarios?: Prisma.ScenarioCreateNestedManyWithoutBusinessInput
+}
+
+export type BusinessUncheckedCreateWithoutActionItemsInput = {
+  id?: string
+  ownerId: string
+  name: string
+  industry?: string | null
+  tenantId?: string | null
+  baselineRevenue?: number
+  baselineMarketing?: number
+  baselineInventory?: number
+  baselineFixedCosts?: number
+  createdAt?: Date | string
+  qboCompanyId?: string | null
+  qboAccessToken?: string | null
+  qboRefreshToken?: string | null
+  qboTokenExpiresAt?: Date | string | null
+  qboRefreshTokenExpiresAt?: Date | string | null
+  shopifyStoreDomain?: string | null
+  shopifyAccessToken?: string | null
+  squareLocationId?: string | null
+  squareAccessToken?: string | null
+  squareRefreshToken?: string | null
+  squareTokenExpiresAt?: Date | string | null
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutBusinessInput
+  employees?: Prisma.EmployeeUncheckedCreateNestedManyWithoutBusinessInput
+  scenarios?: Prisma.ScenarioUncheckedCreateNestedManyWithoutBusinessInput
+}
+
+export type BusinessCreateOrConnectWithoutActionItemsInput = {
+  where: Prisma.BusinessWhereUniqueInput
+  create: Prisma.XOR<Prisma.BusinessCreateWithoutActionItemsInput, Prisma.BusinessUncheckedCreateWithoutActionItemsInput>
+}
+
+export type BusinessUpsertWithoutActionItemsInput = {
+  update: Prisma.XOR<Prisma.BusinessUpdateWithoutActionItemsInput, Prisma.BusinessUncheckedUpdateWithoutActionItemsInput>
+  create: Prisma.XOR<Prisma.BusinessCreateWithoutActionItemsInput, Prisma.BusinessUncheckedCreateWithoutActionItemsInput>
+  where?: Prisma.BusinessWhereInput
+}
+
+export type BusinessUpdateToOneWithWhereWithoutActionItemsInput = {
+  where?: Prisma.BusinessWhereInput
+  data: Prisma.XOR<Prisma.BusinessUpdateWithoutActionItemsInput, Prisma.BusinessUncheckedUpdateWithoutActionItemsInput>
+}
+
+export type BusinessUpdateWithoutActionItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineRevenue?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineMarketing?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  owner?: Prisma.UserUpdateOneRequiredWithoutBusinessesNestedInput
+  products?: Prisma.ProductUpdateManyWithoutBusinessNestedInput
+  employees?: Prisma.EmployeeUpdateManyWithoutBusinessNestedInput
+  scenarios?: Prisma.ScenarioUpdateManyWithoutBusinessNestedInput
+}
+
+export type BusinessUncheckedUpdateWithoutActionItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  industry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baselineRevenue?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineMarketing?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineInventory?: Prisma.FloatFieldUpdateOperationsInput | number
+  baselineFixedCosts?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  qboCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  qboTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  qboRefreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  shopifyStoreDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shopifyAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareLocationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareAccessToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareRefreshToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  squareTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  products?: Prisma.ProductUncheckedUpdateManyWithoutBusinessNestedInput
+  employees?: Prisma.EmployeeUncheckedUpdateManyWithoutBusinessNestedInput
+  scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessCreateManyOwnerInput = {
@@ -1369,6 +1528,7 @@ export type BusinessUpdateWithoutOwnerInput = {
   products?: Prisma.ProductUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateWithoutOwnerInput = {
@@ -1395,6 +1555,7 @@ export type BusinessUncheckedUpdateWithoutOwnerInput = {
   products?: Prisma.ProductUncheckedUpdateManyWithoutBusinessNestedInput
   employees?: Prisma.EmployeeUncheckedUpdateManyWithoutBusinessNestedInput
   scenarios?: Prisma.ScenarioUncheckedUpdateManyWithoutBusinessNestedInput
+  actionItems?: Prisma.ActionItemUncheckedUpdateManyWithoutBusinessNestedInput
 }
 
 export type BusinessUncheckedUpdateManyWithoutOwnerInput = {
@@ -1429,12 +1590,14 @@ export type BusinessCountOutputType = {
   products: number
   employees: number
   scenarios: number
+  actionItems: number
 }
 
 export type BusinessCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   products?: boolean | BusinessCountOutputTypeCountProductsArgs
   employees?: boolean | BusinessCountOutputTypeCountEmployeesArgs
   scenarios?: boolean | BusinessCountOutputTypeCountScenariosArgs
+  actionItems?: boolean | BusinessCountOutputTypeCountActionItemsArgs
 }
 
 /**
@@ -1468,6 +1631,13 @@ export type BusinessCountOutputTypeCountScenariosArgs<ExtArgs extends runtime.Ty
   where?: Prisma.ScenarioWhereInput
 }
 
+/**
+ * BusinessCountOutputType without action
+ */
+export type BusinessCountOutputTypeCountActionItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActionItemWhereInput
+}
+
 
 export type BusinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1495,6 +1665,7 @@ export type BusinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   products?: boolean | Prisma.Business$productsArgs<ExtArgs>
   employees?: boolean | Prisma.Business$employeesArgs<ExtArgs>
   scenarios?: boolean | Prisma.Business$scenariosArgs<ExtArgs>
+  actionItems?: boolean | Prisma.Business$actionItemsArgs<ExtArgs>
   _count?: boolean | Prisma.BusinessCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["business"]>
 
@@ -1578,6 +1749,7 @@ export type BusinessInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   products?: boolean | Prisma.Business$productsArgs<ExtArgs>
   employees?: boolean | Prisma.Business$employeesArgs<ExtArgs>
   scenarios?: boolean | Prisma.Business$scenariosArgs<ExtArgs>
+  actionItems?: boolean | Prisma.Business$actionItemsArgs<ExtArgs>
   _count?: boolean | Prisma.BusinessCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BusinessIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1594,6 +1766,7 @@ export type $BusinessPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     products: Prisma.$ProductPayload<ExtArgs>[]
     employees: Prisma.$EmployeePayload<ExtArgs>[]
     scenarios: Prisma.$ScenarioPayload<ExtArgs>[]
+    actionItems: Prisma.$ActionItemPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2015,6 +2188,7 @@ export interface Prisma__BusinessClient<T, Null = never, ExtArgs extends runtime
   products<T extends Prisma.Business$productsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$productsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   employees<T extends Prisma.Business$employeesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$employeesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   scenarios<T extends Prisma.Business$scenariosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$scenariosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ScenarioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  actionItems<T extends Prisma.Business$actionItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Business$actionItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActionItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2535,6 +2709,30 @@ export type Business$scenariosArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.ScenarioScalarFieldEnum | Prisma.ScenarioScalarFieldEnum[]
+}
+
+/**
+ * Business.actionItems
+ */
+export type Business$actionItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ActionItem
+   */
+  select?: Prisma.ActionItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ActionItem
+   */
+  omit?: Prisma.ActionItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActionItemInclude<ExtArgs> | null
+  where?: Prisma.ActionItemWhereInput
+  orderBy?: Prisma.ActionItemOrderByWithRelationInput | Prisma.ActionItemOrderByWithRelationInput[]
+  cursor?: Prisma.ActionItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActionItemScalarFieldEnum | Prisma.ActionItemScalarFieldEnum[]
 }
 
 /**

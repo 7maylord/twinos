@@ -391,6 +391,7 @@ export const ModelName = {
   Scenario: 'Scenario',
   ScenarioProductAdjustment: 'ScenarioProductAdjustment',
   ScenarioComment: 'ScenarioComment',
+  ActionItem: 'ActionItem',
   SimulationResult: 'SimulationResult'
 } as const
 
@@ -407,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "business" | "product" | "employee" | "scenario" | "scenarioProductAdjustment" | "scenarioComment" | "simulationResult"
+    modelProps: "user" | "business" | "product" | "employee" | "scenario" | "scenarioProductAdjustment" | "scenarioComment" | "actionItem" | "simulationResult"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -929,6 +930,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ActionItem: {
+      payload: Prisma.$ActionItemPayload<ExtArgs>
+      fields: Prisma.ActionItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActionItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActionItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload>
+        }
+        findFirst: {
+          args: Prisma.ActionItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActionItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload>
+        }
+        findMany: {
+          args: Prisma.ActionItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload>[]
+        }
+        create: {
+          args: Prisma.ActionItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload>
+        }
+        createMany: {
+          args: Prisma.ActionItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActionItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload>[]
+        }
+        delete: {
+          args: Prisma.ActionItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload>
+        }
+        update: {
+          args: Prisma.ActionItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.ActionItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActionItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActionItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.ActionItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActionItemPayload>
+        }
+        aggregate: {
+          args: Prisma.ActionItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActionItem>
+        }
+        groupBy: {
+          args: Prisma.ActionItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActionItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActionItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActionItemCountAggregateOutputType> | number
+        }
+      }
+    }
     SimulationResult: {
       payload: Prisma.$SimulationResultPayload<ExtArgs>
       fields: Prisma.SimulationResultFieldRefs
@@ -1145,6 +1220,20 @@ export const ScenarioCommentScalarFieldEnum = {
 } as const
 
 export type ScenarioCommentScalarFieldEnum = (typeof ScenarioCommentScalarFieldEnum)[keyof typeof ScenarioCommentScalarFieldEnum]
+
+
+export const ActionItemScalarFieldEnum = {
+  id: 'id',
+  businessId: 'businessId',
+  category: 'category',
+  description: 'description',
+  status: 'status',
+  assignee: 'assignee',
+  dueDate: 'dueDate',
+  createdAt: 'createdAt'
+} as const
+
+export type ActionItemScalarFieldEnum = (typeof ActionItemScalarFieldEnum)[keyof typeof ActionItemScalarFieldEnum]
 
 
 export const SimulationResultScalarFieldEnum = {
@@ -1367,6 +1456,7 @@ export type GlobalOmitConfig = {
   scenario?: Prisma.ScenarioOmit
   scenarioProductAdjustment?: Prisma.ScenarioProductAdjustmentOmit
   scenarioComment?: Prisma.ScenarioCommentOmit
+  actionItem?: Prisma.ActionItemOmit
   simulationResult?: Prisma.SimulationResultOmit
 }
 
