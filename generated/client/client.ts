@@ -82,6 +82,11 @@ export type ScenarioComment = Prisma.ScenarioCommentModel
  */
 export type ActionItem = Prisma.ActionItemModel
 /**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
  * Model SimulationResult
  * 
  */

@@ -59,6 +59,7 @@ export const ModelName = {
   ScenarioProductAdjustment: 'ScenarioProductAdjustment',
   ScenarioComment: 'ScenarioComment',
   ActionItem: 'ActionItem',
+  Notification: 'Notification',
   SimulationResult: 'SimulationResult'
 } as const
 
@@ -195,6 +196,21 @@ export const ActionItemScalarFieldEnum = {
 } as const
 
 export type ActionItemScalarFieldEnum = (typeof ActionItemScalarFieldEnum)[keyof typeof ActionItemScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  businessId: 'businessId',
+  scenarioId: 'scenarioId',
+  type: 'type',
+  severity: 'severity',
+  title: 'title',
+  message: 'message',
+  read: 'read',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const SimulationResultScalarFieldEnum = {

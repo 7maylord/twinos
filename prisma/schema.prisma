@@ -30,6 +30,7 @@ model Business {
   employees         Employee[]
   scenarios         Scenario[]
   actionItems       ActionItem[]
+  notifications     Notification[]
 
   // QuickBooks Online Connection Details
   qboCompanyId               String?
@@ -153,6 +154,24 @@ model ActionItem {
   assignee    String?
   dueDate     DateTime?
   createdAt   DateTime  @default(now())
+}
+
+// "drift": predicted-vs-actual diverged beyond threshold, created immediately
+// when a QuickBooks sync backfills actuals (lib/predicted-vs-actual.ts).
+// "reminder": a scenario's 6-month prediction window has lapsed with no sync
+// yet to check it against — created by the scheduled cron job
+// (app/api/cron/check-stale-predictions), at most once per scenario.
+model Notification {
+  id         String   @id @default(uuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  scenarioId String?
+  type       String // drift | reminder
+  severity   String   @default("info") // info | warning
+  title      String
+  message    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
 }
 
 model SimulationResult {
