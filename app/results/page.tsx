@@ -93,6 +93,7 @@ interface SimulationData {
     productBreakdown?: ProductRevenueBreakdown[];
   }[];
   explain?: SimulationExplain;
+  calibration?: { sampleSize: number } | null;
   cashFlow?: CashFlowProjection;
   productInventory?: ProductInventoryStatus[];
   recommendation?: {
@@ -297,6 +298,8 @@ function ResultsContent() {
                   title={
                     scenario.priceElasticityOverride != null || scenario.marketingElasticityOverride != null
                       ? 'How Projected Revenue is calculated (using your custom elasticity)'
+                      : data.calibration
+                      ? `How Projected Revenue is calculated (calibrated from your last ${data.calibration.sampleSize} scenarios)`
                       : 'How Projected Revenue is calculated'
                   }
                   formula="baselineRevenue × priceMultiplier × demandMultiplier × seasonalFactor"
