@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { runSimulationWithConfidenceBand, computeRoleSalaries, RoleTarget, ProductAdjustment, ProductBaseline } from '@/lib/simulation-engine';
 import { projectCashFlow } from '@/lib/cashflow-engine';
+import { getCalibratedElasticityForBusiness } from '@/lib/elasticity-calibration';
 
 export async function GET(
   request: Request,
@@ -97,6 +98,10 @@ export async function GET(
       }
     }
 
+    const calibration = scenario.priceElasticityOverride == null
+      ? await getCalibratedElasticityForBusiness(business.id, scenario.id)
+      : null;
+
     const confidenceBand = runSimulationWithConfidenceBand(
       {
         baselineRevenue: business.baselineRevenue,
@@ -106,7 +111,7 @@ export async function GET(
         baselineHeadcount: employeeCount || 24,
         averageEmployeeSalary,
         industry: business.industry,
-        priceElasticityOverride: scenario.priceElasticityOverride,
+        priceElasticityOverride: scenario.priceElasticityOverride ?? calibration?.priceElasticityCoefficient,
         marketingElasticityOverride: scenario.marketingElasticityOverride,
         roleSalaries: computeRoleSalaries(employees),
         products: productsWithVolume,
@@ -157,6 +162,7 @@ export async function GET(
         projectedProfitHigh: confidenceBand.projectedProfitHigh,
       },
       explain: confidenceBand.expected.explain,
+      calibration: calibration ? { sampleSize: calibration.sampleSize } : null,
       cashFlow,
     });
   } catch (error: any) {

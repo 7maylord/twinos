@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
 import { runSimulation, computeRoleSalaries, RoleTarget, ProductAdjustment, ProductBaseline } from '@/lib/simulation-engine';
 import { cacheForecast } from '@/lib/dynamodb';
+import { getCalibratedElasticityForBusiness } from '@/lib/elasticity-calibration';
 
 export async function POST(request: Request) {
   try {
@@ -135,6 +136,13 @@ export async function POST(request: Request) {
       priceIncrease: pa.priceIncrease,
     }));
 
+    // User-set override always wins; otherwise, if this business has enough
+    // of its own price-change-vs-actual-outcome history, calibrate from that
+    // instead of falling straight to the static industry default.
+    const calibration = scenario.priceElasticityOverride == null
+      ? await getCalibratedElasticityForBusiness(business.id, scenario.id)
+      : null;
+
     // Run the simulation calculations
     const simulationOutput = runSimulation(
       {
@@ -145,7 +153,7 @@ export async function POST(request: Request) {
         baselineHeadcount: employees.length || 24,
         averageEmployeeSalary,
         industry: business.industry,
-        priceElasticityOverride: scenario.priceElasticityOverride,
+        priceElasticityOverride: scenario.priceElasticityOverride ?? calibration?.priceElasticityCoefficient,
         marketingElasticityOverride: scenario.marketingElasticityOverride,
         roleSalaries: computeRoleSalaries(employees),
         products: productsWithVolume,

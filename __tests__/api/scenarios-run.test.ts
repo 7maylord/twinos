@@ -36,8 +36,12 @@ vi.mock('@/lib/simulation-engine', () => ({
   }),
   computeRoleSalaries: vi.fn().mockReturnValue({}),
 }));
+vi.mock('@/lib/elasticity-calibration', () => ({
+  getCalibratedElasticityForBusiness: vi.fn().mockResolvedValue(null),
+}));
 
 import { POST } from '@/app/api/scenarios/run/route';
+import { getCalibratedElasticityForBusiness } from '@/lib/elasticity-calibration';
 
 const BASE_SCENARIO = {
   id: 'sc-1',
@@ -298,6 +302,40 @@ describe('POST /api/scenarios/run — existing scenario path', () => {
     expect(vi.mocked(runSimulation)).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ roleTargets: [{ role: 'Barista', count: 18 }] })
+    );
+  });
+
+  it('uses the calibrated elasticity when the scenario has no explicit override', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
+    mockPrisma.scenario.findUnique.mockResolvedValue({ ...BASE_SCENARIO, priceElasticityOverride: null });
+    mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
+    mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
+    vi.mocked(getCalibratedElasticityForBusiness).mockResolvedValue({ priceElasticityCoefficient: 0.8, sampleSize: 3 });
+
+    const req = makeRequest({ scenarioId: 'sc-1' });
+    await POST(req);
+
+    expect(getCalibratedElasticityForBusiness).toHaveBeenCalledWith(BUSINESS_A.id, 'sc-1');
+    expect(vi.mocked(runSimulation)).toHaveBeenCalledWith(
+      expect.objectContaining({ priceElasticityOverride: 0.8 }),
+      expect.anything()
+    );
+  });
+
+  it('prefers a stored explicit override over calibration, and skips calibration entirely', async () => {
+    mockVerifyBusinessOwnership.mockResolvedValue(true);
+    mockPrisma.scenario.findUnique.mockResolvedValue({ ...BASE_SCENARIO, priceElasticityOverride: 0.55 });
+    mockPrisma.simulationResult.create.mockResolvedValue({ id: 'sr-1', scenarioId: 'sc-1' });
+    mockPrisma.scenario.update.mockResolvedValue({ ...BASE_SCENARIO, status: 'COMPLETED' });
+    vi.mocked(getCalibratedElasticityForBusiness).mockResolvedValue({ priceElasticityCoefficient: 0.8, sampleSize: 3 });
+
+    const req = makeRequest({ scenarioId: 'sc-1' });
+    await POST(req);
+
+    expect(getCalibratedElasticityForBusiness).not.toHaveBeenCalled();
+    expect(vi.mocked(runSimulation)).toHaveBeenCalledWith(
+      expect.objectContaining({ priceElasticityOverride: 0.55 }),
+      expect.anything()
     );
   });
 });
