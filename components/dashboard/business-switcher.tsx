@@ -7,6 +7,7 @@ import { switchBusiness } from '@/app/actions/business-actions';
 interface Business {
   id: string;
   name: string;
+  role?: 'owner' | 'viewer';
 }
 
 interface BusinessSwitcherProps {
@@ -49,8 +50,15 @@ export default function BusinessSwitcher({ businesses, activeBusinessId }: Busin
               }}
               className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between"
             >
-              <span className="truncate text-gray-900">{business.name}</span>
-              {business.id === activeBusiness?.id && <Check className="w-4 h-4 text-blue-600" />}
+              <span className="flex items-center gap-2 truncate">
+                <span className="truncate text-gray-900">{business.name}</span>
+                {business.role === 'viewer' && (
+                  <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-500 rounded">
+                    Viewer
+                  </span>
+                )}
+              </span>
+              {business.id === activeBusiness?.id && <Check className="w-4 h-4 text-blue-600 shrink-0" />}
             </button>
           ))}
         </div>

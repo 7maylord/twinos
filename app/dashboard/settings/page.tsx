@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/sidebar';
 import DashboardHeader from '@/components/dashboard/header';
-import { Plus, Trash2, Tag, Users, ShieldAlert, Upload, Download, AlertCircle, FileSpreadsheet, Pencil, Check, X } from 'lucide-react';
+import { Plus, Trash2, Tag, Users, ShieldAlert, Upload, Download, AlertCircle, FileSpreadsheet, Pencil, Check, X, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import TeamPanel from '@/components/settings/team-panel';
 
 interface Product {
   id: string;
@@ -40,7 +41,7 @@ interface Business {
 export default function SettingsPage() {
   const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'products' | 'employees' | 'integrations'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'employees' | 'integrations' | 'team'>('products');
 
   // Product Form states
   const [prodName, setProdName] = useState('');
@@ -677,6 +678,17 @@ export default function SettingsPage() {
               <FileSpreadsheet size={16} />
               Accounting & ERP Integrations
             </button>
+            <button
+              onClick={() => setActiveTab('team')}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 font-medium text-sm transition-colors ${
+                activeTab === 'team'
+                  ? 'border-black text-black'
+                  : 'border-transparent text-gray-500 hover:text-black'
+              }`}
+            >
+              <UserPlus size={16} />
+              Team
+            </button>
           </div>
 
           {/* Products Workspace */}
@@ -1225,6 +1237,9 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
+
+          {/* Team Workspace */}
+          {activeTab === 'team' && <TeamPanel />}
         </div>
       </main>
     </div>

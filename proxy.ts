@@ -8,6 +8,7 @@ const isProtectedRoute = createRouteMatcher([
   '/results(.*)',
   '/admin(.*)',
   '/onboarding(.*)',
+  '/invite(.*)',
   // API routes that read or write tenant-owned data. Excludes
   // /api/scenarios/:id/results and /api/recommendations, which intentionally
   // stay public to back the unauthenticated share-link feature.
@@ -23,6 +24,7 @@ const isProtectedRoute = createRouteMatcher([
   '/api/notifications(.*)',
   '/api/integrations(.*)',
   '/api/admin(.*)',
+  '/api/team(.*)',
   // /api/cron/* is deliberately excluded: Vercel invokes it on a schedule
   // with no Clerk session, and it authenticates via CRON_SECRET instead (see
   // app/api/cron/check-stale-predictions/route.ts).
