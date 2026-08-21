@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getActiveBusiness, verifyBusinessOwnership } from '@/lib/auth-helpers';
+import { verifyBusinessAccess, getViewableActiveBusinessId } from '@/lib/auth-helpers';
 
+// GET is read-only, so viewers (not just owners) can see notifications here.
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -9,12 +10,12 @@ export async function GET(request: Request) {
 
     let targetBusinessId = queryBusinessId;
     if (targetBusinessId) {
-      if (!(await verifyBusinessOwnership(targetBusinessId))) {
+      if (!(await verifyBusinessAccess(targetBusinessId))) {
         return NextResponse.json([]);
       }
     } else {
-      const activeBusiness = await getActiveBusiness();
-      if (activeBusiness) targetBusinessId = activeBusiness.id;
+      const resolved = await getViewableActiveBusinessId();
+      if (resolved) targetBusinessId = resolved.businessId;
     }
 
     if (!targetBusinessId) {

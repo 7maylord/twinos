@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BUSINESS_A, makeRequest } from './helpers';
 
-const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.hoisted(() => ({
+const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockVerifyBusinessAccess, mockGetViewableActiveBusinessId, mockPrisma } = vi.hoisted(() => ({
   mockGetActiveBusiness: vi.fn(),
   mockVerifyBusinessOwnership: vi.fn(),
+  mockVerifyBusinessAccess: vi.fn(),
+  mockGetViewableActiveBusinessId: vi.fn(),
   mockPrisma: {
     scenario: {
       create: vi.fn(),
@@ -15,6 +17,8 @@ const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.ho
 vi.mock('@/lib/auth-helpers', () => ({
   getActiveBusiness: mockGetActiveBusiness,
   verifyBusinessOwnership: mockVerifyBusinessOwnership,
+  verifyBusinessAccess: mockVerifyBusinessAccess,
+  getViewableActiveBusinessId: mockGetViewableActiveBusinessId,
 }));
 vi.mock('@/lib/db', () => ({ prisma: mockPrisma }));
 
@@ -24,7 +28,7 @@ beforeEach(() => vi.clearAllMocks());
 
 describe('GET /api/scenarios', () => {
   it('lists scenarios for the active business when no businessId query param is given', async () => {
-    mockGetActiveBusiness.mockResolvedValue(BUSINESS_A);
+    mockGetViewableActiveBusinessId.mockResolvedValue({ businessId: BUSINESS_A.id, role: 'owner' });
     mockPrisma.scenario.findMany.mockResolvedValue([{ id: 'sc-1', businessId: BUSINESS_A.id }]);
 
     const res = await GET(new Request('http://localhost/api/scenarios'));
@@ -34,8 +38,8 @@ describe('GET /api/scenarios', () => {
     expect(data).toHaveLength(1);
   });
 
-  it('lists scenarios for an explicit businessId when ownership is verified', async () => {
-    mockVerifyBusinessOwnership.mockResolvedValue(true);
+  it('lists scenarios for an explicit businessId when access is verified', async () => {
+    mockVerifyBusinessAccess.mockResolvedValue(true);
     mockPrisma.scenario.findMany.mockResolvedValue([{ id: 'sc-1', businessId: BUSINESS_A.id }]);
 
     const res = await GET(new Request(`http://localhost/api/scenarios?businessId=${BUSINESS_A.id}`));
@@ -43,11 +47,11 @@ describe('GET /api/scenarios', () => {
 
     expect(res.status).toBe(200);
     expect(data).toHaveLength(1);
-    expect(mockGetActiveBusiness).not.toHaveBeenCalled();
+    expect(mockGetViewableActiveBusinessId).not.toHaveBeenCalled();
   });
 
-  it('returns an empty list — not another tenant\'s scenarios — when businessId is not owned (cross-tenant attack)', async () => {
-    mockVerifyBusinessOwnership.mockResolvedValue(false);
+  it('returns an empty list — not another tenant\'s scenarios — when businessId is not accessible (cross-tenant attack)', async () => {
+    mockVerifyBusinessAccess.mockResolvedValue(false);
 
     const res = await GET(new Request('http://localhost/api/scenarios?businessId=biz-not-mine'));
     const data = await res.json();
@@ -55,6 +59,18 @@ describe('GET /api/scenarios', () => {
     expect(res.status).toBe(200);
     expect(data).toEqual([]);
     expect(mockPrisma.scenario.findMany).not.toHaveBeenCalled();
+  });
+
+  it('lists scenarios for a caller with only viewer access — read access is not owner-only', async () => {
+    mockGetViewableActiveBusinessId.mockResolvedValue({ businessId: BUSINESS_A.id, role: 'viewer' });
+    mockPrisma.scenario.findMany.mockResolvedValue([{ id: 'sc-1', businessId: BUSINESS_A.id }]);
+
+    const res = await GET(new Request('http://localhost/api/scenarios'));
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.scenario.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { businessId: BUSINESS_A.id } })
+    );
   });
 });
 

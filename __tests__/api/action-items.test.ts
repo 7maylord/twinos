@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BUSINESS_A, makeRequest } from './helpers';
 
-const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.hoisted(() => ({
+const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockVerifyBusinessAccess, mockGetViewableActiveBusinessId, mockPrisma } = vi.hoisted(() => ({
   mockGetActiveBusiness: vi.fn(),
   mockVerifyBusinessOwnership: vi.fn(),
+  mockVerifyBusinessAccess: vi.fn(),
+  mockGetViewableActiveBusinessId: vi.fn(),
   mockPrisma: {
     actionItem: {
       findMany: vi.fn(),
@@ -18,6 +20,8 @@ const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.ho
 vi.mock('@/lib/auth-helpers', () => ({
   getActiveBusiness: mockGetActiveBusiness,
   verifyBusinessOwnership: mockVerifyBusinessOwnership,
+  verifyBusinessAccess: mockVerifyBusinessAccess,
+  getViewableActiveBusinessId: mockGetViewableActiveBusinessId,
 }));
 vi.mock('@/lib/db', () => ({ prisma: mockPrisma }));
 
@@ -32,7 +36,7 @@ beforeEach(() => vi.clearAllMocks());
 
 describe('GET /api/action-items', () => {
   it('lists items for the active business when no businessId query param is given', async () => {
-    mockGetActiveBusiness.mockResolvedValue(BUSINESS_A);
+    mockGetViewableActiveBusinessId.mockResolvedValue({ businessId: BUSINESS_A.id, role: 'owner' });
     mockPrisma.actionItem.findMany.mockResolvedValue([{ id: 'ai-1' }]);
 
     const res = await GET(new Request('http://localhost/api/action-items'));
@@ -42,8 +46,8 @@ describe('GET /api/action-items', () => {
     expect(data).toHaveLength(1);
   });
 
-  it('returns an empty list — not another tenant\'s items — for an unowned businessId (cross-tenant attack)', async () => {
-    mockVerifyBusinessOwnership.mockResolvedValue(false);
+  it('returns an empty list — not another tenant\'s items — for an inaccessible businessId (cross-tenant attack)', async () => {
+    mockVerifyBusinessAccess.mockResolvedValue(false);
 
     const res = await GET(new Request('http://localhost/api/action-items?businessId=biz-not-mine'));
     const data = await res.json();
@@ -51,6 +55,15 @@ describe('GET /api/action-items', () => {
     expect(res.status).toBe(200);
     expect(data).toEqual([]);
     expect(mockPrisma.actionItem.findMany).not.toHaveBeenCalled();
+  });
+
+  it('lists items for a caller with only viewer access — read access is not owner-only', async () => {
+    mockGetViewableActiveBusinessId.mockResolvedValue({ businessId: BUSINESS_A.id, role: 'viewer' });
+    mockPrisma.actionItem.findMany.mockResolvedValue([{ id: 'ai-1' }]);
+
+    const res = await GET(new Request('http://localhost/api/action-items'));
+
+    expect(res.status).toBe(200);
   });
 });
 

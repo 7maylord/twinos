@@ -1,16 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockGetActiveBusiness, mockVerifyBusinessOwnership, mockPrisma } = vi.hoisted(() => ({
-  mockGetActiveBusiness: vi.fn(),
+const { mockVerifyBusinessOwnership, mockVerifyBusinessAccess, mockGetViewableActiveBusinessId, mockPrisma } = vi.hoisted(() => ({
   mockVerifyBusinessOwnership: vi.fn(),
+  mockVerifyBusinessAccess: vi.fn(),
+  mockGetViewableActiveBusinessId: vi.fn(),
   mockPrisma: {
     notification: { findMany: vi.fn(), findUnique: vi.fn(), update: vi.fn() },
   },
 }));
 
 vi.mock('@/lib/auth-helpers', () => ({
-  getActiveBusiness: mockGetActiveBusiness,
   verifyBusinessOwnership: mockVerifyBusinessOwnership,
+  verifyBusinessAccess: mockVerifyBusinessAccess,
+  getViewableActiveBusinessId: mockGetViewableActiveBusinessId,
 }));
 vi.mock('@/lib/db', () => ({ prisma: mockPrisma }));
 
@@ -25,7 +27,7 @@ beforeEach(() => vi.clearAllMocks());
 
 describe('GET /api/notifications', () => {
   it('lists notifications for the active business when no businessId query param is given', async () => {
-    mockGetActiveBusiness.mockResolvedValue({ id: 'biz-aaa' });
+    mockGetViewableActiveBusinessId.mockResolvedValue({ businessId: 'biz-aaa', role: 'owner' });
     mockPrisma.notification.findMany.mockResolvedValue([{ id: 'n-1' }]);
 
     const res = await GET(new Request('http://localhost/api/notifications'));
@@ -35,8 +37,8 @@ describe('GET /api/notifications', () => {
     expect(data).toHaveLength(1);
   });
 
-  it('returns an empty list — not another tenant\'s notifications — for an unowned businessId (cross-tenant attack)', async () => {
-    mockVerifyBusinessOwnership.mockResolvedValue(false);
+  it('returns an empty list — not another tenant\'s notifications — for an inaccessible businessId (cross-tenant attack)', async () => {
+    mockVerifyBusinessAccess.mockResolvedValue(false);
 
     const res = await GET(new Request('http://localhost/api/notifications?businessId=biz-not-mine'));
     const data = await res.json();
@@ -44,6 +46,15 @@ describe('GET /api/notifications', () => {
     expect(res.status).toBe(200);
     expect(data).toEqual([]);
     expect(mockPrisma.notification.findMany).not.toHaveBeenCalled();
+  });
+
+  it('lists notifications for a caller with only viewer access — read access is not owner-only', async () => {
+    mockGetViewableActiveBusinessId.mockResolvedValue({ businessId: 'biz-aaa', role: 'viewer' });
+    mockPrisma.notification.findMany.mockResolvedValue([{ id: 'n-1' }]);
+
+    const res = await GET(new Request('http://localhost/api/notifications'));
+
+    expect(res.status).toBe(200);
   });
 });
 

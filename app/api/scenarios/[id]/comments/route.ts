@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getActiveUserEmail, verifyBusinessOwnership } from '@/lib/auth-helpers';
+import { getActiveUserEmail, verifyBusinessOwnership, verifyBusinessAccess } from '@/lib/auth-helpers';
 
 // Comments are internal working notes on a scenario — deliberately not exposed
 // on the public share link (app/share/[id]/page.tsx never calls this route),
 // since opening comment posting to unauthenticated share-link visitors would
 // be a new unauthenticated write surface (spam/abuse).
 
+// GET is read-only, so viewers (not just owners) can read the discussion.
+// POST stays owner-only below — v1 viewers are read-only everywhere.
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -15,7 +17,7 @@ export async function GET(
     const { id } = await params;
 
     const scenario = await prisma.scenario.findUnique({ where: { id }, select: { businessId: true } });
-    if (!scenario || !(await verifyBusinessOwnership(scenario.businessId))) {
+    if (!scenario || !(await verifyBusinessAccess(scenario.businessId))) {
       return NextResponse.json({ error: 'Scenario not found' }, { status: 404 });
     }
 

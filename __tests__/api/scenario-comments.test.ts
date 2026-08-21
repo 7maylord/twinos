@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { makeRequest } from './helpers';
 
-const { mockVerifyBusinessOwnership, mockGetActiveUserEmail, mockPrisma } = vi.hoisted(() => ({
+const { mockVerifyBusinessOwnership, mockVerifyBusinessAccess, mockGetActiveUserEmail, mockPrisma } = vi.hoisted(() => ({
   mockVerifyBusinessOwnership: vi.fn(),
+  mockVerifyBusinessAccess: vi.fn(),
   mockGetActiveUserEmail: vi.fn(),
   mockPrisma: {
     scenario: { findUnique: vi.fn() },
@@ -12,6 +13,7 @@ const { mockVerifyBusinessOwnership, mockGetActiveUserEmail, mockPrisma } = vi.h
 
 vi.mock('@/lib/auth-helpers', () => ({
   verifyBusinessOwnership: mockVerifyBusinessOwnership,
+  verifyBusinessAccess: mockVerifyBusinessAccess,
   getActiveUserEmail: mockGetActiveUserEmail,
 }));
 vi.mock('@/lib/db', () => ({ prisma: mockPrisma }));
@@ -27,7 +29,7 @@ beforeEach(() => vi.clearAllMocks());
 describe('GET /api/scenarios/:id/comments', () => {
   it('returns comments for a scenario owned by the caller', async () => {
     mockPrisma.scenario.findUnique.mockResolvedValue({ businessId: 'biz-aaa' });
-    mockVerifyBusinessOwnership.mockResolvedValue(true);
+    mockVerifyBusinessAccess.mockResolvedValue(true);
     mockPrisma.scenarioComment.findMany.mockResolvedValue([
       { id: 'c-1', scenarioId: 'sc-1', authorEmail: 'a@b.com', body: 'Looks good', createdAt: new Date() },
     ]);
@@ -39,9 +41,19 @@ describe('GET /api/scenarios/:id/comments', () => {
     expect(data).toHaveLength(1);
   });
 
+  it('returns comments for a caller with only viewer access — read access is not owner-only', async () => {
+    mockPrisma.scenario.findUnique.mockResolvedValue({ businessId: 'biz-aaa' });
+    mockVerifyBusinessAccess.mockResolvedValue(true);
+    mockPrisma.scenarioComment.findMany.mockResolvedValue([{ id: 'c-1' }]);
+
+    const res = await GET(new Request('http://localhost/api/scenarios/sc-1/comments'), makeParams('sc-1'));
+
+    expect(res.status).toBe(200);
+  });
+
   it('returns 404 when the scenario belongs to a different business (cross-tenant attack)', async () => {
     mockPrisma.scenario.findUnique.mockResolvedValue({ businessId: 'biz-not-mine' });
-    mockVerifyBusinessOwnership.mockResolvedValue(false);
+    mockVerifyBusinessAccess.mockResolvedValue(false);
 
     const res = await GET(new Request('http://localhost/api/scenarios/sc-1/comments'), makeParams('sc-1'));
 
@@ -99,6 +111,18 @@ describe('POST /api/scenarios/:id/comments', () => {
     mockVerifyBusinessOwnership.mockResolvedValue(false);
 
     const req = makeRequest({ body: 'Trying to inject a note' }, 'http://localhost/api/scenarios/sc-1/comments');
+    const res = await POST(req, makeParams('sc-1'));
+
+    expect(res.status).toBe(404);
+    expect(mockPrisma.scenarioComment.create).not.toHaveBeenCalled();
+  });
+
+  it('returns 404 for a caller with only viewer access — v1 viewers cannot write, even though they can read (privilege escalation attack)', async () => {
+    mockPrisma.scenario.findUnique.mockResolvedValue({ businessId: 'biz-aaa' });
+    mockVerifyBusinessAccess.mockResolvedValue(true); // can read...
+    mockVerifyBusinessOwnership.mockResolvedValue(false); // ...but not write
+
+    const req = makeRequest({ body: 'A viewer trying to write' }, 'http://localhost/api/scenarios/sc-1/comments');
     const res = await POST(req, makeParams('sc-1'));
 
     expect(res.status).toBe(404);
