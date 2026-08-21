@@ -10,6 +10,8 @@
  */
 export type * from './models/User'
 export type * from './models/Business'
+export type * from './models/TeamMember'
+export type * from './models/Invite'
 export type * from './models/Product'
 export type * from './models/Employee'
 export type * from './models/Scenario'

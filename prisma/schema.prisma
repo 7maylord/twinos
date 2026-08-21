@@ -31,6 +31,8 @@ model Business {
   scenarios         Scenario[]
   actionItems       ActionItem[]
   notifications     Notification[]
+  teamMembers       TeamMember[]
+  invites           Invite[]
 
   // QuickBooks Online Connection Details
   qboCompanyId               String?
@@ -48,6 +50,37 @@ model Business {
   squareAccessToken          String?
   squareRefreshToken         String?
   squareTokenExpiresAt       DateTime?
+}
+
+// A granted, standing access relationship — separate from Invite, which is
+// a not-yet-accepted token that grants nothing on its own. v1 has only one
+// role: read-only access matching exactly what the public share link
+// already exposes (see lib/auth-helpers.ts's verifyBusinessAccess /
+// getBusinessRole). The owner is not modeled here — that's Business.ownerId.
+model TeamMember {
+  id         String   @id @default(uuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  email      String
+  role       String   @default("viewer")
+  joinedAt   DateTime @default(now())
+
+  @@unique([businessId, email])
+}
+
+// A single-use, expiring, unguessable link an owner generates to grant one
+// person viewer access — not bound to a target email up front (nothing to
+// leak about who was invited), consumed on first accept.
+model Invite {
+  id              String    @id @default(uuid())
+  businessId      String
+  business        Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  token           String    @unique @default(uuid())
+  role            String    @default("viewer")
+  createdAt       DateTime  @default(now())
+  expiresAt       DateTime
+  acceptedAt      DateTime?
+  acceptedByEmail String?
 }
 
 model Product {
