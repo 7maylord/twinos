@@ -87,7 +87,16 @@ export async function getUserBusinesses() {
       },
     },
   });
-  return user?.businesses || [];
+  const owned = (user?.businesses || []).map((b) => ({ ...b, role: 'owner' as const }));
+
+  const memberships = await prisma.teamMember.findMany({
+    where: { email },
+    select: { business: { select: { id: true, name: true } } },
+    orderBy: { joinedAt: 'desc' },
+  });
+  const viewed = memberships.map((m) => ({ ...m.business, role: 'viewer' as const }));
+
+  return [...owned, ...viewed];
 }
 
 // Confirms a client-supplied businessId actually belongs to the caller, before
@@ -121,4 +130,79 @@ export async function verifyBusinessOwnership(businessId: string): Promise<boole
   }
 
   return false;
+}
+
+// Resolves owner-or-viewer access for read-only routes. Deliberately NOT
+// built on top of verifyBusinessOwnership (duplicates its owner + demo-mode
+// check instead) — this function is the read-access answer, and every
+// mutation route in the app still calls verifyBusinessOwnership directly, so
+// that function must stay exactly as it was before team access existed. Never
+// use this to gate a write.
+export async function getBusinessRole(businessId: string): Promise<'owner' | 'viewer' | null> {
+  if (!businessId) return null;
+
+  if (await verifyBusinessOwnership(businessId)) return 'owner';
+
+  const email = await getActiveUserEmail();
+  const membership = await prisma.teamMember.findUnique({
+    where: { businessId_email: { businessId, email } },
+  });
+  return membership ? 'viewer' : null;
+}
+
+export async function verifyBusinessAccess(businessId: string): Promise<boolean> {
+  return (await getBusinessRole(businessId)) !== null;
+}
+
+// The viewer-inclusive counterpart to getActiveBusiness() for read-only
+// routes. getActiveBusiness() only ever resolves OWNED businesses and every
+// mutation route trusts its result implicitly with no further ownership
+// check — widening it in place would let a viewer with no businessId in the
+// request body silently operate on a business they can only view. This is a
+// separate function so that trust boundary never moves.
+//
+// Not composed from getActiveBusiness() either: when the caller owns at
+// least one business but the active-business-id cookie points to one they
+// only view, getActiveBusiness() falls back to their most-recently-created
+// OWNED business instead of respecting the cookie — reusing that here would
+// silently show an owner their own business instead of the viewed one they
+// actually selected. So this re-checks the cookie against both owned and
+// viewed businesses directly.
+export async function getViewableActiveBusinessId(): Promise<{ businessId: string; role: 'owner' | 'viewer' } | null> {
+  const email = await getActiveUserEmail();
+  const cookieStore = await cookies();
+  const activeBusinessId = cookieStore.get('active-business-id')?.value;
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: { businesses: { select: { id: true }, orderBy: { createdAt: 'desc' } } },
+  });
+  const ownedIds = user?.businesses.map((b) => b.id) || [];
+
+  if (activeBusinessId) {
+    if (ownedIds.includes(activeBusinessId)) {
+      return { businessId: activeBusinessId, role: 'owner' };
+    }
+    const membership = await prisma.teamMember.findUnique({
+      where: { businessId_email: { businessId: activeBusinessId, email } },
+    });
+    if (membership) return { businessId: activeBusinessId, role: 'viewer' };
+  }
+
+  if (ownedIds.length > 0) {
+    return { businessId: ownedIds[0], role: 'owner' };
+  }
+
+  const clerkConfigured = !!(process.env.CLERK_SECRET_KEY && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  if (!clerkConfigured && email === 'demo@twinos.com') {
+    if (activeBusinessId) {
+      const byId = await prisma.business.findUnique({ where: { id: activeBusinessId }, select: { id: true } });
+      if (byId) return { businessId: byId.id, role: 'owner' };
+    }
+    const first = await prisma.business.findFirst({ select: { id: true } });
+    return first ? { businessId: first.id, role: 'owner' } : null;
+  }
+
+  const anyMembership = await prisma.teamMember.findFirst({ where: { email }, orderBy: { joinedAt: 'desc' } });
+  return anyMembership ? { businessId: anyMembership.businessId, role: 'viewer' } : null;
 }
