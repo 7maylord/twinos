@@ -5,7 +5,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { LogoIcon } from '@/components/logo';
 
-type Status = 'loading' | 'success' | 'error';
+// Loading/confirm/accepting/success/error. The GET preview on mount is safe
+// (no side effects) — it exists specifically so accepting stays behind an
+// explicit click. Link unfurlers and corporate mail scanners routinely visit
+// URLs with no real user behind them; auto-accepting on page load would let
+// any of those silently burn this single-use invite before a real person
+// ever saw it.
+type Status = 'loading' | 'confirm' | 'accepting' | 'success' | 'error';
 
 export default function InviteAcceptPage() {
   const { token } = useParams<{ token: string }>();
@@ -15,13 +21,9 @@ export default function InviteAcceptPage() {
   const [businessName, setBusinessName] = useState('');
 
   useEffect(() => {
-    async function accept() {
+    async function preview() {
       try {
-        const res = await fetch('/api/team/accept', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
-        });
+        const res = await fetch(`/api/team/accept?token=${encodeURIComponent(token)}`);
         const data = await res.json();
         if (!res.ok) {
           setStatus('error');
@@ -29,14 +31,36 @@ export default function InviteAcceptPage() {
           return;
         }
         setBusinessName(data.businessName || 'this business');
-        setStatus('success');
+        setStatus('confirm');
       } catch {
         setStatus('error');
         setMessage('Something went wrong. Please try again.');
       }
     }
-    accept();
+    preview();
   }, [token]);
+
+  async function handleAccept() {
+    setStatus('accepting');
+    try {
+      const res = await fetch('/api/team/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setStatus('error');
+        setMessage(data.error || 'This invite link could not be used.');
+        return;
+      }
+      setBusinessName(data.businessName || businessName);
+      setStatus('success');
+    } catch {
+      setStatus('error');
+      setMessage('Something went wrong. Please try again.');
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center p-6">
@@ -48,7 +72,30 @@ export default function InviteAcceptPage() {
         {status === 'loading' && (
           <>
             <Loader2 className="w-10 h-10 text-gray-400 mx-auto mb-4 animate-spin" />
-            <p className="text-gray-600">Verifying your invite...</p>
+            <p className="text-gray-600">Checking your invite...</p>
+          </>
+        )}
+
+        {status === 'confirm' && (
+          <>
+            <h1 className="text-xl font-medium text-black mb-2">You've been invited</h1>
+            <p className="text-gray-500 text-sm mb-6">
+              Join <span className="font-medium text-black">{businessName}</span> as a viewer? You'll be able to see
+              scenarios and results, but not edit anything.
+            </p>
+            <button
+              onClick={handleAccept}
+              className="w-full py-2.5 px-4 bg-black hover:bg-gray-800 text-white rounded-full font-medium text-sm transition-colors"
+            >
+              Accept & Join
+            </button>
+          </>
+        )}
+
+        {status === 'accepting' && (
+          <>
+            <Loader2 className="w-10 h-10 text-gray-400 mx-auto mb-4 animate-spin" />
+            <p className="text-gray-600">Joining...</p>
           </>
         )}
 
